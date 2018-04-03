@@ -1,0 +1,4 @@
+name: MCE
+main: facejup.mce.main.Main
+author: facejup
+version: 1.12
