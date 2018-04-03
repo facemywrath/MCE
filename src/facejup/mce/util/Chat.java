@@ -7,7 +7,15 @@ public class Chat {
 	
 	public static void bc(String str)
 	{
-		Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', str));
+		Bukkit.broadcastMessage(translate(str));
 	}
 
+	public static String translate(String str)
+	{
+		ChatColor.translateAlternateColorCodes('&', str);
+		return str;
+	}
+	
+	
+	
 }

@@ -1,8 +1,5 @@
 package facejup.mce.storage;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
@@ -92,4 +89,9 @@ public class EndTimer {
 		}
 	}
 
+	public boolean isRunning() 
+	{
+		return this.running;
+	}
+	
 }

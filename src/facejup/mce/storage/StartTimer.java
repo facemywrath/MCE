@@ -42,37 +42,37 @@ public class StartTimer {
 				switch(time)
 				{
 				case 600:
-					Chat.bc(tag + "Ten minutes left in the match!");
+					Chat.bc(tag + "Ten minutes left until the match begins!");
 					break;
 				case 300:
-					Chat.bc(tag + "Five minutes left in the match!");
+					Chat.bc(tag + "Five minutes left until the match begins!");
 					break;
 				case 120:
-					Chat.bc(tag + "Two minutes left in the match!");
+					Chat.bc(tag + "Two minutes left until the match begins!");
 					break;
 				case 60:
-					Chat.bc(tag + "One minute left in the match!");
+					Chat.bc(tag + "One minute left until the match begins!");
 					break;
 				case 30:
-					Chat.bc(tag + "30 seconds left in the match!");
+					Chat.bc(tag + "30 seconds left until the match begins!");
 					break;
 				case 10:
-					Chat.bc(tag + "10 seconds left in the match!");
+					Chat.bc(tag + "10 seconds left until the match begins!");
 					break;
 				case 5:
-					Chat.bc(tag + "5 seconds left in the match!");
+					Chat.bc(tag + "5 seconds left until the match begins!");
 					break;
 				case 4:
-					Chat.bc(tag + "4 seconds left in the match!");
+					Chat.bc(tag + "4 seconds left until the match begins!");
 					break;
 				case 3:
-					Chat.bc(tag + "3 seconds left in the match!");
+					Chat.bc(tag + "3 seconds left until the match begins!");
 					break;
 				case 2:
-					Chat.bc(tag + "2 seconds left in the match!");
+					Chat.bc(tag + "2 seconds left until the match begins!");
 					break;
 				case 1:
-					Chat.bc(tag + "1 seconds left in the match!");
+					Chat.bc(tag + "1 second left until the match begins!");
 					break;
 				}
 				time--;
@@ -95,4 +95,9 @@ public class StartTimer {
 		}
 	}
 
+	public boolean isRunning() 
+	{
+		return this.running;
+	}
+	
 }

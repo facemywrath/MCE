@@ -1,4 +1,4 @@
-package facejup.mce.inventory;
+package facejup.mce.util;
 
 import java.util.ArrayList;
 import java.util.List;
