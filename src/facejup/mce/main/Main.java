@@ -11,6 +11,7 @@ public class Main extends JavaPlugin {
 	public void onEnable()
 	{
 		startTimer = new StartTimer(this); // Instantiate the timer.
+		System.out.println("x");
 	}
 
 }
