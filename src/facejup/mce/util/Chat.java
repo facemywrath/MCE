@@ -12,8 +12,8 @@ public class Chat {
 
 	public static String translate(String str)
 	{
-		ChatColor.translateAlternateColorCodes('&', str);
-		return str;
+		
+		return ChatColor.translateAlternateColorCodes('&', str);
 	}
 	
 	

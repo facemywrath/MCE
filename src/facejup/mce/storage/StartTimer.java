@@ -1,15 +1,16 @@
 package facejup.mce.storage;
 
+import org.bukkit.Bukkit;
+
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
 
 public class StartTimer {
 
-
-	private final int WAIT_TIME = 900; // Timer start time.
+	private final int WAIT_TIME = 180; // Timer start time.
 	private final int LINGER_TIME = 60; // Time needed to wait if there are not enough players ready.
-	private final String tag = "&9&l[&r&bMCE&9&l] &2&o";
+	private final String tag = "&9&l(&r&bMCE&9&l) &a&o";
 
 	private Main main; // Dependency Injection variable.
 	private MatchManager mm; // Other Dependency Injection.
@@ -18,13 +19,17 @@ public class StartTimer {
 	private boolean running = false; // Whether or not the timer is running.
 
 	public StartTimer(Main main, MatchManager mm) {
-		this.mm = mm;
+		this.mm = mm; // Store the match manager instance.
 		this.main = main; // Store the current running instance of main.
 	}
 
 	public void startTimer()
 	{
+		//TODO: End the end timer if it's running and start the countdown until the next match begins.
+		if(main.getMatchManager().getEndTimer().isRunning())
+			main.getMatchManager().getEndTimer().stopTimer();
 		time = WAIT_TIME;
+		running = true;
 		countdown();
 	}
 
@@ -41,11 +46,8 @@ public class StartTimer {
 			{
 				switch(time)
 				{
-				case 600:
-					Chat.bc(tag + "Ten minutes left until the match begins!");
-					break;
-				case 300:
-					Chat.bc(tag + "Five minutes left until the match begins!");
+				case 180:
+					Chat.bc(tag + "Three minutes left until the match begins!");
 					break;
 				case 120:
 					Chat.bc(tag + "Two minutes left until the match begins!");
@@ -82,14 +84,15 @@ public class StartTimer {
 					{
 						countdown();
 					}
-				}, 20L);
+				}, 1L);
 			}
 			else
 			{
 				if(mm.getPlayerCount() < mm.MIN_PLAYERS)
 				{
 					time = LINGER_TIME;
-					Chat.bc(tag + "Not enough players ready to begin a match.");
+					Chat.bc(tag + "&cNot enough players in queue to begin a match. Please select a kit with the &5&lKit Selector &cto join queue.");
+					countdown();
 				}
 			}
 		}

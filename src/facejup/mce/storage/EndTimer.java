@@ -22,7 +22,10 @@ public class EndTimer {
 
 	public void startTimer()
 	{
+		if(main.getMatchManager().getStartTimer().isRunning())
+			main.getMatchManager().getStartTimer().stopTimer();
 		time = MATCH_TIME;
+		running = true;
 		countdown();
 	}
 	
