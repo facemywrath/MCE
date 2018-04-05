@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import facejup.mce.kits.Kit;
 import facejup.mce.main.Main;
-import facejup.mce.storage.User;
+import facejup.mce.players.User;
 
 public class InventoryListeners implements Listener {
 	

@@ -1,4 +1,4 @@
-package facejup.mce.storage;
+package facejup.mce.players;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import facejup.mce.kits.Kit;
-import facejup.mce.main.UserManager;
 
 public class User {
 

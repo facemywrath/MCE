@@ -1,4 +1,4 @@
-package facejup.mce.storage;
+package facejup.mce.timers;
 
 import org.bukkit.Bukkit;
 
@@ -84,7 +84,7 @@ public class StartTimer {
 					{
 						countdown();
 					}
-				}, 1L);
+				}, 20L);
 			}
 			else
 			{
@@ -93,6 +93,10 @@ public class StartTimer {
 					time = LINGER_TIME;
 					Chat.bc(tag + "&cNot enough players in queue to begin a match. Please select a kit with the &5&lKit Selector &cto join queue.");
 					countdown();
+				}
+				else
+				{
+					mm.startMatch();
 				}
 			}
 		}

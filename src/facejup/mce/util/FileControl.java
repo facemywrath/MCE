@@ -87,5 +87,13 @@ public class FileControl {
 			}
 			catch(Exception e) {}
 		}
+		file = new File(main.getDataFolder(), "maps.yml");
+		if(!file.exists())
+		{
+			try {
+				file.createNewFile();
+			}
+			catch(Exception e) {}
+		}
 	}
 }

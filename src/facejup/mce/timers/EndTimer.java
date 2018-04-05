@@ -1,4 +1,4 @@
-package facejup.mce.storage;
+package facejup.mce.timers;
 
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;

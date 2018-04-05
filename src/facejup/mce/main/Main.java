@@ -3,6 +3,7 @@ package facejup.mce.main;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import facejup.mce.listeners.EventManager;
+import facejup.mce.players.UserManager;
 
 public class Main extends JavaPlugin {
 	

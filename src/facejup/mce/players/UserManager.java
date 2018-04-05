@@ -1,4 +1,4 @@
-package facejup.mce.main;
+package facejup.mce.players;
 
 import java.io.File;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import facejup.mce.kits.Kit;
-import facejup.mce.storage.User;
+import facejup.mce.main.Main;
 import facejup.mce.util.FileControl;
 
 public class UserManager implements Listener {
