@@ -1,7 +1,5 @@
 package facejup.mce.timers;
 
-import org.bukkit.Bukkit;
-
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
@@ -88,7 +86,7 @@ public class StartTimer {
 			}
 			else
 			{
-				if(mm.getPlayerCount() < mm.MIN_PLAYERS)
+				if(mm.getPlayersQueued() < mm.MIN_PLAYERS)
 				{
 					time = LINGER_TIME;
 					Chat.bc(tag + "&cNot enough players in queue to begin a match. Please select a kit with the &5&lKit Selector &cto join queue.");

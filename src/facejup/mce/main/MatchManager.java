@@ -57,6 +57,13 @@ public class MatchManager {
 				
 			}
 		}
+		else
+		{
+			if(am.getMaxSpawnPoints() > desiredKits.keySet().size())
+			{
+				
+			}
+		}
 	}
 
 	public void setPlayerKit(Player player, Kit kit)

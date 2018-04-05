@@ -3,6 +3,7 @@ package facejup.mce.maps;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,11 +32,13 @@ public class ArenaManager {
 	
 	public int getMaxSpawnPoints()
 	{
-		List<List<Location>> spawns = new ArrayList<>();
+		List<Integer> spawns = new ArrayList<>();
 		for(String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false))
 		{
-			
+			spawns.add(fc.getConfig().getConfigurationSection("Arenas." + str).getKeys(false).size());
 		}
+		Optional<Integer> i = spawns.stream().max(Integer::compare);
+		return i.get();
 	}
 	
 	public Arena getArena()
