@@ -83,6 +83,13 @@ public class MatchManager {
 		return Kit.NONE;
 	}
 
+	public Kit getPlayerDesiredKit(Player player)
+	{
+		if(desiredKits.containsKey(player))
+			return desiredKits.get(player);
+		return Kit.NONE;
+	}
+
 	public StartTimer getStartTimer()
 	{
 		return this.startTimer;
