@@ -7,6 +7,7 @@ public class EventManager {
 	private Main main; // Dependency Injection Variable
 	
 	private InventoryListeners invListener; // Inventory Listener
+	private ArenaModListener aml;
 	
 	public EventManager(Main main)
 	{
@@ -19,6 +20,7 @@ public class EventManager {
 	{
 		//TODO: Instantiate the listener variables.
 		invListener = new InventoryListeners(this);
+		aml = new ArenaModListener(this);
 	}
 	
 	public Main getMain() 

@@ -7,12 +7,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
-import facejup.mce.util.Chat;
 import facejup.mce.util.InventoryBuilder;
 import facejup.mce.util.ItemCreator;
 
@@ -61,6 +62,24 @@ public class InventoryListeners implements Listener {
 		if(event.getPlayer().isOp())
 			return;
 		event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void playerPickupItem(PlayerPickupItemEvent event)
+	{
+		if(event.getPlayer().isOp())
+			return;
+		event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void playerRespawn(PlayerRespawnEvent event)
+	{
+		Player player = event.getPlayer();
+		if(main.getMatchManager().getLives(player) > 0 && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE)
+		{
+			main.getMatchManager().spawnPlayer(player);
+		}
 	}
 	
 	//Event Handlers

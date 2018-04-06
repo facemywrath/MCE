@@ -1,5 +1,7 @@
 package facejup.mce.listeners;
 
+import java.util.HashMap;
+
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -11,10 +13,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import facejup.mce.arenas.ArenaManager;
 import facejup.mce.commands.CommandArena;
 import facejup.mce.enums.AddType;
+import facejup.mce.util.Chat;
 
 public class ArenaModListener implements Listener{
 
 	private EventManager em;
+	private HashMap<Player, Long> cooldown = new HashMap<>();
 	
 	public ArenaModListener(EventManager em) {
 		this.em = em;
@@ -29,8 +33,9 @@ public class ArenaModListener implements Listener{
 		ArenaManager am = em.getMain().getMatchManager().getArenaManager();
 		CommandArena ca = em.getMain().getCommandManager().getCommandArena();
 		
-		if (ca.adding.containsKey(event.getPlayer()) && ca.arenaAdd.containsKey(event.getPlayer())) {
+		if ((!cooldown.containsKey(event.getPlayer()) || cooldown.get(event.getPlayer()) + 1000 <= System.currentTimeMillis()) && ca.adding.containsKey(event.getPlayer()) && ca.arenaAdd.containsKey(event.getPlayer())) {
 			Player player = event.getPlayer();
+			cooldown.put(player, System.currentTimeMillis());
 			Location loc = event.getClickedBlock().getLocation();
 			ConfigurationSection section = am.getArenaSection(ca.arenaAdd.get(player));
 			if (ca.adding.get(player) == AddType.BOUND1) {
@@ -39,14 +44,17 @@ public class ArenaModListener implements Listener{
 				section.set("Bound1.z", loc.getZ());
 				am.getFileControl().save();
 				ca.adding.put(player, AddType.BOUND2);
-				//TODO Tell player added to bound 2
+				player.sendMessage(Chat.translate("&9&l(&r&bMCE&9&l) &aBound 1 set at " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + ". Now you must select the second bounding coordinate."));
+				return;
 			} else if (ca.adding.get(player) == AddType.BOUND2) {
 				section.set("Bound2.x", loc.getX());
 				section.set("Bound2.y", loc.getY());
 				section.set("Bound2.z", loc.getZ());
-				am.getFileControl().save();
+				am.getFileControl().save();				
+				player.sendMessage(Chat.translate("&9&l(&r&bMCE&9&l) &aBound 2 set at " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + ". Now you can add spawn points with &7/arena spawn add " + ca.arenaAdd.get(player)));
 				ca.adding.remove(player);
 				ca.arenaAdd.remove(player);
+				return;
 			}
 		}
 		

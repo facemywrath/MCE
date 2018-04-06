@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.AddType;
 import facejup.mce.players.User;
+import facejup.mce.util.Chat;
 
 public class CommandArena implements CommandExecutor{
 
@@ -57,6 +58,7 @@ public class CommandArena implements CommandExecutor{
 			am.createArena(name);
 			adding.put(player, AddType.BOUND1);
 			arenaAdd.put(player, name);
+			player.sendMessage(Chat.translate("&9(&bMCE&9) &aArena " + name + " created. Now you must select the first bounding coordinate."));
 			return true;
 		}
 		if (args[0].equalsIgnoreCase("set")) 
@@ -137,7 +139,7 @@ public class CommandArena implements CommandExecutor{
 				return true;
 			}
 		}
-		if (args[0].equalsIgnoreCase("toggle"))
+		if (args[0].equalsIgnoreCase("togglestart"))
 		{
 			if (cm.getMain().getMatchManager().getEndTimer().isRunning()) {
 				// TODO Tell player only toggleable between matches!
@@ -150,6 +152,24 @@ public class CommandArena implements CommandExecutor{
 				return true;
 			} else {
 				cm.getMain().getMatchManager().startTimer.resumeTimer();
+			}
+			return true;
+		}
+		if (args[0].equalsIgnoreCase("toggleend"))
+		{
+			if (!cm.getMain().getMatchManager().getStartTimer().isRunning()) {
+				// TODO Tell player only toggleable between matches!
+				return true;
+			}
+			if (cm.getMain().getMatchManager().getStartTimer().isRunning()) {
+				cm.getMain().getMatchManager().getStartTimer().stopTimer();
+				cm.getMain().getMatchManager().getEndTimer().startTimer();
+				sender.sendMessage("test");
+				// TODO Tell player it's stopped!
+				return true;
+			} else {
+				cm.getMain().getMatchManager().startTimer.resumeTimer();
+				cm.getMain().getMatchManager().getEndTimer().stopTimer();
 			}
 			return true;
 		}

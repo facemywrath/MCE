@@ -34,15 +34,14 @@ public class ArenaManager {
 	{
 		FileConfiguration config = fc.getConfig();
 		config.set("Arenas." + (getArenaCount() + 1) + ".Name", arenaname);
-		fc.save();
+		fc.save(config);
 	}
 
 	public ConfigurationSection getArenaSection(String arenaname)
 	{
-		FileConfiguration config = fc.getConfig();
-		for (String str : config.getConfigurationSection("Arenas").getKeys(false)) {
-			if (config.getString("Arenas." + str + ".Name").equalsIgnoreCase(arenaname))
-				return config.getConfigurationSection("Arenas." + str);
+		for (String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false)) {
+			if (fc.getConfig().getString("Arenas." + str + ".Name").equalsIgnoreCase(arenaname))
+				return fc.getConfig().getConfigurationSection("Arenas." + str);
 		}
 		return null;
 	}
