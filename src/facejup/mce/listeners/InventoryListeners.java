@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import facejup.mce.kits.Kit;
+import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
 
@@ -27,7 +27,6 @@ public class InventoryListeners implements Listener {
 	}
 	
 	//Event Handlers
-	
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
 	{

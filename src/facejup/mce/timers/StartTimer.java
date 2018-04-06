@@ -31,6 +31,11 @@ public class StartTimer {
 		countdown();
 	}
 
+	public void resumeTimer() {
+		this.running = true;
+		countdown();
+	}
+	
 	public void stopTimer()
 	{
 		this.running = false;

@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import facejup.mce.kits.Kit;
+import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.util.FileControl;
 

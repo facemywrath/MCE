@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import facejup.mce.kits.Kit;
+import com.google.common.collect.Lists;
+
+import facejup.mce.enums.Kit;
 import facejup.mce.maps.Arena;
 import facejup.mce.maps.ArenaManager;
 import facejup.mce.timers.EndTimer;
@@ -54,7 +57,7 @@ public class MatchManager {
 		{
 			for(Player player : desiredKits.keySet())
 			{
-				
+				spawnPlayer(player);
 			}
 		}
 		else
@@ -65,7 +68,39 @@ public class MatchManager {
 			}
 		}
 	}
-
+	
+	public void spawnPlayer(Player player) 
+	{
+		if (!lives.containsKey(player))
+			return;
+		if (lives.get(player) == 0) {
+			lives.remove(player);
+			kits.put(player, Kit.NONE);
+		}
+		if (desiredKits.containsKey(player)) {
+			kits.put(player, desiredKits.get(player));
+			desiredKits.remove(player);
+		} else if (!(kits.containsKey(player)) || kits.get(player) == Kit.NONE)
+			return;
+		if (am.getArena() == null)
+			return;
+		final Location loc = am.getArena().getRandomSpawn();
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+			
+			public void run() {
+				player.teleport(loc);
+				player.getInventory().clear();
+				Kit kit = kits.get(player);
+				kit.storage.stream().forEach(item -> player.getInventory().addItem(item));
+				player.getInventory().setHelmet(kit.helmet);
+				player.getInventory().setChestplate(kit.chestplate);
+				player.getInventory().setLeggings(kit.leggings);
+				player.getInventory().setBoots(kit.boots);
+			}
+			
+		}, 5L);
+	}
+	
 	public void setPlayerKit(Player player, Kit kit)
 	{
 		this.kits.put(player, kit);
@@ -76,6 +111,10 @@ public class MatchManager {
 		this.desiredKits.put(player, kit);
 	}
 
+	public ArenaManager getArenaManager() {
+		return this.am;
+	}
+	
 	public Kit getPlayerKit(Player player)
 	{
 		if(kits.containsKey(player))

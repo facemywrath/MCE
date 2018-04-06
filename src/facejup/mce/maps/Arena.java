@@ -18,12 +18,16 @@ public class Arena {
 	
 	private ConfigurationSection section;
 	private World world;
+	private Location bound1;
+	private Location bound2;
 	
 	public Arena(ArenaManager am, ConfigurationSection section)
 	{
 		this.am = am;
 		this.section = section;
 		this.world = Bukkit.getWorld(section.getString("World"));
+		this.bound1 = new Location(world, section.getDouble("Bound1.x"), section.getDouble("Bound1.y"), section.getDouble("Bound1.z"));
+		this.bound2 = new Location(world, section.getDouble("Bound2.x"), section.getDouble("Bound2.y"), section.getDouble("Bound2.z"));
 	}
 	
 	public Location getRandomSpawn()

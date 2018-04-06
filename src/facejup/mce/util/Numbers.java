@@ -9,4 +9,13 @@ public class Numbers {
 		return random.nextInt((upper - lower) + 1) + lower;
 	}
 
+	public static boolean isInt(String s) {
+		try {
+			Integer.parseInt(s);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+	
 }

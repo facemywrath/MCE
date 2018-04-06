@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.FileControl;
@@ -30,6 +30,33 @@ public class ArenaManager {
 		return this.mm;
 	}
 	
+	public void createArena(String arenaname)
+	{
+		FileConfiguration config = fc.getConfig();
+		config.set("Arenas." + (getArenaCount() + 1) + ".Name", arenaname);
+		fc.save();
+	}
+	
+	public ConfigurationSection getArenaSection(String arenaname)
+	{
+		FileConfiguration config = fc.getConfig();
+		for (String str : config.getConfigurationSection("Arenas").getKeys(false)) {
+			if (config.getString("Arenas." + str + ".Name").equalsIgnoreCase(arenaname))
+				return config.getConfigurationSection("Arenas." + str);
+		}
+		return null;
+	}
+	
+	public FileControl getFileControl() 
+	{
+		return this.fc;
+	}
+	
+	public int getArenaCount()
+	{
+		return fc.getConfig().getConfigurationSection("Arenas").getKeys(false).size();
+	}
+	
 	public int getMaxSpawnPoints()
 	{
 		List<Integer> spawns = new ArrayList<>();
@@ -39,6 +66,10 @@ public class ArenaManager {
 		}
 		Optional<Integer> i = spawns.stream().max(Integer::compare);
 		return i.get();
+	}
+	
+	public int getSpawnCount(ConfigurationSection section) {
+		return section.getConfigurationSection("SpawnPoints").getKeys(false).size();
 	}
 	
 	public Arena getArena()

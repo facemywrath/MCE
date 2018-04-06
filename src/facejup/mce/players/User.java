@@ -8,7 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import facejup.mce.kits.Kit;
+import facejup.mce.enums.Kit;
 
 public class User {
 
