@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -18,10 +19,10 @@ import facejup.mce.util.InventoryBuilder;
 import facejup.mce.util.ItemCreator;
 
 public class InventoryListeners implements Listener {
-	
+
 	private Main main; // Dependency Injection Variable
 	private EventManager em; // Other Dependency Injection Variable
-	
+
 	public InventoryListeners(EventManager eventManager)
 	{
 		//TODO: Constructor which saves the dep inj and registers this instance as a listener.
@@ -29,7 +30,7 @@ public class InventoryListeners implements Listener {
 		this.em = eventManager;
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
-	
+
 	@EventHandler
 	public void invClick(InventoryClickEvent event)
 	{
@@ -55,7 +56,7 @@ public class InventoryListeners implements Listener {
 			player.openInventory(InventoryBuilder.createKitInventory(player));
 		}
 	}
-	
+
 	@EventHandler
 	public void playerDropItem(PlayerDropItemEvent event)
 	{
@@ -63,7 +64,7 @@ public class InventoryListeners implements Listener {
 			return;
 		event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void playerPickupItem(PlayerPickupItemEvent event)
 	{
@@ -71,7 +72,7 @@ public class InventoryListeners implements Listener {
 			return;
 		event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void playerRespawn(PlayerRespawnEvent event)
 	{
@@ -81,7 +82,21 @@ public class InventoryListeners implements Listener {
 			main.getMatchManager().spawnPlayer(player);
 		}
 	}
-	
+
+	@EventHandler
+	public void playerDeathEvent(PlayerDeathEvent event) {
+
+		if (!(event.getEntity().getKiller() instanceof Player)) {
+			return;
+		}
+		
+		Player killer = event.getEntity().getKiller();
+		Player player = event.getEntity();
+		main.getMatchManager().decLives(player);
+		main.getUserManager().getUser(player).incDeaths();
+		main.getUserManager().getUser(killer).incKills();
+	}
+
 	//Event Handlers
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
@@ -99,6 +114,6 @@ public class InventoryListeners implements Listener {
 			}
 		}
 	}
-	
+
 
 }

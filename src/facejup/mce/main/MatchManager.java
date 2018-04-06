@@ -71,11 +71,11 @@ public class MatchManager {
 		{
 			if(am.getMaxSpawnPoints() > desiredKits.keySet().size())
 			{
-				
+
 			}
 		}
 	}
-	
+
 	public void spawnPlayer(Player player) 
 	{
 		if (!lives.containsKey(player))
@@ -92,7 +92,7 @@ public class MatchManager {
 		//	return;
 		//final Location loc = am.getArena().getRandomSpawn();
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
-			
+
 			public void run() {
 				player.getInventory().clear();
 				Kit kit = kits.get(player);
@@ -103,10 +103,10 @@ public class MatchManager {
 				player.getInventory().setBoots(kit.boots);
 				//player.teleport(loc);
 			}
-			
+
 		}, 5L);
 	}
-	
+
 	public void setPlayerKit(Player player, Kit kit)
 	{
 		this.kits.put(player, kit);
@@ -120,19 +120,25 @@ public class MatchManager {
 	public ArenaManager getArenaManager() {
 		return this.am;
 	}
-	
+
 	public void setLives(Player player, int i)
 	{
 		lives.put(player, i);
 	}
-	
+
 	public int getLives(Player player)
 	{
 		if(lives.containsKey(player))
 			return lives.get(player);
 		return 0;
 	}
-	
+
+	public void decLives(Player player) {
+		if(lives.containsKey(player))
+			if((lives.get(player) - 1) >= 0)
+				lives.put(player, (lives.get(player) - 1));
+	}
+
 	public Kit getPlayerKit(Player player)
 	{
 		if(kits.containsKey(player))

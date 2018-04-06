@@ -84,6 +84,16 @@ public class User {
 		return 0;
 	}
 	
+	public void incKills() {
+		if(section.contains("Kills"))
+			section.set("Kills", (section.getInt("Kills")) + 1);
+	}
+	
+	public void incDeaths() {
+		if(section.contains("Deaths"))
+			section.set("Deaths", (section.getInt("Deaths")) + 1);
+	}
+	
 	public int getKills()
 	{
 		if(section.contains("Kills"))
