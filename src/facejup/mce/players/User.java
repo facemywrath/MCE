@@ -34,6 +34,8 @@ public class User {
 			{
 				// Otherwise, set their default information and save. Then store their section.
 				config.set("Users." + player.getUniqueId() + ".Name", player.getName());
+				config.set("Users." + player.getUniqueId() + ".Kills", 0);
+				config.set("Users." + player.getUniqueId() + ".Deaths", 0);
 				config.set("Users." + player.getUniqueId() + ".Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
 				um.getFileControl().save(config);
 				this.section = config.getConfigurationSection("Users." + player.getUniqueId());
@@ -57,6 +59,20 @@ public class User {
 		{
 			section.set("Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
 		}
+	}
+	
+	public int getKills()
+	{
+		if(section.contains("Kills"))
+			return section.getInt("Kills");
+		return 0;
+	}
+	
+	public int getDeaths()
+	{
+		if(section.contains("Deaths"))
+			return section.getInt("Deaths");
+		return 0;
 	}
 	
 	public List<Kit> getKits()

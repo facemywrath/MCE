@@ -33,7 +33,7 @@ public class ItemCreator{
 	public ItemCreator setDisplayname(String display)
 	{
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(display);
+		meta.setDisplayName(Chat.translate(display));
 		item.setItemMeta(meta);
 		return this;
 	}
