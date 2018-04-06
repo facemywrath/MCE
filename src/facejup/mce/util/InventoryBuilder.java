@@ -70,7 +70,9 @@ public class InventoryBuilder {
 		InventoryBuilder ib = new InventoryBuilder(player, "Kits", 2);
 		for (Kit tester : Kit.values()) {
 			String name = StringUtils.capitalize(tester.toString().toLowerCase());
-			ItemCreator item = new ItemCreator(tester.icon).hideFlags(63).setDisplayname((kit == tester)?"&6Kit: " + name:(user.hasKit(tester)?"&2Kit: " + name:"&4Locked: " + name)).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":(user.hasKit(tester)?"&a&lClick to select":(user.getCoins() >= tester.cost?"&aCost: " + tester.cost:"&4Cost: " + tester.cost))), (user.hasKit(tester)?"":user.getCoins() >= tester.cost?"&6Click to purchase!":"&4Your coins: " + user.getCoins())));
+			if(tester == Kit.NONE && main.getMatchManager().getEndTimer().isRunning())
+				continue;
+			ItemCreator item = new ItemCreator(tester.icon).hideFlags(63).setDisplayname((kit == tester)?"&6Kit: " + name:(user.hasKit(tester)?"&2Kit: " + name:"&4Locked: " + name)).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":(user.hasKit(tester)?"&a&lClick to select":(user.getCoins() >= tester.cost?"&aCost: " + tester.cost:"&4Cost: " + tester.cost))), (user.hasKit(tester)?"":(user.getCoins() >= tester.cost?"&aYour coins: " + user.getCoins():"&4Your coins: " + user.getCoins())), (user.hasKit(tester)?"":(user.getCoins() >= tester.cost)?"&6Click to purchase!":"")));
 			if (kit == tester)
 				item.addGlowing();
 			ib.setItem(tester.slot, item.getItem());

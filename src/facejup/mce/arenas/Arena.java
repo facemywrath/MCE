@@ -1,4 +1,4 @@
-package facejup.mce.maps;
+package facejup.mce.arenas;
 
 import java.util.ArrayList;
 import java.util.List;

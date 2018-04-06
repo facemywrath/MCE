@@ -1,4 +1,4 @@
-package facejup.mce.maps;
+package facejup.mce.arenas;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,30 +13,30 @@ import facejup.mce.util.FileControl;
 import facejup.mce.util.Numbers;
 
 public class ArenaManager {
-	
+
 	private MatchManager mm;
-	
+
 	private FileControl fc;
 	private Arena arena;
-	
+
 	public ArenaManager(MatchManager mm)
 	{
 		this.mm = mm;
 		fc = new FileControl(new File(mm.getMain().getDataFolder(), "maps.yml"));
 	}
-	
+
 	public MatchManager getMatchManager()
 	{
 		return this.mm;
 	}
-	
+
 	public void createArena(String arenaname)
 	{
 		FileConfiguration config = fc.getConfig();
 		config.set("Arenas." + (getArenaCount() + 1) + ".Name", arenaname);
 		fc.save();
 	}
-	
+
 	public ConfigurationSection getArenaSection(String arenaname)
 	{
 		FileConfiguration config = fc.getConfig();
@@ -46,17 +46,19 @@ public class ArenaManager {
 		}
 		return null;
 	}
-	
+
 	public FileControl getFileControl() 
 	{
 		return this.fc;
 	}
-	
+
 	public int getArenaCount()
 	{
-		return fc.getConfig().getConfigurationSection("Arenas").getKeys(false).size();
+		if(fc.getConfig().contains("Arenas"))
+			return fc.getConfig().getConfigurationSection("Arenas").getKeys(false).size();
+		return 0;
 	}
-	
+
 	public int getMaxSpawnPoints()
 	{
 		List<Integer> spawns = new ArrayList<>();
@@ -67,16 +69,18 @@ public class ArenaManager {
 		Optional<Integer> i = spawns.stream().max(Integer::compare);
 		return i.get();
 	}
-	
+
 	public int getSpawnCount(ConfigurationSection section) {
-		return section.getConfigurationSection("SpawnPoints").getKeys(false).size();
+		if(section.contains("SpawnPoints"))
+			return section.getConfigurationSection("SpawnPoints").getKeys(false).size();
+		return 0;
 	}
-	
+
 	public Arena getArena()
 	{
 		return this.arena;
 	}
-	
+
 	public Arena getRandomArena(int playercount)
 	{
 		List<ConfigurationSection> arenas = getArenasBigEnough(playercount);
@@ -88,10 +92,12 @@ public class ArenaManager {
 		this.arena = new Arena(this, arenas.get(Numbers.getRandom(0, arenas.size()-1)));
 		return this.arena;
 	}
-	
+
 	public List<ConfigurationSection> getArenasBigEnough(int size)
 	{
 		List<ConfigurationSection> arenas = new ArrayList<>();
+		if(!fc.getConfig().contains("Arenas"))
+			return null;
 		for(String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false))
 		{
 			if(fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size() >= size)

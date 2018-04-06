@@ -1,8 +1,12 @@
 package facejup.mce.timers;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
+import facejup.mce.util.ItemCreator;
 
 public class StartTimer {
 
@@ -47,6 +51,11 @@ public class StartTimer {
 		{
 			if(time > 0)
 			{
+				for(Player player : Bukkit.getOnlinePlayers())
+				{
+					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
+						player.getInventory().setItem(8, ItemCreator.getKitSelector());
+				}
 				switch(time)
 				{
 				case 180:

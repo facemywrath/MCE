@@ -1,6 +1,7 @@
 package facejup.mce.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -100,5 +101,10 @@ public class ItemCreator{
 		net.minecraft.server.v1_12_R1.ItemStack itemnms = CraftItemStack.asNMSCopy(item);
 		NBTTagCompound tag = (itemnms.hasTag() ? itemnms.getTag() : new NBTTagCompound());
 		return tag.getByte(tagname);
+	}
+	
+	public static ItemStack getKitSelector()
+	{
+		return new ItemCreator(Material.COMPASS).setDisplayname("&5&lKit Selector").setLore(Arrays.asList("&7&oRightclick with this to", "&7&lopen the kit menu.")).getItem();
 	}
 }

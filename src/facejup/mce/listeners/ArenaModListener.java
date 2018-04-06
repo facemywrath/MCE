@@ -8,9 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import facejup.mce.arenas.ArenaManager;
 import facejup.mce.commands.CommandArena;
 import facejup.mce.enums.AddType;
-import facejup.mce.maps.ArenaManager;
 
 public class ArenaModListener implements Listener{
 

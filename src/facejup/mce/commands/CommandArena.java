@@ -9,8 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.AddType;
-import facejup.mce.maps.ArenaManager;
 import facejup.mce.players.User;
 
 public class CommandArena implements CommandExecutor{
@@ -155,6 +155,7 @@ public class CommandArena implements CommandExecutor{
 		}
 		if(args[0].equalsIgnoreCase("test"))
 		{
+			cm.getMain().getMatchManager().setLives(player, 5);
 			cm.getMain().getMatchManager().spawnPlayer(player);
 		}
 		return true;

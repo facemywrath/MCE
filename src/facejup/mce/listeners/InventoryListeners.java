@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -13,6 +14,7 @@ import facejup.mce.main.Main;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.InventoryBuilder;
+import facejup.mce.util.ItemCreator;
 
 public class InventoryListeners implements Listener {
 	
@@ -53,22 +55,28 @@ public class InventoryListeners implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void playerDropItem(PlayerDropItemEvent event)
+	{
+		if(event.getPlayer().isOp())
+			return;
+		event.setCancelled(true);
+	}
+	
 	//Event Handlers
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
 	{
 		//TODO: Open the custom inventory for kit selection.
-		if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
+		if(event.getAction().toString().contains("RIGHT_CLICK") && event.getPlayer().getInventory().getItemInMainHand().equals(ItemCreator.getKitSelector()))
 		{
 			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
 		}
 		if(event.getAction() == Action.LEFT_CLICK_BLOCK)
 		{
-			Chat.bc("1");
 			if(main.getUserManager().getUser(event.getPlayer()) != null)
 			{
-				Chat.bc("2");
-				main.getUserManager().getUser(event.getPlayer()).setCoins(10000);
+				main.getUserManager().getUser(event.getPlayer()).setCoins(3000);
 			}
 		}
 	}

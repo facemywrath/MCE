@@ -1,8 +1,12 @@
 package facejup.mce.timers;
 
+import org.bukkit.entity.Player;
+
+import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
+import facejup.mce.util.ItemCreator;
 
 public class EndTimer {
 
@@ -28,7 +32,7 @@ public class EndTimer {
 		running = true;
 		countdown();
 	}
-	
+
 	public void stopTimer()
 	{
 		this.running = false;
@@ -40,6 +44,19 @@ public class EndTimer {
 		{
 			if(time > 0)
 			{
+				for(Player player : mm.getPlayersAlive())
+				{
+					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
+						player.getInventory().setItem(8, ItemCreator.getKitSelector());
+					if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
+					{
+						Kit kit = mm.getPlayerKit(player);
+						if(kit.pot != null)
+						{
+							player.addPotionEffect(kit.pot);
+						}
+					}
+				}
 				switch(time)
 				{
 				case 600:
@@ -96,5 +113,5 @@ public class EndTimer {
 	{
 		return this.running;
 	}
-	
+
 }
