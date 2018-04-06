@@ -1,17 +1,18 @@
 package facejup.mce.listeners;
 
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
+import facejup.mce.util.Chat;
+import facejup.mce.util.InventoryBuilder;
 
 public class InventoryListeners implements Listener {
 	
@@ -26,12 +27,50 @@ public class InventoryListeners implements Listener {
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 	
+	@EventHandler
+	public void invClick(InventoryClickEvent event)
+	{
+		if(event.getClickedInventory() == null)
+			return;
+		Inventory inv = event.getClickedInventory();
+		if(!inv.getTitle().equals("Kits"))
+			return;
+		event.setCancelled(true);
+		Kit kit = InventoryBuilder.getKitBySlot(event.getSlot());
+		Player player = (Player) event.getWhoClicked();
+		if(main.getUserManager().getUser(player) == null)
+			return;
+		User user = main.getUserManager().getUser(player);
+		if(user.hasKit(kit))
+		{
+			main.getMatchManager().setPlayerDesiredKit(player, kit);
+			player.openInventory(InventoryBuilder.createKitInventory(player));
+		}
+		else
+		{
+			user.purchaseKit(kit);
+			player.openInventory(InventoryBuilder.createKitInventory(player));
+		}
+	}
+	
 	//Event Handlers
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
 	{
 		//TODO: Open the custom inventory for kit selection.
-		event.getPlayer().sendMessage(main.getUserManager().getUser(event.getPlayer()).getKits().stream().map(Kit::toString).collect(Collectors.joining(", ")));
+		if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
+		{
+			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
+		}
+		if(event.getAction() == Action.LEFT_CLICK_BLOCK)
+		{
+			Chat.bc("1");
+			if(main.getUserManager().getUser(event.getPlayer()) != null)
+			{
+				Chat.bc("2");
+				main.getUserManager().getUser(event.getPlayer()).setCoins(10000);
+			}
+		}
 	}
 	
 

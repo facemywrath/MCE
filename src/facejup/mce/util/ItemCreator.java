@@ -10,8 +10,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
 
 import net.minecraft.server.v1_12_R1.NBTTagByte;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
@@ -50,13 +48,13 @@ public class ItemCreator{
 		item.setItemMeta(meta);
 		return this;
 	}
-	
+
 	public ItemCreator setData(MaterialData data)
 	{
 		item.setData(data);
 		return this;
 	}
-	
+
 	public ItemCreator setData(int i)
 	{
 		item.setDurability((byte) i);
@@ -68,11 +66,18 @@ public class ItemCreator{
 			item.addEnchantment(ench, i);
 		return this;
 	}
-	
+
 	public ItemCreator addGlowing()
 	{
-		item = ItemCreator.setTag(item, "HideFlags", 1);
-		item.addEnchantment(Enchantment.DURABILITY, 1);
+		if(getTag(item, "HideFlags") == 0)
+			item = setTag(item, "HideFlags", 1);
+		item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+		return this;
+	}
+
+	public ItemCreator hideFlags(int i)
+	{
+		item = setTag(item, "HideFlags", i);
 		return this;
 	}
 
@@ -81,7 +86,7 @@ public class ItemCreator{
 		return this.item;
 	}	
 
-	public static ItemStack setTag(ItemStack item, String tagname, int amt)
+	private ItemStack setTag(ItemStack item, String tagname, int amt)
 	{
 		net.minecraft.server.v1_12_R1.ItemStack itemnms = CraftItemStack.asNMSCopy(item);
 		NBTTagCompound tag = (itemnms.hasTag() ? itemnms.getTag() : new NBTTagCompound());
@@ -90,7 +95,7 @@ public class ItemCreator{
 		return CraftItemStack.asBukkitCopy(itemnms);
 	}
 
-	public static byte getTag(ItemStack item, String tagname)
+	private byte getTag(ItemStack item, String tagname)
 	{
 		net.minecraft.server.v1_12_R1.ItemStack itemnms = CraftItemStack.asNMSCopy(item);
 		NBTTagCompound tag = (itemnms.hasTag() ? itemnms.getTag() : new NBTTagCompound());

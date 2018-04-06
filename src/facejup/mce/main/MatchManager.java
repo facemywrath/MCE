@@ -14,6 +14,7 @@ import facejup.mce.maps.Arena;
 import facejup.mce.maps.ArenaManager;
 import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
+import facejup.mce.util.Chat;
 
 public class MatchManager {
 
@@ -52,7 +53,13 @@ public class MatchManager {
 	public void startMatch()
 	{
 		int i = 0;
-		Arena arena = am.getRandomArena();
+		Arena arena = am.getRandomArena(desiredKits.keySet().size());
+		if(arena == null)
+		{
+			startTimer.linger();
+			Chat.bc("&9(&bMCE&9) &cError: No Arena Found.");
+			return;
+		}
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
 			for(Player player : desiredKits.keySet())
@@ -77,9 +84,8 @@ public class MatchManager {
 			lives.remove(player);
 			kits.put(player, Kit.NONE);
 		}
-		if (desiredKits.containsKey(player)) {
+		if (desiredKits.containsKey(player) && !(desiredKits.get(player).equals(kits.get(player)))) {
 			kits.put(player, desiredKits.get(player));
-			desiredKits.remove(player);
 		} else if (!(kits.containsKey(player)) || kits.get(player) == Kit.NONE)
 			return;
 		if (am.getArena() == null)

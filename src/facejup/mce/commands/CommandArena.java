@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import facejup.mce.enums.AddType;
 import facejup.mce.maps.ArenaManager;
+import facejup.mce.players.User;
 
 public class CommandArena implements CommandExecutor{
 
@@ -35,6 +36,9 @@ public class CommandArena implements CommandExecutor{
 
 		Player player = (Player) sender;
 
+		if(!player.isOp())
+			return true;
+		
 		if (args.length == 0) 
 		{
 			//TODO Invalid Syntax, Return help
@@ -149,7 +153,10 @@ public class CommandArena implements CommandExecutor{
 			}
 			return true;
 		}
-
+		if(args[0].equalsIgnoreCase("test"))
+		{
+			cm.getMain().getMatchManager().spawnPlayer(player);
+		}
 		return true;
 	}
 

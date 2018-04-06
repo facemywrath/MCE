@@ -34,6 +34,7 @@ public class User {
 			{
 				// Otherwise, set their default information and save. Then store their section.
 				config.set("Users." + player.getUniqueId() + ".Name", player.getName());
+				config.set("Users." + player.getUniqueId() + ".Coins", 0);
 				config.set("Users." + player.getUniqueId() + ".Kills", 0);
 				config.set("Users." + player.getUniqueId() + ".Deaths", 0);
 				config.set("Users." + player.getUniqueId() + ".Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
@@ -61,6 +62,28 @@ public class User {
 		}
 	}
 	
+	public void purchaseKit(Kit kit)
+	{
+		int coins = getCoins();
+		if(coins < kit.cost)
+			return;
+		setCoins(coins - kit.cost);
+		unlockKit(kit);
+	}
+	
+	public void setCoins(int i)
+	{
+		section.set("Coins", i);
+		um.getFileControl().save();
+	}
+	
+	public int getCoins()
+	{
+		if(section.contains("Coins"))
+			return section.getInt("Coins");
+		return 0;
+	}
+	
 	public int getKills()
 	{
 		if(section.contains("Kills"))
@@ -73,6 +96,13 @@ public class User {
 		if(section.contains("Deaths"))
 			return section.getInt("Deaths");
 		return 0;
+	}
+	
+	public boolean hasKit(Kit kit)
+	{
+		if(getKits().contains(kit))
+			return true;
+		return false;
 	}
 	
 	public List<Kit> getKits()

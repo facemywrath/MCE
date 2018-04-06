@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -13,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
+import facejup.mce.players.User;
 
 
 public class InventoryBuilder {
@@ -45,20 +45,35 @@ public class InventoryBuilder {
 	{
 		return this.inventory;
 	}
+	
+	public static Kit getKitBySlot(int slot)
+	{
+		for(Kit kit : Kit.values())
+		{
+			if(kit.slot == slot)
+				return kit;
+		}
+		return null;
+	}
 
 	public static Inventory createKitInventory(Player player)
 	{
 		Main main = Main.getPlugin(Main.class);
 		Kit kit = main.getMatchManager().getPlayerDesiredKit(player);
+		if(main.getUserManager().getUser(player) == null)
+		{
+			player.sendMessage(Chat.translate("&9(&bMCE&9) &4Error: Please relog."));
+		}
+		User user = main.getUserManager().getUser(player);
 		if(kit == Kit.NONE)
 			kit = main.getMatchManager().getPlayerKit(player);
 		InventoryBuilder ib = new InventoryBuilder(player, "Kits", 2);
 		for (Kit tester : Kit.values()) {
 			String name = StringUtils.capitalize(tester.toString().toLowerCase());
-			ItemCreator item = new ItemCreator(tester.icon).setDisplayname((kit == tester)?"&6Kit: " + name:"&2Kit: " + name).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":"")));
+			ItemCreator item = new ItemCreator(tester.icon).hideFlags(63).setDisplayname((kit == tester)?"&6Kit: " + name:(user.hasKit(tester)?"&2Kit: " + name:"&4Locked: " + name)).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":(user.hasKit(tester)?"&a&lClick to select":(user.getCoins() >= tester.cost?"&aCost: " + tester.cost:"&4Cost: " + tester.cost))), (user.hasKit(tester)?"":user.getCoins() >= tester.cost?"&6Click to purchase!":"&4Your coins: " + user.getCoins())));
 			if (kit == tester)
 				item.addGlowing();
-			ib.addItem(item.getItem());
+			ib.setItem(tester.slot, item.getItem());
 		}
 
 		return ib.getInventory();

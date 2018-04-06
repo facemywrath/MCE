@@ -77,11 +77,27 @@ public class ArenaManager {
 		return this.arena;
 	}
 	
-	public Arena getRandomArena()
+	public Arena getRandomArena(int playercount)
 	{
+		List<ConfigurationSection> arenas = getArenasBigEnough(playercount);
+		if(arenas.isEmpty())
+		{
+			return null;
+		}
 		ConfigurationSection section = fc.getConfig().getConfigurationSection("Arenas");
-		this.arena = new Arena(this, section.getConfigurationSection("" + Numbers.getRandom(0, section.getKeys(false).size())));
+		this.arena = new Arena(this, arenas.get(Numbers.getRandom(0, arenas.size()-1)));
 		return this.arena;
+	}
+	
+	public List<ConfigurationSection> getArenasBigEnough(int size)
+	{
+		List<ConfigurationSection> arenas = new ArrayList<>();
+		for(String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false))
+		{
+			if(fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size() >= size)
+				arenas.add(fc.getConfig().getConfigurationSection("Arenas." + str));
+		}
+		return arenas;
 	}
 
 }

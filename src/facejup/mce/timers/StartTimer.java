@@ -93,9 +93,8 @@ public class StartTimer {
 			{
 				if(mm.getPlayersQueued() < mm.MIN_PLAYERS)
 				{
-					time = LINGER_TIME;
 					Chat.bc(tag + "&cNot enough players in queue to begin a match. Please select a kit with the &5&lKit Selector &cto join queue.");
-					countdown();
+					linger();
 				}
 				else
 				{
@@ -108,6 +107,11 @@ public class StartTimer {
 	public boolean isRunning() 
 	{
 		return this.running;
+	}
+
+	public void linger() {
+		time = LINGER_TIME;
+		countdown();
 	}
 	
 }
