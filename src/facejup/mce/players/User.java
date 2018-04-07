@@ -71,6 +71,22 @@ public class User {
 		unlockKit(kit);
 	}
 	
+	public void incCoins(int i)
+	{
+		if(section.contains("Coins"))
+			section.set("Coins", section.getInt("Coins") + i);
+		else
+			section.set("Coins", i);
+	}
+	
+	public void incCoins()
+	{
+		if(section.contains("Coins"))
+			section.set("Coins", section.getInt("Coins") + 1);
+		else
+			section.set("Coins", 1);
+	}
+	
 	public void setCoins(int i)
 	{
 		section.set("Coins", i);

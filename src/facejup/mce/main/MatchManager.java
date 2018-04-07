@@ -15,6 +15,7 @@ import facejup.mce.enums.Kit;
 import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
 import facejup.mce.util.Chat;
+import facejup.mce.util.ItemCreator;
 
 public class MatchManager {
 
@@ -95,6 +96,7 @@ public class MatchManager {
 
 			public void run() {
 				player.getInventory().clear();
+				player.getInventory().setItem(8, ItemCreator.getKitSelector());
 				Kit kit = kits.get(player);
 				kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
 				player.getInventory().setHelmet(kit.helmet);
@@ -131,6 +133,13 @@ public class MatchManager {
 		if(lives.containsKey(player))
 			return lives.get(player);
 		return 0;
+	}
+	
+	public void incLives(Player player)
+	{
+		if(lives.containsKey(player))
+			if(lives.get(player) > 0)
+				lives.put(player, lives.get(player)+1);
 	}
 
 	public void decLives(Player player) {

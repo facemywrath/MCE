@@ -72,16 +72,6 @@ public class InventoryListeners implements Listener {
 			return;
 		event.setCancelled(true);
 	}
-
-	@EventHandler
-	public void playerRespawn(PlayerRespawnEvent event)
-	{
-		Player player = event.getPlayer();
-		if(main.getMatchManager().getLives(player) > 0 && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE)
-		{
-			main.getMatchManager().spawnPlayer(player);
-		}
-	}
 	//Event Handlers
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
