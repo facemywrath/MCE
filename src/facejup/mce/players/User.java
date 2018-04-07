@@ -87,11 +87,15 @@ public class User {
 	public void incKills() {
 		if(section.contains("Kills"))
 			section.set("Kills", (section.getInt("Kills")) + 1);
+		else
+			section.set("Kills", 1);
 	}
 	
 	public void incDeaths() {
 		if(section.contains("Deaths"))
 			section.set("Deaths", (section.getInt("Deaths")) + 1);
+		else
+			section.set("Deaths", 1);
 	}
 	
 	public int getKills()

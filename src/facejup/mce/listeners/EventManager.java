@@ -8,6 +8,7 @@ public class EventManager {
 	
 	private InventoryListeners invListener; // Inventory Listener
 	private ArenaModListener aml;
+	private DeathListeners dl;
 	
 	public EventManager(Main main)
 	{
@@ -21,6 +22,7 @@ public class EventManager {
 		//TODO: Instantiate the listener variables.
 		invListener = new InventoryListeners(this);
 		aml = new ArenaModListener(this);
+		dl = new DeathListeners(this);
 	}
 	
 	public Main getMain() 

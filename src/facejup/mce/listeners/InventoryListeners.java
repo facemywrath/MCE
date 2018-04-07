@@ -82,21 +82,6 @@ public class InventoryListeners implements Listener {
 			main.getMatchManager().spawnPlayer(player);
 		}
 	}
-
-	@EventHandler
-	public void playerDeathEvent(PlayerDeathEvent event) {
-
-		if (!(event.getEntity().getKiller() instanceof Player)) {
-			return;
-		}
-		
-		Player killer = event.getEntity().getKiller();
-		Player player = event.getEntity();
-		main.getMatchManager().decLives(player);
-		main.getUserManager().getUser(player).incDeaths();
-		main.getUserManager().getUser(killer).incKills();
-	}
-
 	//Event Handlers
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)

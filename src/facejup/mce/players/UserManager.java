@@ -59,4 +59,11 @@ public class UserManager implements Listener {
 		return this.fc;
 	}
 
+	public void addUser(Player player) {
+		if(!users.containsKey(player))
+		{
+			users.put(player, new User(this, player));
+		}
+	}
+
 }
