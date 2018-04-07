@@ -39,13 +39,13 @@ public class CommandArena implements CommandExecutor{
 
 		if(!player.isOp())
 			return true;
-		
+
 		if (args.length == 0) 
 		{
 			//TODO Invalid Syntax, Return help
 			return true;
 		}
-
+		// Anything
 		ArenaManager am = cm.getMain().getMatchManager().getArenaManager();
 		if (args[0].equalsIgnoreCase("create")) 
 		{
@@ -135,7 +135,7 @@ public class CommandArena implements CommandExecutor{
 			}
 			if (args[1].equalsIgnoreCase("remove")) 
 			{
-				
+
 				return true;
 			}
 		}
