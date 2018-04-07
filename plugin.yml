@@ -6,3 +6,7 @@ version: 1.12
 commands:
   arena:
     description: Main command for MCE
+  stats:
+    description: Stats command for MCE
+  achievements:
+    description: Achievemens command for MCE

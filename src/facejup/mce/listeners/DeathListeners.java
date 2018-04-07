@@ -69,15 +69,11 @@ public class DeathListeners implements Listener {
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
 		Player player = event.getEntity();
-		if(main.getUserManager().getUser(player) == null)
-			main.getUserManager().addUser(player);
 		main.getMatchManager().decLives(player);
 		main.getUserManager().getUser(player).incDeaths();
 		if(!lastDamagedBy.containsKey(event.getEntity()))
 			return;
 		Player killer = lastDamagedBy.get(event.getEntity()).getDamager();
-		if(main.getUserManager().getUser(killer) == null)
-			main.getUserManager().addUser(killer);
 		if(Numbers.getRandom(0, 4) == 4)
 			main.getMatchManager().incLives(killer);
 		main.getUserManager().getUser(killer).incCoins();

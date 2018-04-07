@@ -2,6 +2,7 @@ package facejup.mce.util;
 
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
@@ -45,7 +47,7 @@ public class InventoryBuilder {
 	{
 		return this.inventory;
 	}
-	
+
 	public static Kit getKitBySlot(int slot)
 	{
 		for(Kit kit : Kit.values())
@@ -60,14 +62,10 @@ public class InventoryBuilder {
 	{
 		Main main = Main.getPlugin(Main.class);
 		Kit kit = main.getMatchManager().getPlayerDesiredKit(player);
-		if(main.getUserManager().getUser(player) == null)
-		{
-			player.sendMessage(Chat.translate("&9(&bMCE&9) &4Error: Please relog."));
-		}
 		User user = main.getUserManager().getUser(player);
 		if(kit == Kit.NONE)
 			kit = main.getMatchManager().getPlayerKit(player);
-		InventoryBuilder ib = new InventoryBuilder(player, "Kits", 2);
+		InventoryBuilder ib = new InventoryBuilder(player, "Kits", (int) (( Kit.values().length / 9.0) + 1));
 		for (Kit tester : Kit.values()) {
 			String name = StringUtils.capitalize(tester.toString().toLowerCase());
 			if(tester == Kit.NONE && main.getMatchManager().getEndTimer().isRunning())
@@ -78,6 +76,31 @@ public class InventoryBuilder {
 			ib.setItem(tester.slot, item.getItem());
 		}
 
+		return ib.getInventory();
+	}
+	
+	public static Inventory createAchievementInventory(Player player)
+	{
+		Main main = Main.getPlugin(Main.class);
+		User user = main.getUserManager().getUser(player);
+		InventoryBuilder ib = new InventoryBuilder(player, "Achievements", (int) (( Achievement.values().length / 9.0) + 1));
+		
+		for (Achievement ach : Achievement.values()) {
+			ItemCreator item = new ItemCreator(ach.icon);
+			String name = ach.icon.getItemMeta().getDisplayName();
+			List<String> lore = ach.icon.getItemMeta().getLore();
+			boolean flag = user.hasAchievement(ach);
+			String newName = (flag ? "&aUnlocked: " + name : "&cLocked: " + name);
+			
+			if(!flag) {
+				lore.add("&6Score: " + user.getScore(ach) + "/" + ach.score);
+				lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.reward));
+			} else {
+				item.addGlowing();
+			}
+			ib.addItem(item.setDisplayname(newName).setLore(lore).getItem());
+		}
+		
 		return ib.getInventory();
 	}
 

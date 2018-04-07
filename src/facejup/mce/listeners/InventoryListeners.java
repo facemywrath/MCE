@@ -36,24 +36,28 @@ public class InventoryListeners implements Listener {
 	{
 		if(event.getClickedInventory() == null)
 			return;
+		if(event.getCurrentItem() == null)
+			return;
 		Inventory inv = event.getClickedInventory();
-		if(!inv.getTitle().equals("Kits"))
-			return;
-		event.setCancelled(true);
-		Kit kit = InventoryBuilder.getKitBySlot(event.getSlot());
-		Player player = (Player) event.getWhoClicked();
-		if(main.getUserManager().getUser(player) == null)
-			return;
-		User user = main.getUserManager().getUser(player);
-		if(user.hasKit(kit))
-		{
-			main.getMatchManager().setPlayerDesiredKit(player, kit);
-			player.openInventory(InventoryBuilder.createKitInventory(player));
-		}
-		else
-		{
-			user.purchaseKit(kit);
-			player.openInventory(InventoryBuilder.createKitInventory(player));
+		if(inv.getTitle().equals("Kits")) {
+			event.setCancelled(true);
+			Kit kit = InventoryBuilder.getKitBySlot(event.getSlot());
+			Player player = (Player) event.getWhoClicked();
+			if(main.getUserManager().getUser(player) == null)
+				return;
+			User user = main.getUserManager().getUser(player);
+			if(user.hasKit(kit))
+			{
+				main.getMatchManager().setPlayerDesiredKit(player, kit);
+				player.openInventory(InventoryBuilder.createKitInventory(player));
+			}
+			else
+			{
+				user.purchaseKit(kit);
+				player.openInventory(InventoryBuilder.createKitInventory(player));
+			}
+		} else if (inv.getTitle().equals("Achievements")) {
+			event.setCancelled(true);
 		}
 	}
 

@@ -1,6 +1,8 @@
 package facejup.mce.timers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
@@ -53,7 +55,8 @@ public class EndTimer {
 						Kit kit = mm.getPlayerKit(player);
 						if(kit.pot != null)
 						{
-							player.addPotionEffect(kit.pot);
+							if (!player.hasPotionEffect(kit.pot.getType()))
+							player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
 						}
 					}
 				}
@@ -108,7 +111,7 @@ public class EndTimer {
 			}
 		}
 	}
-
+	
 	public boolean isRunning() 
 	{
 		return this.running;

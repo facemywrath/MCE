@@ -22,6 +22,11 @@ public class ItemCreator{
 	{
 		this.item = new ItemStack(mat, 1);
 	}
+	
+	public ItemCreator(ItemStack item)
+	{
+		this.item = item.clone();
+	}
 
 	public ItemCreator setAmount(int i)
 	{
@@ -105,6 +110,6 @@ public class ItemCreator{
 	
 	public static ItemStack getKitSelector()
 	{
-		return new ItemCreator(Material.COMPASS).setDisplayname("&5&lKit Selector").setLore(Arrays.asList("&7&oRightclick with this to", "&7&lopen the kit menu.")).getItem();
+		return new ItemCreator(Material.COMPASS).setDisplayname("&5&lKit Selector").setLore(Arrays.asList("&7&oRightclick with this to", "&7&oopen the kit menu.")).getItem();
 	}
 }
