@@ -55,6 +55,28 @@ public class User {
 		}
 	}
 
+	public boolean hasKit(Kit kit)
+	{
+		if(getKits().contains(kit))
+			return true;
+		return false;
+	}
+
+	public boolean hasAchievement(Achievement ach) {
+		if (getScore(ach) >= ach.score)
+			return true;
+		return false;
+	}
+
+	public void purchaseKit(Kit kit)
+	{
+		int coins = getCoins();
+		if(coins < kit.cost)
+			return;
+		setCoins(coins - kit.cost);
+		unlockKit(kit);
+	}
+
 	public void unlockKit(Kit kit)
 	{
 		//TODO: Unlocks a kit for a player for future use.
@@ -65,28 +87,44 @@ public class User {
 			List<String> kits = section.getStringList("Kits");
 			kits.add(kit.toString());
 			section.set("Kits", kits);
-			um.getFileControl().save();
 		}
 		else
 		{
 			section.set("Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
 		}
+		um.getFileControl().save();
 	}
 
-	public boolean hasAchievement(Achievement ach) {
-		if (getScore(ach) >= ach.score)
-			return true;
-		return false;
+	public void setCoins(int i)
+	{
+		section.set("Coins", i);
+		um.getFileControl().save();
 	}
 
-	public int getAchievementCount() {
-		int i = 0;
-		for (Achievement ach : Achievement.values()) {
-			if (hasAchievement(ach)) {
-				i++;
-			}
-		}
-		return i;
+	public void incWin(int i) {
+		if(section.contains("Wins"))
+			section.set("Wins", section.getInt("Wins") + i);
+		else
+			section.set("Wins", i);
+		incCoins(25);
+		this.um.getFileControl().save();
+	}
+
+	public void incRunnerup(int i) {
+		if(section.contains("Runnerup"))
+			section.set("Runnerup", section.getInt("Runnerup") + i);
+		else
+			section.set("Runnerup", i);
+		incCoins(10);
+		this.um.getFileControl().save();
+	}
+
+	public void incGamesplayed(int i) {
+		if(section.contains("Gamesplayed"))
+			section.set("Gamesplayed", section.getInt("Gamesplayed") + i);
+		else
+			section.set("Gamesplayed", i);
+		this.um.getFileControl().save();
 	}
 
 	public void incScore(Achievement ach) {
@@ -100,49 +138,44 @@ public class User {
 					incScore(Achievement.MASTER);
 				}
 			}
-
+	
 		} else {
 			section.set("Achievements." + ach.toString() + ".Score", 1);
 		}
 		um.getFileControl().save();
 	}
 
-	public int getScore(Achievement ach) {
-		if (section.contains("Achievements." + ach.toString() + ".Score"))
-			return section.getInt("Achievements." + ach.toString() + ".Score");
-		return 0;
-	}
-
-	public void purchaseKit(Kit kit)
+	public void incCoins(int i)
 	{
-		int coins = getCoins();
-		if(coins < kit.cost)
-			return;
-		setCoins(coins - kit.cost);
-		unlockKit(kit);
-	}
-
-	public void incWin(int i) {
-		if(section.contains("Wins"))
-			section.set("Wins", section.getInt("Wins") + i);
+		if(section.contains("Coins"))
+			section.set("Coins", section.getInt("Coins") + i);
 		else
-			section.set("Wins", 0);
+			section.set("Coins", i);
 		this.um.getFileControl().save();
 	}
 
-	public void incRunnerup(int i) {
-		if(section.contains("Runnerup"))
-			section.set("Runnerup", section.getInt("Runnerup") + i);
+	public void incCoins()
+	{
+		if(section.contains("Coins"))
+			section.set("Coins", section.getInt("Coins") + 1);
 		else
-			section.set("Runnerup", 0);
+			section.set("Coins", 1);
 		this.um.getFileControl().save();
 	}
 
-	public void incGamesplayed(int i) {
-		if(section.contains("Gamesplayed"))
-			section.set("Gamesplayed", section.getInt("Gamesplayed") + i);
+	public void incDeaths() {
+		if(section.contains("Deaths"))
+			section.set("Deaths", (section.getInt("Deaths")) + 1);
 		else
-			section.set("Gamesplayed", 0);
+			section.set("Deaths", 1);
+		this.um.getFileControl().save();
+	}
+
+	public void incKills() {
+		if(section.contains("Kills"))
+			section.set("Kills", (section.getInt("Kills")) + 1);
+		else
+			section.set("Kills", 1);
 		this.um.getFileControl().save();
 	}
 
@@ -164,57 +197,16 @@ public class User {
 		return 0;
 	}
 
-	public void incCoins(int i)
-	{
-		if(section.contains("Coins"))
-			section.set("Coins", section.getInt("Coins") + i);
-		else
-			section.set("Coins", i);
-		this.um.getFileControl().save();
-	}
-
-	public void incCoins()
-	{
-		if(section.contains("Coins"))
-			section.set("Coins", section.getInt("Coins") + 1);
-		else
-			section.set("Coins", 1);
-		this.um.getFileControl().save();
-	}
-
-	public void setCoins(int i)
-	{
-		section.set("Coins", i);
-		um.getFileControl().save();
+	public int getScore(Achievement ach) {
+		if (section.contains("Achievements." + ach.toString() + ".Score"))
+			return section.getInt("Achievements." + ach.toString() + ".Score");
+		return 0;
 	}
 
 	public int getCoins()
 	{
 		if(section.contains("Coins"))
 			return section.getInt("Coins");
-		return 0;
-	}
-
-	public void incKills() {
-		if(section.contains("Kills"))
-			section.set("Kills", (section.getInt("Kills")) + 1);
-		else
-			section.set("Kills", 1);
-		this.um.getFileControl().save();
-	}
-
-	public void incDeaths() {
-		if(section.contains("Deaths"))
-			section.set("Deaths", (section.getInt("Deaths")) + 1);
-		else
-			section.set("Deaths", 1);
-		this.um.getFileControl().save();
-	}
-
-	public int getKills()
-	{
-		if(section.contains("Kills"))
-			return section.getInt("Kills");
 		return 0;
 	}
 
@@ -225,11 +217,21 @@ public class User {
 		return 0;
 	}
 
-	public boolean hasKit(Kit kit)
+	public int getKills()
 	{
-		if(getKits().contains(kit))
-			return true;
-		return false;
+		if(section.contains("Kills"))
+			return section.getInt("Kills");
+		return 0;
+	}
+
+	public int getAchievementCount() {
+		int i = 0;
+		for (Achievement ach : Achievement.values()) {
+			if (hasAchievement(ach)) {
+				i++;
+			}
+		}
+		return i;
 	}
 
 	public List<Kit> getKits()

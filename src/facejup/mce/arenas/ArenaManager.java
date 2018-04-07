@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -30,9 +31,10 @@ public class ArenaManager {
 		return this.mm;
 	}
 
-	public void createArena(String arenaname)
+	public void createArena(String arenaname, World w)
 	{
 		FileConfiguration config = fc.getConfig();
+		config.set("Arenas." + (getArenaCount() + 1) + ".World", w.getName());
 		config.set("Arenas." + (getArenaCount() + 1) + ".Name", arenaname);
 		fc.save(config);
 	}
@@ -96,7 +98,7 @@ public class ArenaManager {
 	{
 		List<ConfigurationSection> arenas = new ArrayList<>();
 		if(!fc.getConfig().contains("Arenas"))
-			return null;
+			return arenas;
 		for(String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false))
 		{
 			if(fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size() >= size)

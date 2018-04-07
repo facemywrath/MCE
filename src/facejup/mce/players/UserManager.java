@@ -2,6 +2,7 @@ package facejup.mce.players;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -12,6 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
+import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
 
 public class UserManager implements Listener {
@@ -27,10 +29,18 @@ public class UserManager implements Listener {
 		//TODO: Constructor which stores the given variables and loads the users.
 		this.main = main;
 		this.fc = new FileControl(new File(main.getDataFolder(), "users.yml"));
-		for(Player player : Bukkit.getOnlinePlayers())
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
-			users.put(player, new User(this, player));
-		}
+			public void run()
+			{
+				for(Player player : Bukkit.getOnlinePlayers())
+				{
+					addUser(player);
+					main.getMatchManager().setPlayerKit(player, Kit.NONE);
+				}
+			}
+		}, 10L);
+
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 
@@ -39,10 +49,7 @@ public class UserManager implements Listener {
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent event)
 	{
-		if(!users.containsKey(event.getPlayer()))
-		{
-			users.put(event.getPlayer(), new User(this, event.getPlayer()));
-		}
+		addUser(event.getPlayer());
 		this.main.getMatchManager().setPlayerKit(event.getPlayer(), Kit.NONE);
 	}
 
@@ -50,9 +57,8 @@ public class UserManager implements Listener {
 
 	public User getUser(OfflinePlayer player)
 	{
-		if(!(users.containsKey(player)))
-			users.put(player, new User(this, player));
-		return users.get(player);
+		addUser(player);
+		return users.get(player.getUniqueId());
 	}
 
 	public FileControl getFileControl()

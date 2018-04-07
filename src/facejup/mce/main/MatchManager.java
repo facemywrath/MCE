@@ -3,15 +3,16 @@ package facejup.mce.main;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.google.common.collect.Lists;
-
 import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.Kit;
+import facejup.mce.players.User;
 import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
 import facejup.mce.util.Chat;
@@ -19,7 +20,7 @@ import facejup.mce.util.ItemCreator;
 
 public class MatchManager {
 
-	public final int MIN_PLAYERS = 4;
+	public final int MIN_PLAYERS = 1;
 
 	private Main main; // Dependency Injection variable.
 
@@ -63,17 +64,19 @@ public class MatchManager {
 		}
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
+			Chat.bc("&9&l(&r&bMCE&9&l) &b&l Arena selected: " + arena.getName());
 			for(Player player : desiredKits.keySet())
 			{
+				lives.put(player, 2);
 				spawnPlayer(player);
 			}
+			endTimer.startTimer();
 		}
 		else
 		{
-			if(am.getMaxSpawnPoints() > desiredKits.keySet().size())
-			{
-
-			}
+			startTimer.linger();
+			Chat.bc("&9(&bMCE&9) &cError: No Arena Found.");
+			return;
 		}
 	}
 
@@ -89,13 +92,14 @@ public class MatchManager {
 			kits.put(player, desiredKits.get(player));
 		} else if (!(kits.containsKey(player)) || kits.get(player) == Kit.NONE)
 			return;
-		//if (am.getArena() == null)
-		//	return;
-		//final Location loc = am.getArena().getRandomSpawn();
+		if (am.getArena() == null)
+			return;
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
 
 			public void run() {
 				player.getInventory().clear();
+				player.setHealth(player.getMaxHealth());
+				player.setFoodLevel(20);
 				player.getInventory().setItem(8, ItemCreator.getKitSelector());
 				Kit kit = kits.get(player);
 				kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
@@ -103,10 +107,59 @@ public class MatchManager {
 				player.getInventory().setChestplate(kit.chestplate);
 				player.getInventory().setLeggings(kit.leggings);
 				player.getInventory().setBoots(kit.boots);
-				//player.teleport(loc);
+				Location loc = am.getArena().getRandomSpawn();
+				player.teleport(loc);
 			}
 
 		}, 5L);
+	}
+
+	public void endMatchByTime()
+	{
+		if(lives.keySet().size() >= 2)
+		{
+			Optional<Integer> i = lives.keySet().stream().map(player -> lives.get(player)).max((i1,i2) -> Integer.compare(i1, i2));
+
+			int j = (int) lives.keySet().stream().filter(player -> lives.get(player) == i.get()).count();
+			if(j > 1)
+			{
+				List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == i.get()).collect(Collectors.toList());
+				for(Player player : players)
+				{
+					User user = main.getUserManager().getUser(player);
+					user.incRunnerup(1);
+				}
+				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
+				Chat.bc(msg);
+			}
+			else
+			{
+				Player winner = lives.keySet().stream().filter(player -> lives.get(player) == i.get()).collect(Collectors.toList()).get(0);
+				Optional<Integer> k = lives.keySet().stream().filter(player -> lives.get(player) != i.get()).map(player -> lives.get(player)).max((i1, i2) -> Integer.compare(i1, i2));
+
+				int l = (int) lives.keySet().stream().filter(player -> lives.get(player) == k.get()).count();
+				if(l > 1)
+				{
+					List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList());
+					for(Player player : players)
+					{
+						User user = main.getUserManager().getUser(player);
+						user.incRunnerup(1);
+					}
+					String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
+					Chat.bc(msg);	
+				}
+				else
+				{
+					Player runnerup = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList()).get(0);
+					String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
+					Chat.bc(msg);
+					main.getUserManager().getUser(winner).incWin(1);
+					main.getUserManager().getUser(runnerup).incRunnerup(1);
+				}
+			}
+		}
+		this.startTimer.startTimer();
 	}
 
 	public void setPlayerKit(Player player, Kit kit)
@@ -134,7 +187,7 @@ public class MatchManager {
 			return lives.get(player);
 		return 0;
 	}
-	
+
 	public void incLives(Player player)
 	{
 		if(lives.containsKey(player))
@@ -191,14 +244,19 @@ public class MatchManager {
 	public int getPlayersQueued()
 	{
 		int i = 0;
-		if(kits.isEmpty())
+		if(desiredKits.isEmpty())
 			return 0;
-		for(Player player : kits.keySet())
+		for(Player player : desiredKits.keySet())
 		{
-			if(kits.get(player) != Kit.NONE)
+			if(desiredKits.get(player) != Kit.NONE)
 				i++;
 		}
 		return i;
+	}
+
+	public void kill(Player player) {
+		this.lives.remove(player);
+		
 	}
 
 }

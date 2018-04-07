@@ -87,10 +87,7 @@ public class InventoryListeners implements Listener {
 		}
 		if(event.getAction() == Action.LEFT_CLICK_BLOCK)
 		{
-			if(main.getUserManager().getUser(event.getPlayer()) != null)
-			{
-				main.getUserManager().getUser(event.getPlayer()).setCoins(3000);
-			}
+			main.getUserManager().getUser(event.getPlayer()).setCoins(3000);
 		}
 	}
 

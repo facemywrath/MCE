@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
+import facejup.mce.util.Chat;
 import facejup.mce.util.Numbers;
 
 public class DeathListeners implements Listener {
@@ -68,6 +69,7 @@ public class DeathListeners implements Listener {
 	@EventHandler
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
+		event.setDeathMessage("");
 		Player player = event.getEntity();
 		main.getMatchManager().decLives(player);
 		main.getUserManager().getUser(player).incDeaths();
@@ -78,6 +80,30 @@ public class DeathListeners implements Listener {
 			main.getMatchManager().incLives(killer);
 		main.getUserManager().getUser(killer).incCoins();
 		main.getUserManager().getUser(killer).incKills();
+		if(main.getMatchManager().getLives(player) == 0)
+		{
+			if(main.getMatchManager().getPlayersAlive().size() == 1)
+			{
+				main.getMatchManager().kill(player);
+				Player winner = main.getMatchManager().getPlayersAlive().get(0);
+				main.getUserManager().getUser(winner).incWin(1);
+				main.getUserManager().getUser(player).incRunnerup(1);
+				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
+				Chat.bc(msg);
+				main.getMatchManager().startTimer.startTimer();
+			}
+			else
+			{
+				main.getMatchManager().kill(player);
+			}
+		}
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				player.spigot().respawn();
+			}
+		}, 100L);
 	}
 
 

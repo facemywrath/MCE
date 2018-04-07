@@ -12,8 +12,8 @@ import facejup.mce.util.ItemCreator;
 
 public class EndTimer {
 
-	private final int MATCH_TIME = 900; // Timer start time.
-	private final String tag = "&9&l[&r&bMCE&9&l] &2&o";
+	private final int MATCH_TIME = 1000; // Timer start time.
+	private final String tag = "&9&l(&r&bMCE&9&l) &a&o";
 
 	private Main main; // Dependency Injection variable.
 	private MatchManager mm; // Other Dependency Injection.
@@ -62,6 +62,9 @@ public class EndTimer {
 				}
 				switch(time)
 				{
+				case 900:
+					Chat.bc(tag + "Fifteen minutes left in the match!");
+					break;
 				case 600:
 					Chat.bc(tag + "Ten minutes left in the match!");
 					break;
@@ -103,11 +106,12 @@ public class EndTimer {
 					{
 						countdown();
 					}
-				}, 20L);
+				}, 1L);
 			}
 			else
 			{
 				Chat.bc(tag + "The match has ended.");
+				mm.endMatchByTime();
 			}
 		}
 	}

@@ -30,6 +30,13 @@ public class Arena {
 		this.bound2 = new Location(world, section.getDouble("Bound2.x"), section.getDouble("Bound2.y"), section.getDouble("Bound2.z"));
 	}
 	
+	public String getName()
+	{
+		if(section.contains("Name"))
+			return section.getString("Name");
+		return null;
+	}
+	
 	public Location getRandomSpawn()
 	{
 		List<Location> currentSpawnPoints = getSpawnPoints();
@@ -61,7 +68,7 @@ public class Arena {
 		double i = Double.MAX_VALUE;
 		for(Player player : am.getMatchManager().getPlayersAlive())
 		{
-			if(loc.distance(player.getLocation()) < i)
+			if(player.getWorld().equals(loc.getWorld()) && loc.distance(player.getLocation()) < i)
 				i = loc.distance(player.getLocation());
 		}
 		return i;

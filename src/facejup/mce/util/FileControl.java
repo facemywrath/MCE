@@ -23,6 +23,14 @@ public class FileControl {
 	{
 		FileControl.checkBaseFiles();
 		this.file = f;
+		if(!f.exists())
+		{
+			try{
+				f.createNewFile();
+			}
+			catch(Exception e){}
+		}
+		this.config = YamlConfiguration.loadConfiguration(f);
 	}
 
 	public FileControl setConfig(File file)
@@ -42,7 +50,7 @@ public class FileControl {
 	{
 		return this.file;
 	}
-	
+
 	public void save()
 	{
 		try {
@@ -51,7 +59,7 @@ public class FileControl {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void save(FileConfiguration config)
 	{
 		try {
@@ -70,8 +78,7 @@ public class FileControl {
 
 	public FileConfiguration getConfig()
 	{
-		config = YamlConfiguration.loadConfiguration(file);
-		return config;
+		return YamlConfiguration.loadConfiguration(file);
 	}
 
 	public static void checkBaseFiles()

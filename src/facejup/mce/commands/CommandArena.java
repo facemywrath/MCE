@@ -55,7 +55,7 @@ public class CommandArena implements CommandExecutor{
 				return true;
 			}
 			String name = args[1];
-			am.createArena(name);
+			am.createArena(name, player.getWorld());
 			adding.put(player, AddType.BOUND1);
 			arenaAdd.put(player, name);
 			player.sendMessage(Chat.translate("&9(&bMCE&9) &aArena " + name + " created. Now you must select the first bounding coordinate."));

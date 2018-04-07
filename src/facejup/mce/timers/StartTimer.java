@@ -96,7 +96,7 @@ public class StartTimer {
 					{
 						countdown();
 					}
-				}, 20L);
+				}, 3L);
 			}
 			else
 			{
