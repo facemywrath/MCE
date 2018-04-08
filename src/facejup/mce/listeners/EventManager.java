@@ -14,6 +14,7 @@ public class EventManager {
 	private DeathListeners dl;
 	@SuppressWarnings("unused")
 	private AchievementListeners al;
+	private KitPowerListeners kpl;
 	
 	public EventManager(Main main)
 	{
@@ -29,6 +30,7 @@ public class EventManager {
 		al = new AchievementListeners(this);
 		aml = new ArenaModListener(this);
 		dl = new DeathListeners(this);
+		kpl = new KitPowerListeners(this);
 	}
 	
 	public Main getMain() 

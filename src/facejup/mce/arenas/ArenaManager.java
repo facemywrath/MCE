@@ -34,8 +34,9 @@ public class ArenaManager {
 	public void createArena(String arenaname, World w)
 	{
 		FileConfiguration config = fc.getConfig();
-		config.set("Arenas." + (getArenaCount() + 1) + ".World", w.getName());
-		config.set("Arenas." + (getArenaCount() + 1) + ".Name", arenaname);
+		int count = getArenaCount();
+		config.set("Arenas." + (count+1) + ".World", w.getName());
+		config.set("Arenas." + (count+1) + ".Name", arenaname);
 		fc.save(config);
 	}
 

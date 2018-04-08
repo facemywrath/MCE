@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
@@ -76,9 +82,9 @@ public class User {
 	public void purchaseKit(Kit kit)
 	{
 		int coins = getCoins();
-		if(coins < kit.cost)
+		if(coins < kit.coincost)
 			return;
-		setCoins(coins - kit.cost);
+		setCoins(coins - kit.coincost);
 		unlockKit(kit);
 	}
 
@@ -137,7 +143,10 @@ public class User {
 			int score = section.getInt("Achievements." + ach.toString() + ".Score") + 1;
 			section.set("Achievements." + ach.toString() + ".Score", score);
 			if (score == ach.score) {
-				incCoins(ach.reward);
+				if(ach.kitreward == null)
+					incCoins(ach.coinreward);
+				else
+					unlockKit(ach.kitreward);
 				if (this.player.isOnline()) {
 					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + ach));
 				}
@@ -145,7 +154,7 @@ public class User {
 					incScore(Achievement.MASTER);
 				}
 			}
-	
+
 		} else {
 			section.set("Achievements." + ach.toString() + ".Score", 1);
 		}
@@ -258,6 +267,40 @@ public class User {
 			section.set("Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
 		}
 		return Arrays.asList(Kit.NONE, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
+	}
+
+	public void updateScoreboard() {
+		if(!player.isOnline())
+			return;
+		boolean running = this.um.getMain().getMatchManager().isMatchRunning();
+		ScoreboardManager manager = this.um.getMain().getServer().getScoreboardManager();
+		Player player = (Player) this.player;
+		int lives = this.um.getMain().getMatchManager().getLives(player);
+		Scoreboard board = manager.getNewScoreboard();
+		if(running)
+		{
+			Objective objective = board.getObjective("lives") != null?board.getObjective("lives"):board.registerNewObjective("lives", "dummy");
+			objective.setDisplayName(ChatColor.GREEN + "   " + ChatColor.BOLD + "Lives");
+			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+			for(Player tempPlayer : um.getMain().getMatchManager().getPlayersAlive())
+			{
+				objective.getScore(ChatColor.GOLD + tempPlayer.getName()).setScore(um.getMain().getMatchManager().getLives(tempPlayer));;
+			}
+		}
+		else
+		{		
+			Objective objective = (board.getObjective("stats") != null?board.getObjective("stats"):board.registerNewObjective("stats", "dummy"));
+			objective.setDisplayName(ChatColor.GREEN + "Stats");
+			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+			objective.getScore(ChatColor.GOLD + "Coins: " + getCoins()).setScore(8);
+			objective.getScore(ChatColor.GOLD + "Kills: " + getKills()).setScore(7);
+			objective.getScore(ChatColor.GOLD + "Deaths: " + getDeaths()).setScore(6);
+			objective.getScore(ChatColor.GOLD + "Wins: " + getWins()).setScore(5);
+			objective.getScore(ChatColor.GOLD + "Runnerups: " + getRunnerup()).setScore(4);
+			objective.getScore(ChatColor.GOLD + "Games Played: " + getGamesplayed()).setScore(3);
+			objective.getScore(ChatColor.GOLD + "Achievements: " + getAchievementCount()).setScore(2);
+		}
+			player.setScoreboard(board);
 	}
 
 }

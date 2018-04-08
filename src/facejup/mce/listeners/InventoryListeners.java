@@ -1,5 +1,6 @@
 package facejup.mce.listeners;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,16 +46,26 @@ public class InventoryListeners implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			if(main.getUserManager().getUser(player) == null)
 				return;
+			boolean matchrunning = main.getMatchManager().isMatchRunning();
 			User user = main.getUserManager().getUser(player);
 			if(user.hasKit(kit))
 			{
+				if(kit == Kit.NONE && matchrunning)
+					return;
 				main.getMatchManager().setPlayerDesiredKit(player, kit);
 				player.openInventory(InventoryBuilder.createKitInventory(player));
 			}
 			else
 			{
-				user.purchaseKit(kit);
-				player.openInventory(InventoryBuilder.createKitInventory(player));
+				if(kit.achcost == null)
+				{
+					user.purchaseKit(kit);
+					player.openInventory(InventoryBuilder.createKitInventory(player));
+				}
+				else
+				{
+					player.openInventory(InventoryBuilder.createAchievementInventory(player));
+				}
 			}
 		} else if (inv.getTitle().equals("Achievements")) {
 			event.setCancelled(true);
@@ -85,9 +96,19 @@ public class InventoryListeners implements Listener {
 		{
 			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
 		}
-		if(event.getAction() == Action.LEFT_CLICK_BLOCK)
+		if(event.getItem() != null && event.getItem().getType() == Material.COOKED_BEEF)
 		{
-			main.getUserManager().getUser(event.getPlayer()).setCoins(3000);
+			for(int i = 0; i < 8; i++)
+			{
+				if(event.getPlayer().getHealth() > 0 && event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
+				{
+					event.getPlayer().setHealth(event.getPlayer().getHealth() + 1);
+				}
+			}
+			if(event.getItem().getAmount() > 1)
+				event.getItem().setAmount(event.getItem().getAmount()-1);
+			else
+				event.getPlayer().setItemInHand(null);
 		}
 	}
 

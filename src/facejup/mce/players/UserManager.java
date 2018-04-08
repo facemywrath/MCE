@@ -65,6 +65,11 @@ public class UserManager implements Listener {
 	{
 		return this.fc;
 	}
+	
+	public Main getMain()
+	{
+		return this.main;
+	}
 
 	public void addUser(OfflinePlayer player) {
 		if(!users.containsKey(player))

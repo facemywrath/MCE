@@ -5,10 +5,10 @@ import org.bukkit.entity.Player;
 
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
+import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
-import net.md_5.bungee.api.ChatColor;
 
 public class StartTimer {
 
@@ -29,7 +29,7 @@ public class StartTimer {
 
 	public void startTimer()
 	{
-		//TODO: End the end timer if it's running and start the countdown until the next match begins.
+		// End the end timer if it's running and start the countdown until the next match begins.
 		if(main.getMatchManager().getEndTimer().isRunning())
 			main.getMatchManager().getEndTimer().stopTimer();
 		time = WAIT_TIME;
@@ -55,11 +55,19 @@ public class StartTimer {
 			{
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
+					User user = main.getUserManager().getUser(player);
+					user.updateScoreboard();
 					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
 						player.getInventory().setItem(8, ItemCreator.getKitSelector());
 				}
 				switch(time)
 				{
+				case 300:
+					Chat.bc(tag + "Five minutes left until the match begins!");
+					break;
+				case 240:
+					Chat.bc(tag + "Four minutes left until the match begins!");
+					break;
 				case 180:
 					Chat.bc(tag + "Three minutes left until the match begins!");
 					break;
@@ -98,7 +106,7 @@ public class StartTimer {
 					{
 						countdown();
 					}
-				}, 20L);
+				}, 20L); 
 			}
 			else
 			{

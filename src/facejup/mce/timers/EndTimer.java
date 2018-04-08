@@ -48,15 +48,18 @@ public class EndTimer {
 			{
 				for(Player player : mm.getPlayersAlive())
 				{
+					if(player.getInventory().getItemInMainHand().getDurability() > 20)
+						player.getInventory().getItemInMainHand().setDurability((short) 0);
 					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
 						player.getInventory().setItem(8, ItemCreator.getKitSelector());
+					main.getUserManager().getUser(player).updateScoreboard();
 					if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 					{
 						Kit kit = mm.getPlayerKit(player);
 						if(kit.pot != null)
 						{
 							if (!player.hasPotionEffect(kit.pot.getType()))
-							player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
+								player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
 						}
 					}
 				}
@@ -115,7 +118,7 @@ public class EndTimer {
 			}
 		}
 	}
-	
+
 	public boolean isRunning() 
 	{
 		return this.running;
