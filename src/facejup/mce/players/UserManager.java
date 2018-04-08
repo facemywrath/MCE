@@ -58,7 +58,7 @@ public class UserManager implements Listener {
 	public User getUser(OfflinePlayer player)
 	{
 		addUser(player);
-		return users.get(player.getUniqueId());
+		return users.get(player);
 	}
 
 	public FileControl getFileControl()

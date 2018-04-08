@@ -78,7 +78,9 @@ public class FileControl {
 
 	public FileConfiguration getConfig()
 	{
-		return YamlConfiguration.loadConfiguration(file);
+		if (this.config == null)
+			this.config = YamlConfiguration.loadConfiguration(file);
+		return this.config;
 	}
 
 	public static void checkBaseFiles()

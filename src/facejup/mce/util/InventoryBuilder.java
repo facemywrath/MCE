@@ -94,7 +94,8 @@ public class InventoryBuilder {
 			
 			if(!flag) {
 				lore.add("&6Score: " + user.getScore(ach) + "/" + ach.score);
-				lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.reward));
+				lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.reward + " coins"));
+				
 			} else {
 				item.addGlowing();
 			}

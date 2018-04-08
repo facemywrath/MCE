@@ -4,23 +4,27 @@ import facejup.mce.main.Main;
 
 public class EventManager {
 	
-	private Main main; // Dependency Injection Variable
+	private Main main; //Dependency Injection Variable
 	
-	private InventoryListeners invListener; // Inventory Listener
+	@SuppressWarnings("unused")
+	private InventoryListeners invListener; //Inventory Listener
+	@SuppressWarnings("unused")
 	private ArenaModListener aml;
+	@SuppressWarnings("unused")
 	private DeathListeners dl;
+	@SuppressWarnings("unused")
 	private AchievementListeners al;
 	
 	public EventManager(Main main)
 	{
-		//TODO: Constructor which stores dependency injection and registers the listeners.
+		//Constructor which stores dependency injection and registers the listeners.
 		this.main = main;
 		registerListeners();
 	}
 	
 	private void registerListeners()
 	{
-		//TODO: Instantiate the listener variables.
+		//Instantiate the listener variables.
 		invListener = new InventoryListeners(this);
 		al = new AchievementListeners(this);
 		aml = new ArenaModListener(this);
@@ -29,7 +33,7 @@ public class EventManager {
 	
 	public Main getMain() 
 	{
-		//TODO: Return the main instance.
+		//Return the main instance.
 		return this.main;
 	}
 

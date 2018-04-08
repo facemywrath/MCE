@@ -1,6 +1,5 @@
 package facejup.mce.timers;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -9,11 +8,12 @@ import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
+import facejup.mce.util.Lang;
 
 public class EndTimer {
 
-	private final int MATCH_TIME = 1000; // Timer start time.
-	private final String tag = "&9&l(&r&bMCE&9&l) &a&o";
+	private final int MATCH_TIME = 1500; // Timer start time.
+	private final String tag = Lang.Tag;
 
 	private Main main; // Dependency Injection variable.
 	private MatchManager mm; // Other Dependency Injection.
@@ -106,7 +106,7 @@ public class EndTimer {
 					{
 						countdown();
 					}
-				}, 1L);
+				}, 20L);
 			}
 			else
 			{

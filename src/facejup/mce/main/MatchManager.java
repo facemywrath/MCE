@@ -20,7 +20,7 @@ import facejup.mce.util.ItemCreator;
 
 public class MatchManager {
 
-	public final int MIN_PLAYERS = 1;
+	public final int MIN_PLAYERS = 4;
 
 	private Main main; // Dependency Injection variable.
 
@@ -54,7 +54,6 @@ public class MatchManager {
 
 	public void startMatch()
 	{
-		int i = 0;
 		Arena arena = am.getRandomArena(desiredKits.keySet().size());
 		if(arena == null)
 		{
@@ -67,7 +66,7 @@ public class MatchManager {
 			Chat.bc("&9&l(&r&bMCE&9&l) &b&l Arena selected: " + arena.getName());
 			for(Player player : desiredKits.keySet())
 			{
-				lives.put(player, 2);
+				lives.put(player, 5);
 				spawnPlayer(player);
 			}
 			endTimer.startTimer();
@@ -96,6 +95,7 @@ public class MatchManager {
 			return;
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
 
+			@SuppressWarnings("deprecation")
 			public void run() {
 				player.getInventory().clear();
 				player.setHealth(player.getMaxHealth());

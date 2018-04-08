@@ -48,6 +48,16 @@ public class ArenaManager {
 		return null;
 	}
 
+	public List<String> getArenaList()
+	{
+		List<String> arenas = new ArrayList<>();
+		for (String s : fc.getConfig().getConfigurationSection("Arenas").getKeys(false)) {
+			if (fc.getConfig().contains("Arenas." + s + ".Name"))
+				arenas.add(fc.getConfig().getString("Arenas." + s + ".Name"));
+		}
+		return arenas;
+	}
+	
 	public FileControl getFileControl() 
 	{
 		return this.fc;

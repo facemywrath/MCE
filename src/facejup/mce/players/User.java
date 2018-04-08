@@ -7,20 +7,24 @@ import java.util.List;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
+import facejup.mce.util.Chat;
+import facejup.mce.util.Lang;
 
 public class User {
 
 	private UserManager um; // Dependency Injection Variable.
 
 	private ConfigurationSection section; // Section storing the players information.
+	@SuppressWarnings("unused")
 	private OfflinePlayer player; // The player.
 
 	public User(UserManager um, OfflinePlayer player)
 	{
-		//TODO: Constructor which loads and saves the information from the file.
+		//Constructor which loads and saves the information from the file.
 		this.player = player;
 		this.um = um;
 		if(um.getFileControl() != null && um.getFileControl().getFile().exists()) // Checks to make sure the file exists.
@@ -34,6 +38,7 @@ public class User {
 					if (!config.contains("Users." + player.getUniqueId() + ".Achievements." + ach.toString()))
 						config.set("Users." + player.getUniqueId() + ".Achievements." + ach.toString() + ".Score", 0);
 				}
+				um.getFileControl().save();
 			}
 			else
 			{
@@ -79,7 +84,7 @@ public class User {
 
 	public void unlockKit(Kit kit)
 	{
-		//TODO: Unlocks a kit for a player for future use.
+		//Unlocks a kit for a player for future use.
 		if(section.contains("Kits"))
 		{
 			if(section.getStringList("Kits").contains(kit.toString()))
@@ -133,7 +138,9 @@ public class User {
 			section.set("Achievements." + ach.toString() + ".Score", score);
 			if (score == ach.score) {
 				incCoins(ach.reward);
-				// TODO Achievement Unlocked!
+				if (this.player.isOnline()) {
+					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + ach));
+				}
 				if (ach != Achievement.MASTER) {
 					incScore(Achievement.MASTER);
 				}

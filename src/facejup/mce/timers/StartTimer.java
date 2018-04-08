@@ -7,12 +7,14 @@ import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
+import facejup.mce.util.Lang;
+import net.md_5.bungee.api.ChatColor;
 
 public class StartTimer {
 
-	private final int WAIT_TIME = 180; // Timer start time.
-	private final int LINGER_TIME = 60; // Time needed to wait if there are not enough players ready.
-	private final String tag = "&9&l(&r&bMCE&9&l) &a&o";
+	private final int WAIT_TIME = 300; // Timer start time.
+	private final int LINGER_TIME = 120; // Time needed to wait if there are not enough players ready.
+	private final String tag = Lang.Tag;
 
 	private Main main; // Dependency Injection variable.
 	private MatchManager mm; // Other Dependency Injection.
@@ -96,13 +98,13 @@ public class StartTimer {
 					{
 						countdown();
 					}
-				}, 3L);
+				}, 20L);
 			}
 			else
 			{
 				if(mm.getPlayersQueued() < mm.MIN_PLAYERS)
 				{
-					Chat.bc(tag + "&cNot enough players in queue to begin a match. Please select a kit with the &5&lKit Selector &cto join queue.");
+					Chat.bc(tag + "&cNot enough players queued " + "&6(" + mm.getPlayersQueued() + "/" + mm.MIN_PLAYERS + ")" + "&c to begin a match. Please select a kit with the &5&lKit Selector &cto join queue.");
 					linger();
 				}
 				else

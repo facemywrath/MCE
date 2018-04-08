@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import facejup.mce.enums.Achievement;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
+import facejup.mce.util.Lang;
 import net.md_5.bungee.api.ChatColor;
 
 public class CommandStats implements CommandExecutor {
@@ -31,7 +32,7 @@ public class CommandStats implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
 		if (!(sender instanceof Player)) {
-			// TODO NO CONSOLE USE!
+			sender.sendMessage(Lang.ConsoleUse);
 			return true;
 		}
 		Player player = (Player) sender;
@@ -64,7 +65,7 @@ public class CommandStats implements CommandExecutor {
 		}
 		if (args.length == 1) {
 			if (!Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore()) {
-				// TODO Player is null!
+				player.sendMessage(Lang.NullPlayer);
 				return true;
 			}
 			OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);

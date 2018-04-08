@@ -1,6 +1,7 @@
 package facejup.mce.commands;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -13,6 +14,8 @@ import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.AddType;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
+import facejup.mce.util.Lang;
+import net.md_5.bungee.api.ChatColor;
 
 public class CommandArena implements CommandExecutor{
 
@@ -31,7 +34,7 @@ public class CommandArena implements CommandExecutor{
 
 		if (!(sender instanceof Player)) 
 		{
-			//TODO Must be player
+			sender.sendMessage(Lang.ConsoleUse);
 			return true;
 		}
 
@@ -42,7 +45,7 @@ public class CommandArena implements CommandExecutor{
 
 		if (args.length == 0) 
 		{
-			//TODO Invalid Syntax, Return help
+			sender.sendMessage(Lang.InvalidSyn);
 			return true;
 		}
 		// Anything
@@ -51,7 +54,7 @@ public class CommandArena implements CommandExecutor{
 		{
 			if (args.length == 1) 
 			{
-				//TODO Invalid Syntax, Return help
+				sender.sendMessage(Lang.InvalidSyn);
 				return true;
 			}
 			String name = args[1];
@@ -65,19 +68,19 @@ public class CommandArena implements CommandExecutor{
 		{
 			if (args.length == 1) 
 			{
-				//TODO Invalid Syntax, Return help
+				sender.sendMessage(Lang.InvalidSyn);
 				return true;
 			}
 			if (args[1].equals("1")) 
 			{
 				if (args.length == 2)
 				{
-					//TODO Invalid Syntax, Return help
+					sender.sendMessage(Lang.InvalidSyn);
 					return true;
 				}
 				String ArenaName = args[2];
 				if (am.getArenaSection(ArenaName) == null) {
-					// TODO Arena does not exist
+					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of: &6" + ArenaName + " &cdoes not exist!"));
 					return true;
 				}
 				arenaAdd.put(player, ArenaName);
@@ -88,12 +91,12 @@ public class CommandArena implements CommandExecutor{
 			{
 				if (args.length == 2)
 				{
-					//TODO Invalid Syntax, Return help
+					sender.sendMessage(Lang.InvalidSyn);
 					return true;
 				}
 				String ArenaName = args[2];
 				if (am.getArenaSection(ArenaName) == null) {
-					// TODO Arena does not exist
+					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of: &6" + ArenaName + " &cdoes not exist!"));
 					return true;
 				}
 				arenaAdd.put(player, ArenaName);
@@ -103,11 +106,16 @@ public class CommandArena implements CommandExecutor{
 
 			return true;
 		}
+		if (args[0].equalsIgnoreCase("list")) 
+		{
+			sender.sendMessage(ChatColor.AQUA + "----------==={" + ChatColor.GREEN + "Arenas" + ChatColor.AQUA + "}===----------");
+			sender.sendMessage(cm.getMain().getMatchManager().getArenaManager().getArenaList().stream().sorted().collect(Collectors.joining(", ")));
+		}
 		if (args[0].equalsIgnoreCase("spawn")) 
 		{
 			if (args.length == 1) 
 			{
-				// TODO Arena does not exist
+				sender.sendMessage(Lang.InvalidSyn);
 				return true;
 			}
 
@@ -115,13 +123,13 @@ public class CommandArena implements CommandExecutor{
 			{
 				if (args.length == 2) 
 				{
-					// TODO Arena does not exist
+					sender.sendMessage(Lang.InvalidSyn);
 					return true;
 				}
 				String ArenaName = args[2];
 				if (am.getArenaSection(ArenaName) == null) 
 				{
-					// TODO Arena does not exist
+					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of: &6" + ArenaName + " &cdoes not exist!"));
 					return true;
 				}
 				Location loc = player.getLocation();
@@ -131,6 +139,7 @@ public class CommandArena implements CommandExecutor{
 				section.set("SpawnPoints." + id + ".y", loc.getY());
 				section.set("SpawnPoints." + id + ".z", loc.getZ());
 				am.getFileControl().save();
+				sender.sendMessage(Lang.Tag + Chat.translate("&aSpawn successfuly added for arena: &b" + ArenaName + " &aAt location: &b" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
 				return true;
 			}
 			if (args[1].equalsIgnoreCase("remove")) 
@@ -142,13 +151,12 @@ public class CommandArena implements CommandExecutor{
 		if (args[0].equalsIgnoreCase("togglestart"))
 		{
 			if (cm.getMain().getMatchManager().getEndTimer().isRunning()) {
-				// TODO Tell player only toggleable between matches!
+				sender.sendMessage(Lang.Tag + Chat.translate("&cYou may only togglestart inbetween matches!"));
 				return true;
 			}
 			if (cm.getMain().getMatchManager().getStartTimer().isRunning()) {
 				cm.getMain().getMatchManager().getStartTimer().stopTimer();
-				sender.sendMessage("test");
-				// TODO Tell player it's stopped!
+				sender.sendMessage(Lang.Tag + Chat.translate("&aStart time successfuly stopped!"));
 				return true;
 			} else {
 				cm.getMain().getMatchManager().startTimer.resumeTimer();
@@ -158,25 +166,20 @@ public class CommandArena implements CommandExecutor{
 		if (args[0].equalsIgnoreCase("toggleend"))
 		{
 			if (!cm.getMain().getMatchManager().getStartTimer().isRunning()) {
-				// TODO Tell player only toggleable between matches!
+				sender.sendMessage(Lang.Tag + Chat.translate("&cYou may only togglestart inbetween matches!"));
 				return true;
 			}
 			if (cm.getMain().getMatchManager().getStartTimer().isRunning()) {
 				cm.getMain().getMatchManager().getStartTimer().stopTimer();
 				cm.getMain().getMatchManager().getEndTimer().startTimer();
 				sender.sendMessage("test");
-				// TODO Tell player it's stopped!
+				sender.sendMessage(Lang.Tag + Chat.translate("&aEnd time successfuly stopped!"));
 				return true;
 			} else {
 				cm.getMain().getMatchManager().startTimer.resumeTimer();
 				cm.getMain().getMatchManager().getEndTimer().stopTimer();
 			}
 			return true;
-		}
-		if(args[0].equalsIgnoreCase("test"))
-		{
-			cm.getMain().getMatchManager().setLives(player, 5);
-			cm.getMain().getMatchManager().spawnPlayer(player);
 		}
 		return true;
 	}

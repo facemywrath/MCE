@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import facejup.mce.util.InventoryBuilder;
+import facejup.mce.util.Lang;
 
 public class CommandAchievements implements CommandExecutor{
 
@@ -15,7 +16,7 @@ public class CommandAchievements implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
 		if (!(sender instanceof Player)) {
-			// TODO MUST BE PLAYER
+			sender.sendMessage(Lang.ConsoleUse);
 			return true;
 		}
 		

@@ -4,12 +4,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 
 import facejup.mce.enums.Kit;
@@ -18,14 +16,16 @@ import facejup.mce.players.User;
 import facejup.mce.util.InventoryBuilder;
 import facejup.mce.util.ItemCreator;
 
+@SuppressWarnings("deprecation")
 public class InventoryListeners implements Listener {
 
 	private Main main; // Dependency Injection Variable
+	@SuppressWarnings("unused")
 	private EventManager em; // Other Dependency Injection Variable
 
 	public InventoryListeners(EventManager eventManager)
 	{
-		//TODO: Constructor which saves the dep inj and registers this instance as a listener.
+		//Constructor which saves the dep inj and registers this instance as a listener.
 		this.main = eventManager.getMain();
 		this.em = eventManager;
 		main.getServer().getPluginManager().registerEvents(this, main);
@@ -80,7 +80,7 @@ public class InventoryListeners implements Listener {
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
 	{
-		//TODO: Open the custom inventory for kit selection.
+		//Open the custom inventory for kit selection.
 		if(event.getAction().toString().contains("RIGHT_CLICK") && event.getPlayer().getInventory().getItemInMainHand().equals(ItemCreator.getKitSelector()))
 		{
 			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));

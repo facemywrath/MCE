@@ -38,4 +38,9 @@ public class Main extends JavaPlugin {
 		return this.um;
 	}
 	
+	public EventManager getEventManager()
+	{
+		return this.em;
+	}
+	
 }
