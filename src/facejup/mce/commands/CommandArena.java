@@ -3,6 +3,7 @@ package facejup.mce.commands;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,6 +16,7 @@ import facejup.mce.enums.AddType;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Numbers;
 import net.md_5.bungee.api.ChatColor;
 
 public class CommandArena implements CommandExecutor{
@@ -180,6 +182,17 @@ public class CommandArena implements CommandExecutor{
 				cm.getMain().getMatchManager().getEndTimer().stopTimer();
 			}
 			return true;
+		}
+		if(args[0].equalsIgnoreCase("setcoins") && args.length == 3)
+		{
+			if(!Bukkit.getOfflinePlayer(args[1]).isOnline())
+				return true;
+			if(!Numbers.isInt(args[2]))
+				return true;
+			Player target = Bukkit.getPlayer(args[1]);
+			int amount = Integer.parseInt(args[2]);
+			User user = cm.getMain().getUserManager().getUser(target);
+			user.setCoins(amount);
 		}
 		return true;
 	}

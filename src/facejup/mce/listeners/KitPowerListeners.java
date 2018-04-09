@@ -1,6 +1,7 @@
 package facejup.mce.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,10 +47,10 @@ public class KitPowerListeners implements Listener {
 	@EventHandler
 	public void negateNinjaTeleportDamage(PlayerTeleportEvent event)
 	{
-		if(event.getCause() == TeleportCause.ENDER_PEARL)
+		if(event.getCause() == TeleportCause.ENDER_PEARL && main.getMatchManager().getPlayerKit(event.getPlayer()) == Kit.NINJA)
 		{
 			event.setCancelled(true);
-			event.getPlayer().setNoDamageTicks(1);
+		//	event.getPlayer().setNoDamageTicks(1);
 			event.getPlayer().teleport(event.getTo());
 		}
 	}
@@ -62,6 +63,7 @@ public class KitPowerListeners implements Listener {
 		Player player = (Player) event.getCaught();
 		Location loc = event.getPlayer().getLocation().add(new Vector(event.getPlayer().getLocation().getDirection().getX(), 0, event.getPlayer().getLocation().getDirection().getZ()));
 		player.teleport(loc);
+		event.getPlayer().setCooldown(Material.FISHING_ROD, 20);
 	}
 	
 }

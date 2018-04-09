@@ -2,11 +2,11 @@ name: MCE
 main: facejup.mce.main.Main
 author: facejup
 version: 1.12
-
+depend: [ RPGItems ]
 commands:
   arena:
     description: Main command for MCE
   stats:
     description: Stats command for MCE
   achievements:
-    description: Achievemens command for MCE
+    description: Achievements command for MCE

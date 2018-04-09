@@ -20,7 +20,7 @@ import facejup.mce.util.ItemCreator;
 
 public class MatchManager {
 
-	public final int MIN_PLAYERS = 4;
+	public final int MIN_PLAYERS = 2;
 
 	private Main main; // Dependency Injection variable.
 

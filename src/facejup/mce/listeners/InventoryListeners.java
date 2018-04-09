@@ -96,19 +96,22 @@ public class InventoryListeners implements Listener {
 		{
 			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
 		}
-		if(event.getItem() != null && event.getItem().getType() == Material.COOKED_BEEF)
+		if(event.getItem() != null && (event.getItem().getType() == Material.POTION || event.getItem().getType() == Material.COOKED_BEEF))
 		{
-			for(int i = 0; i < 8; i++)
+			if(event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
 			{
-				if(event.getPlayer().getHealth() > 0 && event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
+				for(int i = 0; i < 8; i++)
 				{
-					event.getPlayer().setHealth(event.getPlayer().getHealth() + 1);
+					if(event.getPlayer().getHealth() > 0 && event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
+					{
+						event.getPlayer().setHealth(event.getPlayer().getHealth() + 1);
+					}
 				}
+				if(event.getItem().getAmount() > 1)
+					event.getItem().setAmount(event.getItem().getAmount()-1);
+				else
+					event.getPlayer().setItemInHand(null);
 			}
-			if(event.getItem().getAmount() > 1)
-				event.getItem().setAmount(event.getItem().getAmount()-1);
-			else
-				event.getPlayer().setItemInHand(null);
 		}
 	}
 
