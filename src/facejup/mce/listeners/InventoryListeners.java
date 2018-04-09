@@ -1,5 +1,6 @@
 package facejup.mce.listeners;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,8 +16,11 @@ import org.bukkit.inventory.ItemStack;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
+import facejup.mce.util.Chat;
 import facejup.mce.util.InventoryBuilder;
 import facejup.mce.util.ItemCreator;
+import facejup.mce.util.Lang;
+import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("deprecation")
 public class InventoryListeners implements Listener {
@@ -45,15 +49,22 @@ public class InventoryListeners implements Listener {
 			event.setCancelled(true);
 			Kit kit = InventoryBuilder.getKitBySlot(event.getSlot());
 			Player player = (Player) event.getWhoClicked();
-			if(main.getUserManager().getUser(player) == null)
-				return;
 			boolean matchrunning = main.getMatchManager().isMatchRunning();
 			User user = main.getUserManager().getUser(player);
 			if(user.hasKit(kit))
 			{
 				if(kit == Kit.NONE && matchrunning)
 					return;
-				main.getMatchManager().setPlayerDesiredKit(player, kit);
+				if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE)
+				{
+					main.getMatchManager().setPlayerDesiredKit(player, kit);
+					Chat.bc(Lang.Tag + ChatColor.GREEN + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
+				}
+				else if(main.getMatchManager().isMatchRunning())
+				{
+					main.getMatchManager().setPlayerDesiredKit(player, kit);
+					player.sendMessage(Chat.translate(Lang.Tag + "&aYou will spawn with &bKit " + StringUtils.capitalize(kit.toString().toLowerCase())));
+				}
 				player.openInventory(InventoryBuilder.createKitInventory(player));
 			}
 			else
@@ -72,7 +83,7 @@ public class InventoryListeners implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void itemDamage(PlayerItemDamageEvent event)
 	{

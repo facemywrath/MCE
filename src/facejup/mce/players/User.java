@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -107,12 +108,14 @@ public class User {
 			section.set("Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
 		}
 		um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void setCoins(int i)
 	{
 		section.set("Coins", i);
 		um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incWin(int i) {
@@ -122,6 +125,7 @@ public class User {
 			section.set("Wins", i);
 		incCoins(25);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incRunnerup(int i) {
@@ -131,6 +135,7 @@ public class User {
 			section.set("Runnerup", i);
 		incCoins(10);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incGamesplayed(int i) {
@@ -139,6 +144,7 @@ public class User {
 		else
 			section.set("Gamesplayed", i);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incScore(Achievement ach) {
@@ -162,6 +168,7 @@ public class User {
 			section.set("Achievements." + ach.toString() + ".Score", 1);
 		}
 		um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incCoins(int i)
@@ -171,6 +178,7 @@ public class User {
 		else
 			section.set("Coins", i);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incCoins()
@@ -180,6 +188,7 @@ public class User {
 		else
 			section.set("Coins", 1);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incDeaths() {
@@ -188,6 +197,7 @@ public class User {
 		else
 			section.set("Deaths", 1);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public void incKills() {
@@ -196,6 +206,7 @@ public class User {
 		else
 			section.set("Kills", 1);
 		this.um.getFileControl().save();
+		updateScoreboard();
 	}
 
 	public int getWins() {
@@ -296,14 +307,14 @@ public class User {
 			Objective objective = board.getObjective("lives") != null?board.getObjective("lives"):board.registerNewObjective("lives", "dummy");
 			objective.setDisplayName(ChatColor.GREEN + "   " + ChatColor.BOLD + "Current Game");
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-			objective.getScore("           ").setScore(14);
+			objective.getScore("           ").setScore(21);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Match ").setScore(20);
-			objective.getScore(ChatColor.GREEN + "" + ChatColor.BOLD + "  Players Alive: " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getPlayersAlive().size()).setScore(0);
-			objective.getScore("           ").setScore(14);
-			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Lives ").setScore(20);
+			objective.getScore(ChatColor.GREEN + "" + ChatColor.BOLD + "  Players Alive: " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getPlayersAlive().size()).setScore(19);
+			objective.getScore("           ").setScore(18);
+			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Lives ").setScore(17);
 			for(Player tempPlayer : um.getMain().getMatchManager().getPlayersAlive())
 			{
-				objective.getScore(ChatColor.GREEN + "  " + tempPlayer.getName()).setScore(um.getMain().getMatchManager().getLives(tempPlayer));;
+				objective.getScore(ChatColor.GREEN + "  " + tempPlayer.getName() + ": " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getLives(tempPlayer)).setScore(um.getMain().getMatchManager().getLives(tempPlayer));;
 			}
 		}
 		else

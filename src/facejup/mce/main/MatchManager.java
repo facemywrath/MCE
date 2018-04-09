@@ -18,6 +18,7 @@ import facejup.mce.timers.StartTimer;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import net.md_5.bungee.api.ChatColor;
 
 public class MatchManager {
 
@@ -65,7 +66,7 @@ public class MatchManager {
 		}
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
-			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName());
+			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
 			for(Player player : desiredKits.keySet())
 			{
 				lives.put(player, 5);
@@ -194,7 +195,10 @@ public class MatchManager {
 	{
 		if(lives.containsKey(player))
 			if(lives.get(player) > 0)
+			{
 				lives.put(player, lives.get(player)+1);
+				player.sendMessage(Lang.Tag + ChatColor.GOLD + " You gained an extra life!");
+			}
 	}
 
 	public void decLives(Player player) {
@@ -237,7 +241,7 @@ public class MatchManager {
 		List<Player> players = new ArrayList<>();
 		for(Player player : lives.keySet())
 		{
-			if(lives.get(player) > 0)
+			if(lives.get(player) > 0 && kits.get(player) != Kit.NONE)
 				players.add(player);
 		}
 		return players;

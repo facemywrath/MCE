@@ -34,6 +34,10 @@ public class StartTimer {
 			main.getMatchManager().getEndTimer().stopTimer();
 		time = WAIT_TIME;
 		running = true;
+		for(Player player : Bukkit.getOnlinePlayers())
+		{
+			main.getUserManager().getUser(player).updateScoreboard();
+		}
 		countdown();
 	}
 
@@ -58,7 +62,6 @@ public class StartTimer {
 					player.setHealth(player.getMaxHealth());
 					player.setFoodLevel(20);
 					User user = main.getUserManager().getUser(player);
-					user.updateScoreboard();
 					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
 						player.getInventory().setItem(8, ItemCreator.getKitSelector());
 				}
@@ -108,7 +111,7 @@ public class StartTimer {
 					{
 						countdown();
 					}
-				}, 2L); 
+				}, 20L); 
 			}
 			else
 			{

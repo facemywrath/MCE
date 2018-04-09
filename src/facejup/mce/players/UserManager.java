@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,6 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
+import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
 
 public class UserManager implements Listener {
@@ -110,15 +110,62 @@ public class UserManager implements Listener {
 	{
 		addUser(event.getPlayer());
 		this.main.getMatchManager().setPlayerKit(event.getPlayer(), Kit.NONE);
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				for(Player p : Bukkit.getOnlinePlayers())
+				{
+					getUser(p).updateScoreboard();
+				}
+			}
+		}, 10L);
 	}
 
 	@EventHandler
 	public void playerLeave(PlayerQuitEvent event)
 	{
 		Player player = event.getPlayer();
+		if(main.getMatchManager().getPlayersAlive().contains(player))
+		{
+			this.main.getMatchManager().setLives(player, 0);
+			this.main.getMatchManager().setPlayerDesiredKit(player, Kit.NONE);
+			this.main.getMatchManager().setPlayerKit(player, Kit.NONE);
+			if(main.getMatchManager().getPlayersAlive().size() == 1)
+			{
+				main.getMatchManager().kill(player);
+				Player winner = main.getMatchManager().getPlayersAlive().get(0);
+				main.getUserManager().getUser(winner).incWin(1);
+				main.getUserManager().getUser(player).incRunnerup(1);
+				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
+				Chat.bc(msg);
+				main.getMatchManager().startTimer.startTimer();
+			}
+			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+			{
+				public void run()
+				{
+					for(Player p : Bukkit.getOnlinePlayers())
+					{
+						getUser(p).updateScoreboard();
+					}
+				}
+			}, 10L);
+			return;
+		}
 		this.main.getMatchManager().setLives(player, 0);
 		this.main.getMatchManager().setPlayerDesiredKit(player, Kit.NONE);
 		this.main.getMatchManager().setPlayerKit(player, Kit.NONE);
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				for(Player p : Bukkit.getOnlinePlayers())
+				{
+					getUser(p).updateScoreboard();
+				}
+			}
+		}, 10L);
 	}
 
 	//Getters
@@ -143,6 +190,7 @@ public class UserManager implements Listener {
 		if(!users.containsKey(player))
 		{
 			users.put(player, new User(this, player));
+			getUser(player).updateScoreboard();
 		}
 	}
 

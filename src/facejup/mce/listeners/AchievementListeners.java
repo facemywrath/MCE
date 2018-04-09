@@ -2,11 +2,13 @@ package facejup.mce.listeners;
 
 import java.util.HashMap;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
@@ -71,6 +73,10 @@ public class AchievementListeners implements Listener{
 		else
 		{
 			killsPerLife.put(event.getPlayer(), 1);
+		}
+		if(killsPerLife.get(event.getPlayer())%3 == 0)
+		{
+			event.getPlayer().getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 2));
 		}
 		User user = em.getMain().getUserManager().getUser(event.getPlayer());
 		if(user.getScore(Achievement.IMMORTAL) < killsPerLife.get(event.getPlayer()))

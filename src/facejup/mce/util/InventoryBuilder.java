@@ -55,7 +55,7 @@ public class InventoryBuilder {
 			if(kit.slot == slot)
 				return kit;
 		}
-		return null;
+		return Kit.NONE;
 	}
 
 	public static Inventory createKitInventory(Player player)

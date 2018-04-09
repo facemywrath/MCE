@@ -199,7 +199,10 @@ public class CommandArena implements CommandExecutor{
 		}
 		if(args[0].equalsIgnoreCase("start"))
 		{
-			cm.getMain().getMatchManager().startMatch();
+			if(cm.getMain().getMatchManager().isMatchRunning())
+				return true;
+			if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
+				cm.getMain().getMatchManager().startMatch();
 		}
 		return true;
 	}

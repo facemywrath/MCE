@@ -3,6 +3,7 @@ package facejup.mce.listeners;
 import java.util.HashMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -69,29 +70,53 @@ public class DeathListeners implements Listener {
 			}
 		}, 160L);
 	}
-
-	@EventHandler
-	public void DeathMessageEvent(PlayerDeathEvent event) {
-		event.setDeathMessage("");
-		Player p = event.getEntity();
-		if (!(event.getEntity().getKiller() instanceof Player))
-			return;
-		if (main.getMatchManager().getPlayersAlive().contains(p)) {
-			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + event.getEntity().getKiller().getName() + " &ahas killed &b" + p.getName().toString()));
-		}
+	
+	public void setLastDamagedBy(Player player, DamageMarker marker)
+	{
+		lastDamagedBy.put(player, marker);
+		em.getMain().getServer().getScheduler().scheduleSyncDelayedTask(em.getMain(), new Runnable()
+		{
+			public void run()
+			{
+				if(lastDamagedBy.containsKey(player) && lastDamagedBy.get(player).equals(marker))
+					lastDamagedBy.remove(player);
+			}
+		}, 160L);
 	}
 
 	@EventHandler
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
+		event.setKeepInventory(true);
 		Player player = event.getEntity();
 		main.getMatchManager().decLives(player);
 		main.getUserManager().getUser(player).incDeaths();
 		if(!lastDamagedBy.containsKey(event.getEntity()))
+		{
+			for(Player player2 : Bukkit.getOnlinePlayers())
+			{
+				main.getUserManager().getUser(player2).updateScoreboard();
+			}
+			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + player.getName() + " &ahas died from natural causes."));
+			if(main.getMatchManager().getPlayersAlive().size() == 1)
+			{
+				Player winner = main.getMatchManager().getPlayersAlive().get(0);
+				main.getUserManager().getUser(winner).incWin(1);
+				main.getUserManager().getUser(player).incRunnerup(1);
+				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
+				Chat.bc(msg);
+				main.getMatchManager().startTimer.startTimer();
+			}
 			return;
-		Player killer = lastDamagedBy.get(event.getEntity()).getDamager();
+		}
+		Player killer = lastDamagedBy.get(event.getEntity()).getDamager();	
+		event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
 		if(Numbers.getRandom(0, 4) == 4)
 			main.getMatchManager().incLives(killer);
+		for(Player player2 : Bukkit.getOnlinePlayers())
+		{
+			main.getUserManager().getUser(player2).updateScoreboard();
+		}
 		main.getUserManager().getUser(killer).incCoins();
 		main.getUserManager().getUser(killer).incKills();
 		main.getServer().getPluginManager().callEvent(new PlayerKillEvent(killer, player));

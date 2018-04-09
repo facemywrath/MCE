@@ -33,6 +33,11 @@ public class EventManager {
 		kpl = new KitPowerListeners(this);
 	}
 	
+	public DeathListeners getDeathListeners()
+	{
+		return this.dl;
+	}
+	
 	public Main getMain() 
 	{
 		//Return the main instance.

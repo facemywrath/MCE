@@ -16,7 +16,7 @@ import facejup.mce.util.Lang;
 
 public class EndTimer {
 
-	private final int MATCH_TIME = 1500; // Timer start time.
+	private final int MATCH_TIME = 1200; // Timer start time.
 	private final String tag = Lang.Tag;
 
 	private Main main; // Dependency Injection variable.
@@ -36,6 +36,10 @@ public class EndTimer {
 			main.getMatchManager().getStartTimer().stopTimer();
 		time = MATCH_TIME;
 		running = true;
+		for(Player player : Bukkit.getOnlinePlayers())
+		{
+			main.getUserManager().getUser(player).updateScoreboard();
+		}
 		countdown();
 	}
 
@@ -69,7 +73,6 @@ public class EndTimer {
 							}
 						}
 					}
-					main.getUserManager().getUser(player).updateScoreboard();
 				}
 				switch(time)
 				{
