@@ -55,6 +55,8 @@ public class StartTimer {
 			{
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
+					player.setHealth(player.getMaxHealth());
+					player.setFoodLevel(20);
 					User user = main.getUserManager().getUser(player);
 					user.updateScoreboard();
 					if(!player.getInventory().contains(ItemCreator.getKitSelector()))

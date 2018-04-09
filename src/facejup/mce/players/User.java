@@ -1,5 +1,6 @@
 package facejup.mce.players;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +12,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
@@ -232,6 +232,17 @@ public class User {
 			return section.getInt("Deaths");
 		return 0;
 	}
+	
+	public double getKDR()
+	{
+		int deaths = getDeaths();
+		int kills = getKills();
+		if(deaths == 0)
+			return kills;
+		if(kills == 0)
+			return deaths*-1;
+		return Double.parseDouble(new DecimalFormat("##.###").format(1.0*kills/deaths));
+	}
 
 	public int getKills()
 	{
@@ -290,15 +301,16 @@ public class User {
 		else
 		{		
 			Objective objective = (board.getObjective("stats") != null?board.getObjective("stats"):board.registerNewObjective("stats", "dummy"));
-			objective.setDisplayName(ChatColor.GREEN + "Stats");
+			objective.setDisplayName(ChatColor.AQUA + "~~~~~~~Stats~~~~~~~");
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-			objective.getScore(ChatColor.GOLD + "Coins: " + getCoins()).setScore(8);
-			objective.getScore(ChatColor.GOLD + "Kills: " + getKills()).setScore(7);
-			objective.getScore(ChatColor.GOLD + "Deaths: " + getDeaths()).setScore(6);
-			objective.getScore(ChatColor.GOLD + "Wins: " + getWins()).setScore(5);
-			objective.getScore(ChatColor.GOLD + "Runnerups: " + getRunnerup()).setScore(4);
-			objective.getScore(ChatColor.GOLD + "Games Played: " + getGamesplayed()).setScore(3);
-			objective.getScore(ChatColor.GOLD + "Achievements: " + getAchievementCount()).setScore(2);
+			objective.getScore(ChatColor.GREEN + "KDR: " + ChatColor.LIGHT_PURPLE + getKDR()).setScore(8);
+			objective.getScore(ChatColor.GREEN + "Kills: " + ChatColor.LIGHT_PURPLE + getKills()).setScore(7);
+			objective.getScore(ChatColor.GREEN + "Deaths: " + ChatColor.LIGHT_PURPLE + getDeaths()).setScore(6);
+			objective.getScore(ChatColor.GREEN + "Wins: " + ChatColor.LIGHT_PURPLE + getWins()).setScore(5);
+			objective.getScore(ChatColor.GREEN + "Runnerups: " + ChatColor.LIGHT_PURPLE + getRunnerup()).setScore(4);
+			objective.getScore(ChatColor.GREEN + "Games Played: " + ChatColor.LIGHT_PURPLE + getGamesplayed()).setScore(3);
+			objective.getScore(ChatColor.GREEN + "Achievements: " + ChatColor.LIGHT_PURPLE + getAchievementCount() + "/" + Achievement.values().length).setScore(2);
+			objective.getScore(ChatColor.GREEN + "Coins: " + ChatColor.LIGHT_PURPLE + getCoins()).setScore(1);
 		}
 			player.setScoreboard(board);
 	}

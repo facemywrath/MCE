@@ -4,16 +4,18 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
-import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
 
 public class UserManager implements Listener {
@@ -44,6 +46,63 @@ public class UserManager implements Listener {
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 
+	public Pair<String, Double> getHighestStat(String str)
+	{
+		double highest = -1;
+		String name = null;
+		if(str.equals("KDR"))
+		{
+			for(String key : fc.getConfig().getConfigurationSection("Users").getKeys(false))
+			{
+				int kills = fc.getConfig().getInt("Users." + key + ".Kills");
+				int deaths = fc.getConfig().getInt("Users." + key + ".Deaths");
+				double kdr = (kills == 0?(deaths*-1):deaths==0?kills:1.0*kills/deaths);
+				if(kdr > highest)
+				{
+					highest = kdr;
+					name = fc.getConfig().getString("Users." + key + ".Name");
+				}
+			}
+		}
+		else if(str.equals("Achievements"))
+		{
+			for(String key : fc.getConfig().getConfigurationSection("Users").getKeys(false))
+			{
+				if(users.containsKey(Bukkit.getOfflinePlayer(UUID.fromString(key))))
+				{
+					if(users.get(Bukkit.getOfflinePlayer(UUID.fromString(key))).getAchievementCount() > highest)
+					{
+						highest = users.get(Bukkit.getOfflinePlayer(UUID.fromString(key))).getAchievementCount();
+						name = fc.getConfig().getString("Users." + key + ".Name");
+					}
+				}
+				else
+				{
+					User user = new User(this, Bukkit.getOfflinePlayer(UUID.fromString(key)));
+					if(user.getAchievementCount() > highest)
+					{
+						highest = user.getAchievementCount();
+						name = fc.getConfig().getString("Users." + key + ".Name");
+					}
+				}
+			}
+		}
+		else
+		{
+			for(String key : fc.getConfig().getConfigurationSection("Users").getKeys(false))
+			{
+				int check = fc.getConfig().getInt("Users." + key + "." + str);
+				if(check > highest)
+				{
+					highest = check;
+					name = fc.getConfig().getString("Users." + key + ".Name");
+				}
+			}
+		}
+		Pair<String, Double> pair = Pair.of(name, highest);
+		return pair;
+	}
+
 	//EventHandlers
 
 	@EventHandler
@@ -51,6 +110,15 @@ public class UserManager implements Listener {
 	{
 		addUser(event.getPlayer());
 		this.main.getMatchManager().setPlayerKit(event.getPlayer(), Kit.NONE);
+	}
+
+	@EventHandler
+	public void playerLeave(PlayerQuitEvent event)
+	{
+		Player player = event.getPlayer();
+		this.main.getMatchManager().setLives(player, 0);
+		this.main.getMatchManager().setPlayerDesiredKit(player, Kit.NONE);
+		this.main.getMatchManager().setPlayerKit(player, Kit.NONE);
 	}
 
 	//Getters
@@ -65,7 +133,7 @@ public class UserManager implements Listener {
 	{
 		return this.fc;
 	}
-	
+
 	public Main getMain()
 	{
 		return this.main;

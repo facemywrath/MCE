@@ -1,6 +1,9 @@
 package facejup.mce.timers;
 
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import facejup.mce.enums.Kit;
@@ -48,8 +51,10 @@ public class EndTimer {
 			{
 				for(Player player : mm.getPlayersAlive())
 				{
-					if(player.getInventory().getItemInMainHand().getDurability() > 20)
-						player.getInventory().getItemInMainHand().setDurability((short) 0);
+					player.setMaxHealth(20);
+					player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100.0D);
+					if(mm.getPlayerClosestTo(player) != null)
+						player.setCompassTarget(mm.getPlayerClosestTo(player).getLocation());
 					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
 						player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					main.getUserManager().getUser(player).updateScoreboard();

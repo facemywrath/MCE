@@ -253,6 +253,27 @@ public class MatchManager {
 		}
 		return i;
 	}
+	
+	public Player getPlayerClosestTo(Player target)
+	{
+		Double d = Double.MAX_VALUE;
+		Player ret = null;
+		for(Player player : getPlayersAlive())
+		{
+			if(player.equals(target))
+				continue;
+			if(player.getWorld().equals(target.getWorld()))
+			{
+				if(player.getLocation().distance(target.getLocation()) < d)
+				{
+					d = player.getLocation().distance(target.getLocation());
+					ret = player;
+				}
+			}
+		}
+		return ret;
+		
+	}
 
 	public void kill(Player player) {
 		this.lives.remove(player);

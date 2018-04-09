@@ -4,12 +4,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
@@ -71,6 +72,15 @@ public class InventoryListeners implements Listener {
 			event.setCancelled(true);
 		}
 	}
+	
+	@EventHandler
+	public void itemDamage(PlayerItemDamageEvent event)
+	{
+		if(em.getMain().getMatchManager().isMatchRunning() && em.getMain().getMatchManager().getPlayersAlive().contains(event.getPlayer()))
+		{
+			event.setCancelled(true);
+		}
+	}
 
 	@EventHandler
 	public void playerDropItem(PlayerDropItemEvent event)
@@ -102,15 +112,16 @@ public class InventoryListeners implements Listener {
 			{
 				for(int i = 0; i < 8; i++)
 				{
-					if(event.getPlayer().getHealth() > 0 && event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
+					if(event.getPlayer().getHealth() > 0 && event.getPlayer().getHealth()+1 < event.getPlayer().getMaxHealth())
 					{
 						event.getPlayer().setHealth(event.getPlayer().getHealth() + 1);
 					}
 				}
-				if(event.getItem().getAmount() > 1)
-					event.getItem().setAmount(event.getItem().getAmount()-1);
+				ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+				if(item.getAmount() > 1)
+					item.setAmount(item.getAmount()-1);
 				else
-					event.getPlayer().setItemInHand(null);
+					event.getPlayer().getInventory().setItemInMainHand(null);
 			}
 		}
 	}

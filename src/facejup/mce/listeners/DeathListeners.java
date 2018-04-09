@@ -11,6 +11,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import facejup.mce.enums.Kit;
+import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.main.Main;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Numbers;
@@ -80,6 +81,7 @@ public class DeathListeners implements Listener {
 			main.getMatchManager().incLives(killer);
 		main.getUserManager().getUser(killer).incCoins();
 		main.getUserManager().getUser(killer).incKills();
+		main.getServer().getPluginManager().callEvent(new PlayerKillEvent(killer, player));
 		if(main.getMatchManager().getLives(player) == 0)
 		{
 			if(main.getMatchManager().getPlayersAlive().size() == 1)

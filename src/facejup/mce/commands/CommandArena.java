@@ -193,6 +193,11 @@ public class CommandArena implements CommandExecutor{
 			int amount = Integer.parseInt(args[2]);
 			User user = cm.getMain().getUserManager().getUser(target);
 			user.setCoins(amount);
+			return true;
+		}
+		if(args[0].equalsIgnoreCase("start"))
+		{
+			cm.getMain().getMatchManager().startMatch();
 		}
 		return true;
 	}

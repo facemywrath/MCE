@@ -103,7 +103,7 @@ public class InventoryBuilder {
 			} else {
 				item.addGlowing();
 			}
-			ib.addItem(item.setDisplayname(newName).setLore(lore).getItem());
+			ib.addItem(item.setDisplayname(newName).setLore(lore).hideFlags(63).getItem());
 		}
 
 		return ib.getInventory();

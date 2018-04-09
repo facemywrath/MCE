@@ -1,5 +1,7 @@
 package facejup.mce.listeners;
 
+import java.util.HashMap;
+
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -8,11 +10,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
+import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.players.User;
 
 public class AchievementListeners implements Listener{
 
 	private EventManager em;
+	private HashMap<Player, Integer> killsPerLife = new HashMap<>();
 
 	public AchievementListeners(EventManager em) {
 		this.em = em;
@@ -21,7 +25,7 @@ public class AchievementListeners implements Listener{
 	}
 
 	@EventHandler
-	public void onHit(EntityDamageByEntityEvent event) {
+	public void HitterAchievementModifier(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player) {
 			if (event.getEntity() instanceof Player) {
 				if (em.getMain().getMatchManager().isMatchRunning()) {
@@ -38,7 +42,7 @@ public class AchievementListeners implements Listener{
 	}
 
 	@EventHandler
-	public void registerLastHit(EntityDamageByEntityEvent event)
+	public void BowAchievementModifier(EntityDamageByEntityEvent event)
 	{
 		if(!(event.getEntity() instanceof Player))
 			return;
@@ -54,5 +58,27 @@ public class AchievementListeners implements Listener{
 				user.incScore(Achievement.DIAMOND_BOW);
 			}
 		}
+	}
+	
+	@EventHandler
+	public void SpreeAchievementModifier(PlayerKillEvent event)
+	{
+		killsPerLife.put(event.getTarget(), 0);
+		if(killsPerLife.containsKey(event.getPlayer()))
+		{
+			killsPerLife.put(event.getPlayer(), killsPerLife.get(event.getPlayer())+1);
+		}
+		else
+		{
+			killsPerLife.put(event.getPlayer(), 1);
+		}
+		User user = em.getMain().getUserManager().getUser(event.getPlayer());
+		if(user.getScore(Achievement.IMMORTAL) < killsPerLife.get(event.getPlayer()))
+		{
+			user.incScore(Achievement.SPREE);
+			user.incScore(Achievement.UNKILLABLE);
+			user.incScore(Achievement.IMMORTAL);
+		}
+		
 	}
 }
