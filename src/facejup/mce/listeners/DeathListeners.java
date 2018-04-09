@@ -2,6 +2,7 @@ package facejup.mce.listeners;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -14,7 +15,9 @@ import facejup.mce.enums.Kit;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.main.Main;
 import facejup.mce.util.Chat;
+import facejup.mce.util.Lang;
 import facejup.mce.util.Numbers;
+import net.md_5.bungee.api.ChatColor;
 
 public class DeathListeners implements Listener {
 
@@ -68,9 +71,19 @@ public class DeathListeners implements Listener {
 	}
 
 	@EventHandler
+	public void DeathMessageEvent(PlayerDeathEvent event) {
+		event.setDeathMessage("");
+		Player p = event.getEntity();
+		if (!(event.getEntity().getKiller() instanceof Player))
+			return;
+		if (main.getMatchManager().getPlayersAlive().contains(p)) {
+			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + event.getEntity().getKiller().getName() + " &ahas killed &b" + p.getName().toString()));
+		}
+	}
+
+	@EventHandler
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
-		event.setDeathMessage("");
 		Player player = event.getEntity();
 		main.getMatchManager().decLives(player);
 		main.getUserManager().getUser(player).incDeaths();

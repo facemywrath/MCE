@@ -85,6 +85,7 @@ public class CommandArena implements CommandExecutor{
 					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of: &6" + ArenaName + " &cdoes not exist!"));
 					return true;
 				}
+				sender.sendMessage(Lang.Tag + Chat.translate("&aYou are now editing bound 1 for arena: &b" + ArenaName));
 				arenaAdd.put(player, ArenaName);
 				adding.put(player, AddType.BOUND1);
 				return true;
@@ -101,6 +102,7 @@ public class CommandArena implements CommandExecutor{
 					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of: &6" + ArenaName + " &cdoes not exist!"));
 					return true;
 				}
+				sender.sendMessage(Lang.Tag + Chat.translate("&aYou are now editing bound 2 for arena: &b" + ArenaName));
 				arenaAdd.put(player, ArenaName);
 				adding.put(player, AddType.BOUND2);
 				return true;

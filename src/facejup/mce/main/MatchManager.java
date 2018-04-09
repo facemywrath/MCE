@@ -17,6 +17,7 @@ import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
+import facejup.mce.util.Lang;
 
 public class MatchManager {
 
@@ -27,6 +28,7 @@ public class MatchManager {
 	public ArenaManager am;
 	public StartTimer startTimer; // The timer variable which decides when a round begins.
 	public EndTimer endTimer; // The timer variable which decides when a round begins.
+	public String Tag = Lang.Tag;
 
 	private HashMap<Player, Integer> lives = new HashMap<>();
 	private HashMap<Player, Kit> kits = new HashMap<>();
@@ -58,12 +60,12 @@ public class MatchManager {
 		if(arena == null)
 		{
 			startTimer.linger();
-			Chat.bc("&9(&bMCE&9) &cError: No Arena Found.");
+			Chat.bc(Tag + "&cError: No Arena Found.");
 			return;
 		}
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
-			Chat.bc("&9&l(&r&bMCE&9&l) &b&l Arena selected: " + arena.getName());
+			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName());
 			for(Player player : desiredKits.keySet())
 			{
 				lives.put(player, 5);
@@ -74,7 +76,7 @@ public class MatchManager {
 		else
 		{
 			startTimer.linger();
-			Chat.bc("&9(&bMCE&9) &cError: No Arena Found.");
+			Chat.bc(Tag + "&cError: No Arena Found.");
 			return;
 		}
 	}
@@ -129,7 +131,7 @@ public class MatchManager {
 					User user = main.getUserManager().getUser(player);
 					user.incRunnerup(1);
 				}
-				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
+				String msg = Tag + "&6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
 				Chat.bc(msg);
 			}
 			else
@@ -146,13 +148,13 @@ public class MatchManager {
 						User user = main.getUserManager().getUser(player);
 						user.incRunnerup(1);
 					}
-					String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
+					String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
 					Chat.bc(msg);	
 				}
 				else
 				{
 					Player runnerup = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList()).get(0);
-					String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
+					String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
 					Chat.bc(msg);
 					main.getUserManager().getUser(winner).incWin(1);
 					main.getUserManager().getUser(runnerup).incRunnerup(1);

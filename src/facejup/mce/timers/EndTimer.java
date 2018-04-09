@@ -1,5 +1,6 @@
 package facejup.mce.timers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -49,24 +50,26 @@ public class EndTimer {
 		{
 			if(time > 0)
 			{
-				for(Player player : mm.getPlayersAlive())
+				for(Player player : Bukkit.getOnlinePlayers())
 				{
-					player.setMaxHealth(20);
-					player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100.0D);
-					if(mm.getPlayerClosestTo(player) != null)
-						player.setCompassTarget(mm.getPlayerClosestTo(player).getLocation());
-					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
-						player.getInventory().setItem(8, ItemCreator.getKitSelector());
-					main.getUserManager().getUser(player).updateScoreboard();
-					if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
-					{
-						Kit kit = mm.getPlayerKit(player);
-						if(kit.pot != null)
+					if (mm.getPlayersAlive().contains(player)) {
+						player.setMaxHealth(20);
+						player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100.0D);
+						if(mm.getPlayerClosestTo(player) != null)
+							player.setCompassTarget(mm.getPlayerClosestTo(player).getLocation());
+						if(!player.getInventory().contains(ItemCreator.getKitSelector()))
+							player.getInventory().setItem(8, ItemCreator.getKitSelector());
+						if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 						{
-							if (!player.hasPotionEffect(kit.pot.getType()))
-								player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
+							Kit kit = mm.getPlayerKit(player);
+							if(kit.pot != null)
+							{
+								if (!player.hasPotionEffect(kit.pot.getType()))
+									player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
+							}
 						}
 					}
+					main.getUserManager().getUser(player).updateScoreboard();
 				}
 				switch(time)
 				{

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,6 +20,8 @@ import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
+import net.minecraft.server.v1_12_R1.MinecraftServer;
+import net.minecraft.server.v1_12_R1.ServerPing;
 
 public class User {
 
@@ -291,26 +294,43 @@ public class User {
 		if(running)
 		{
 			Objective objective = board.getObjective("lives") != null?board.getObjective("lives"):board.registerNewObjective("lives", "dummy");
-			objective.setDisplayName(ChatColor.GREEN + "   " + ChatColor.BOLD + "Lives");
+			objective.setDisplayName(ChatColor.GREEN + "   " + ChatColor.BOLD + "Current Game");
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+			objective.getScore("           ").setScore(14);
+			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Match ").setScore(20);
+			objective.getScore(ChatColor.GREEN + "" + ChatColor.BOLD + "  Players Alive: " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getPlayersAlive().size()).setScore(0);
+			objective.getScore("           ").setScore(14);
+			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Lives ").setScore(20);
 			for(Player tempPlayer : um.getMain().getMatchManager().getPlayersAlive())
 			{
-				objective.getScore(ChatColor.GOLD + tempPlayer.getName()).setScore(um.getMain().getMatchManager().getLives(tempPlayer));;
+				objective.getScore(ChatColor.GREEN + "  " + tempPlayer.getName()).setScore(um.getMain().getMatchManager().getLives(tempPlayer));;
 			}
 		}
 		else
 		{		
 			Objective objective = (board.getObjective("stats") != null?board.getObjective("stats"):board.registerNewObjective("stats", "dummy"));
-			objective.setDisplayName(ChatColor.AQUA + "~~~~~~~Stats~~~~~~~");
+			String title = "" + ChatColor.BLUE + ChatColor.BOLD + "(" + ChatColor.AQUA + ChatColor.BOLD + ChatColor.ITALIC + "MC" + ChatColor.WHITE + ChatColor.BOLD + ChatColor.ITALIC + "Elim" + ChatColor.BLUE + ChatColor.BOLD + ")";
+			objective.setDisplayName(title);
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-			objective.getScore(ChatColor.GREEN + "KDR: " + ChatColor.LIGHT_PURPLE + getKDR()).setScore(8);
-			objective.getScore(ChatColor.GREEN + "Kills: " + ChatColor.LIGHT_PURPLE + getKills()).setScore(7);
-			objective.getScore(ChatColor.GREEN + "Deaths: " + ChatColor.LIGHT_PURPLE + getDeaths()).setScore(6);
-			objective.getScore(ChatColor.GREEN + "Wins: " + ChatColor.LIGHT_PURPLE + getWins()).setScore(5);
-			objective.getScore(ChatColor.GREEN + "Runnerups: " + ChatColor.LIGHT_PURPLE + getRunnerup()).setScore(4);
-			objective.getScore(ChatColor.GREEN + "Games Played: " + ChatColor.LIGHT_PURPLE + getGamesplayed()).setScore(3);
-			objective.getScore(ChatColor.GREEN + "Achievements: " + ChatColor.LIGHT_PURPLE + getAchievementCount() + "/" + Achievement.values().length).setScore(2);
-			objective.getScore(ChatColor.GREEN + "Coins: " + ChatColor.LIGHT_PURPLE + getCoins()).setScore(1);
+			objective.getScore("           ").setScore(14);
+			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Server ").setScore(20);
+			objective.getScore(ChatColor.GREEN + "  IP: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getIp()).setScore(19);
+			objective.getScore(ChatColor.GREEN + "  Playing: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getOnlinePlayers().size()).setScore(16);
+			objective.getScore(ChatColor.GREEN + "             ").setScore(15);
+			objective.getScore(ChatColor.GREEN + "             ").setScore(14);
+			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Player ").setScore(13);
+			objective.getScore(ChatColor.GREEN + "  Name: " + ChatColor.LIGHT_PURPLE + player.getName()).setScore(12);
+			objective.getScore(ChatColor.GREEN + "  Coins: " + ChatColor.LIGHT_PURPLE + getCoins()).setScore(11);
+			objective.getScore(ChatColor.GREEN + "  Achievements: " + ChatColor.LIGHT_PURPLE + getAchievementCount() + "/" + Achievement.values().length).setScore(10);
+			objective.getScore(ChatColor.GREEN + "             ").setScore(9);
+			objective.getScore(ChatColor.GREEN + "             ").setScore(8);
+			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Stats ").setScore(7);
+			objective.getScore(ChatColor.GREEN + "  KDR: " + ChatColor.LIGHT_PURPLE + getKDR()).setScore(6);
+			objective.getScore(ChatColor.GREEN + "  Kills: " + ChatColor.LIGHT_PURPLE + getKills()).setScore(5);
+			objective.getScore(ChatColor.GREEN + "  Deaths: " + ChatColor.LIGHT_PURPLE + getDeaths()).setScore(4);
+			objective.getScore(ChatColor.GREEN + "  Wins: " + ChatColor.LIGHT_PURPLE + getWins()).setScore(3);
+			objective.getScore(ChatColor.GREEN + "  Runnerups: " + ChatColor.LIGHT_PURPLE + getRunnerup()).setScore(2);
+			objective.getScore(ChatColor.GREEN + "  Games Played: " + ChatColor.LIGHT_PURPLE + getGamesplayed()).setScore(1);
 		}
 			player.setScoreboard(board);
 	}
