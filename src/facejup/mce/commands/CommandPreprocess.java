@@ -41,6 +41,11 @@ public class CommandPreprocess implements Listener {
 			player.sendMessage(" ");
 			event.setCancelled(true);
 		}
+		if(event.getMessage().equalsIgnoreCase("/pl"))
+		{
+			player.sendMessage(Chat.translate("&cNo Plugins For You"));
+			event.setCancelled(true);
+		}
 	}
 
 }

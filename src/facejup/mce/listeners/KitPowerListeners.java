@@ -77,11 +77,6 @@ public class KitPowerListeners implements Listener {
 	public void fishermanHook(PlayerFishEvent event)
 	{
 		event.getPlayer().setCooldown(Material.FISHING_ROD, 40);
-		//if(!(event.getCaught() instanceof Player))
-		//	return;
-		//Player player = (Player) event.getCaught();
-		//Location loc = event.getPlayer().getLocation().add(new Vector(event.getPlayer().getLocation().getDirection().getX(), 0, event.getPlayer().getLocation().getDirection().getZ()));
-		//player.teleport(loc);
 	}
 
 }

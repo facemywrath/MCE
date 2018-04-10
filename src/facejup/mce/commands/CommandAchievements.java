@@ -38,7 +38,7 @@ public class CommandAchievements implements CommandExecutor{
 				sender.sendMessage(Lang.ConsoleUse);
 				return true;
 			}
-			if(args.length > 0 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getAchievementByName(args[1]) != null)
+			if(args.length > 1 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getAchievementByName(args[1]) != null)
 			{
 				Achievement ach = getAchievementByName(args[1]);
 				sender.sendMessage(Chat.translate(Lang.Tag + "You've given &b" + Bukkit.getOfflinePlayer(args[0]).getName() + "&a the achievement &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
@@ -58,7 +58,7 @@ public class CommandAchievements implements CommandExecutor{
 				sender.sendMessage(Lang.InvalidSyn);
 				return true;
 			}
-			if(args.length > 0 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getAchievementByName(args[1]) != null)
+			if(args.length > 1 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getAchievementByName(args[1]) != null)
 			{
 				Achievement ach = getAchievementByName(args[1]);
 				sender.sendMessage(Chat.translate(Lang.Tag + "You've given &b" + Bukkit.getOfflinePlayer(args[0]).getName() + "&a the achievement &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
