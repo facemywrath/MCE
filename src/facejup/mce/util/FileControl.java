@@ -3,7 +3,6 @@ package facejup.mce.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 

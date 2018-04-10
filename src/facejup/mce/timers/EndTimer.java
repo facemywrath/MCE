@@ -13,6 +13,7 @@ import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import net.minecraft.server.v1_12_R1.MinecraftServer;
 
 public class EndTimer {
 
@@ -48,8 +49,15 @@ public class EndTimer {
 		this.running = false;
 	}
 
+	public int getTime() {
+		return this.time;
+	}
+	
 	private void countdown()
 	{
+		int minutes = (int) ((time) / 60.0);
+		int seconds = (int) ((time) % 60.0);
+		MinecraftServer.getServer().setMotd(Chat.translate("    &9&l(&b&l&oMC&f&l&oEliminations&9&l) &7&l : &e&l Version: 1.8 - 1.12 \n        &a&lMatch ending in: &b" + minutes + ":" + seconds + " &a&lminutes!"));
 		if(running)
 		{
 			if(time > 0)

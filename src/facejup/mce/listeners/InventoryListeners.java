@@ -57,14 +57,10 @@ public class InventoryListeners implements Listener {
 					return;
 				if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE)
 				{
-					main.getMatchManager().setPlayerDesiredKit(player, kit);
 					Chat.bc(Lang.Tag + ChatColor.GREEN + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
 				}
-				else if(main.getMatchManager().isMatchRunning())
-				{
-					main.getMatchManager().setPlayerDesiredKit(player, kit);
-					player.sendMessage(Chat.translate(Lang.Tag + "&aYou will spawn with &bKit " + StringUtils.capitalize(kit.toString().toLowerCase())));
-				}
+				main.getMatchManager().setPlayerDesiredKit(player, kit);
+				player.sendMessage(Chat.translate(Lang.Tag + "&aYou will spawn with &bKit " + StringUtils.capitalize(kit.toString().toLowerCase())));
 				player.openInventory(InventoryBuilder.createKitInventory(player));
 			}
 			else

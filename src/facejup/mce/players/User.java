@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -22,8 +21,6 @@ import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
-import net.minecraft.server.v1_12_R1.MinecraftServer;
-import net.minecraft.server.v1_12_R1.ServerPing;
 
 public class User {
 
@@ -347,7 +344,7 @@ public class User {
 			objective.getScore("           ").setScore(14);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Server ").setScore(20);
 			objective.getScore(ChatColor.GREEN + "  IP: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getIp()).setScore(19);
-			objective.getScore(ChatColor.GREEN + "  Playing: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getOnlinePlayers().size()).setScore(16);
+			objective.getScore(ChatColor.GREEN + "  Online: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getOnlinePlayers().size()).setScore(16);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(15);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(14);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Player ").setScore(13);

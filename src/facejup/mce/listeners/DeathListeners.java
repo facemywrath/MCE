@@ -73,6 +73,8 @@ public class DeathListeners implements Listener {
 	
 	public void setLastDamagedBy(Player player, DamageMarker marker)
 	{
+		if(!em.getMain().getMatchManager().isMatchRunning())
+			return;
 		lastDamagedBy.put(player, marker);
 		em.getMain().getServer().getScheduler().scheduleSyncDelayedTask(em.getMain(), new Runnable()
 		{
@@ -87,6 +89,8 @@ public class DeathListeners implements Listener {
 	@EventHandler
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
+		if(!em.getMain().getMatchManager().isMatchRunning())
+			return;
 		event.setKeepInventory(true);
 		Player player = event.getEntity();
 		main.getMatchManager().decLives(player);
