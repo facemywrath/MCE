@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -118,6 +119,26 @@ public class User {
 		updateScoreboard();
 	}
 
+	public void setScore(Achievement ach, int i)
+	{
+		int score = i;
+		section.set("Achievements." + ach.toString() + ".Score", score);
+		if (score == ach.score) {
+			if(ach.kitreward == null)
+				incCoins(ach.coinreward);
+			else
+				unlockKit(ach.kitreward);
+			if (this.player.isOnline()) {
+				((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
+			}
+			if (ach != Achievement.MASTER) {
+				incScore(Achievement.MASTER);
+			}
+		}
+		um.getFileControl().save();
+		updateScoreboard();
+	}
+
 	public void incWin(int i) {
 		if(section.contains("Wins"))
 			section.set("Wins", section.getInt("Wins") + i);
@@ -157,7 +178,7 @@ public class User {
 				else
 					unlockKit(ach.kitreward);
 				if (this.player.isOnline()) {
-					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + ach));
+					((Player) player).sendMessage("&aYou have unlocked the achievement: &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " ")));
 				}
 				if (ach != Achievement.MASTER) {
 					incScore(Achievement.MASTER);
@@ -246,7 +267,7 @@ public class User {
 			return section.getInt("Deaths");
 		return 0;
 	}
-	
+
 	public double getKDR()
 	{
 		int deaths = getDeaths();
@@ -343,7 +364,7 @@ public class User {
 			objective.getScore(ChatColor.GREEN + "  Runnerups: " + ChatColor.LIGHT_PURPLE + getRunnerup()).setScore(2);
 			objective.getScore(ChatColor.GREEN + "  Games Played: " + ChatColor.LIGHT_PURPLE + getGamesplayed()).setScore(1);
 		}
-			player.setScoreboard(board);
+		player.setScoreboard(board);
 	}
 
 }

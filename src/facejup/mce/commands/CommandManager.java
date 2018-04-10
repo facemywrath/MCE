@@ -8,16 +8,21 @@ public class CommandManager {
 	private CommandArena ca;
 	private CommandStats cs;
 	private CommandAchievements cach;
+	private CommandKits ck;
+	private CommandPreprocess cpp;
 	
 	public CommandManager(Main main)
 	{
 		this.main = main;
 		ca = new CommandArena(this);
 		cs = new CommandStats(this);
-		cach = new CommandAchievements();
+		cach = new CommandAchievements(main);
+		ck = new CommandKits(main);
+		cpp = new CommandPreprocess(main); // Don't need to set an executor for this.
 		main.getCommand(ca.name).setExecutor(ca);
 		main.getCommand(cs.name).setExecutor(cs);
 		main.getCommand(cach.name).setExecutor(cach);
+		main.getCommand(ck.name).setExecutor(ck);
 	}
 	
 	public CommandArena getCommandArena() 

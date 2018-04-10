@@ -10,3 +10,5 @@ commands:
     description: Stats command for MCE
   achievements:
     description: Achievements command for MCE
+  kits:
+    description: Achievements command for MCE
