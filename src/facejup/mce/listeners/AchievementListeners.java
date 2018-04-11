@@ -34,9 +34,7 @@ public class AchievementListeners implements Listener{
 					Player player = (Player) event.getDamager();
 					if (em.getMain().getMatchManager().getPlayerKit(player) != Kit.NONE) {
 						User user = em.getMain().getUserManager().getUser(player);
-						user.incScore(Achievement.IRON_HITTER);
-						user.incScore(Achievement.GOLD_HITTER);
-						user.incScore(Achievement.DIAMOND_HITTER);
+						user.incScore(Achievement.HITTER);
 					}
 				}
 			}
@@ -55,9 +53,7 @@ public class AchievementListeners implements Listener{
 		if (em.getMain().getMatchManager().isMatchRunning()) {
 			if (em.getMain().getMatchManager().getPlayerKit(damager) != Kit.NONE) {
 				User user = em.getMain().getUserManager().getUser(damager);
-				user.incScore(Achievement.IRON_BOW);
-				user.incScore(Achievement.GOLD_BOW);
-				user.incScore(Achievement.DIAMOND_BOW);
+				user.incScore(Achievement.BOW);
 			}
 		}
 	}
@@ -79,12 +75,9 @@ public class AchievementListeners implements Listener{
 			event.getPlayer().getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 2));
 		}
 		User user = em.getMain().getUserManager().getUser(event.getPlayer());
-		if(user.getScore(Achievement.IMMORTAL) < killsPerLife.get(event.getPlayer()))
+		if(user.getScore(Achievement.SPREE) < killsPerLife.get(event.getPlayer()))
 		{
 			user.incScore(Achievement.SPREE);
-			user.incScore(Achievement.UNKILLABLE);
-			user.incScore(Achievement.IMMORTAL);
 		}
-		
 	}
 }

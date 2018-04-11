@@ -43,7 +43,7 @@ public class CommandAchievements implements CommandExecutor{
 				Achievement ach = getAchievementByName(args[1]);
 				sender.sendMessage(Chat.translate(Lang.Tag + "You've given &b" + Bukkit.getOfflinePlayer(args[0]).getName() + "&a the achievement &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				User user = main.getUserManager().getUser(Bukkit.getOfflinePlayer(args[0]));
-				user.setScore(ach, ach.score);
+				user.setScore(ach, ach.scores.get(ach.scores.size()-1));
 			}
 		}
 		else if(((Player) sender).isOp())
@@ -64,7 +64,7 @@ public class CommandAchievements implements CommandExecutor{
 				Achievement ach = getAchievementByName(args[1]);
 				sender.sendMessage(Chat.translate(Lang.Tag + "You've given &b" + Bukkit.getOfflinePlayer(args[0]).getName() + "&a the achievement &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				User user = main.getUserManager().getUser(Bukkit.getOfflinePlayer(args[0]));
-				user.setScore(ach, ach.score);
+				user.setScore(ach, ach.scores.get(ach.scores.size()-1));
 				return true;
 			}
 		}

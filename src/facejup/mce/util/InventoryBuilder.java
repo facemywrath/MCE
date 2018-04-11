@@ -15,6 +15,7 @@ import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
+import net.md_5.bungee.api.ChatColor;
 
 
 public class InventoryBuilder {
@@ -91,12 +92,31 @@ public class InventoryBuilder {
 			String name = ach.icon.getItemMeta().getDisplayName();
 			List<String> lore = ach.icon.getItemMeta().getLore();
 			boolean flag = user.hasAchievement(ach);
-			String newName = (flag ? "&aUnlocked: " + name : "&cLocked: " + name);
-
+			String newName = (flag ? "&aUnlocked: " : "&cLocked: ");
+			String level = "";
+			if(ach.scores.size() > 1)
+				switch(user.getAchievementLevel(ach))
+				{
+				case 0:
+					level = "Iron ";
+					break;
+				case 1:
+					level = "Gold ";
+					break;
+				case 2:
+					level = "Diamond ";
+					break;
+				}
+			newName += level + name;
+			for(int i = 0; i < lore.size(); i++)
+			{
+				String str = lore.get(i);
+				lore.set(i, str.replaceAll("%SCORE%", "&6" + user.getNextAchievementScore(ach)));
+			}
 			if(!flag) {
-				lore.add("&6Score: " + user.getScore(ach) + "/" + ach.score);
+				lore.add("&6Score: " + user.getScore(ach) + "/" + ach.scores.get(user.getAchievementLevel(ach)));
 				if(ach.kitreward == null)
-					lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.coinreward + " coins"));
+					lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.coinrewards.get(user.getAchievementLevel(ach)) + " coins"));
 				else
 					lore.addAll(Arrays.asList("", "&7&lReward: &bKit " + StringUtils.capitalize(ach.kitreward.toString().toLowerCase())));
 

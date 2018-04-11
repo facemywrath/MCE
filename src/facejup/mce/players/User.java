@@ -75,10 +75,80 @@ public class User {
 		return false;
 	}
 
-	public boolean hasAchievement(Achievement ach) {
-		if (getScore(ach) >= ach.score)
+	public boolean hasAchievement(Achievement ach, int level) {
+		if (ach.scores.size() >= level && getScore(ach) >= ach.scores.get(level))
 			return true;
 		return false;
+	}
+
+	public boolean hasAchievement(Achievement ach) {
+		if (getScore(ach) >= ach.scores.get(ach.scores.size()-1))
+			return true;
+		return false;
+	}
+
+	public int getAchievementLevel(Achievement ach)
+	{
+		int score = getScore(ach);
+		int lower = 0;
+		int i = 0;
+		for(int higher : ach.scores)
+		{
+			if(score >= lower && score < higher)
+			{
+				return i;
+			}
+			lower = higher;
+			i++;
+		}
+		return (i < ach.scores.size()?i:ach.scores.size());
+	}
+
+	public int getAchievementLevelIndex(Achievement ach)
+	{
+		int score = getScore(ach);
+		int lower = 0;
+		int i = -1;
+		for(int higher : ach.scores)
+		{
+			if(score >= lower && score < higher)
+			{
+				return i;
+			}
+			lower = higher;
+			i++;
+		}
+		return ach.scores.size()-1;
+	}
+
+	public int getNextAchievementScore(Achievement ach)
+	{
+		int score = getScore(ach);
+		int lower = 0;
+		for(int higher : ach.scores)
+		{
+			if(score >= lower && score < higher)
+			{
+				return higher;
+			}
+			lower = higher;
+		}
+		return lower;
+	}
+
+	public int getCurrentAchievementMaxScore(Achievement ach)
+	{
+		int score = getScore(ach);
+		int lower = 0;
+		for(int higher : ach.scores)
+		{
+			if(score > lower && score <= higher)
+			{
+				return higher;
+			}
+			lower = higher;
+		}
+		return lower;
 	}
 
 	public void purchaseKit(Kit kit)
@@ -115,18 +185,41 @@ public class User {
 		um.getFileControl().save();
 		updateScoreboard();
 	}
-
-	public void setScore(Achievement ach, int i)
+	
+	public String getAchievementTypeByScore(Achievement ach)
 	{
-		int score = i;
+		String level = "";
+		if(ach.scores.size() > 1)
+			switch(getAchievementLevel(ach))
+			{
+			case 0:
+				level = "Iron ";
+				break;
+			case 1:
+				level = "Iron ";
+				break;
+			case 2:
+				level = "Gold ";
+				break;
+			case 3:
+				level = "Diamond ";
+				break;
+			}
+		return level;
+	}
+
+	public void setScore(Achievement ach, int score)
+	{
 		section.set("Achievements." + ach.toString() + ".Score", score);
-		if (score == ach.score) {
+		if (score == getCurrentAchievementMaxScore(ach)) {
 			if(ach.kitreward == null)
-				incCoins(ach.coinreward);
+			{
+				incCoins(ach.coinrewards.get(getAchievementLevelIndex(ach)));
+			}
 			else
 				unlockKit(ach.kitreward);
 			if (this.player.isOnline()) {
-				((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
+				((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + getAchievementTypeByScore(ach) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 			}
 			if (ach != Achievement.MASTER) {
 				incScore(Achievement.MASTER);
@@ -142,6 +235,7 @@ public class User {
 		else
 			section.set("Wins", i);
 		incCoins(25);
+		incScore(Achievement.VICTOR);
 		this.um.getFileControl().save();
 		updateScoreboard();
 	}
@@ -152,6 +246,7 @@ public class User {
 		else
 			section.set("Runnerup", i);
 		incCoins(10);
+		incScore(Achievement.FAILURE);
 		this.um.getFileControl().save();
 		updateScoreboard();
 	}
@@ -169,13 +264,15 @@ public class User {
 		if (section.contains("Achievements." + ach.toString() + ".Score")) {
 			int score = section.getInt("Achievements." + ach.toString() + ".Score") + 1;
 			section.set("Achievements." + ach.toString() + ".Score", score);
-			if (score == ach.score) {
+			if (score == getCurrentAchievementMaxScore(ach)) {
 				if(ach.kitreward == null)
-					incCoins(ach.coinreward);
+				{
+					incCoins(ach.coinrewards.get(getAchievementLevelIndex(ach)));
+				}
 				else
 					unlockKit(ach.kitreward);
 				if (this.player.isOnline()) {
-					((Player) player).sendMessage("&aYou have unlocked the achievement: &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " ")));
+					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + getAchievementTypeByScore(ach) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				}
 				if (ach != Achievement.MASTER) {
 					incScore(Achievement.MASTER);
@@ -286,9 +383,7 @@ public class User {
 	public int getAchievementCount() {
 		int i = 0;
 		for (Achievement ach : Achievement.values()) {
-			if (hasAchievement(ach)) {
-				i++;
-			}
+			i+=getAchievementLevel(ach);
 		}
 		return i;
 	}
