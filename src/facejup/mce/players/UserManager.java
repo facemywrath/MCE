@@ -110,7 +110,6 @@ public class UserManager implements Listener {
 	public void playerJoin(PlayerJoinEvent event)
 	{
 		addUser(event.getPlayer());
-		main.getMatchManager().spawnPlayer(event.getPlayer());
 		this.main.getMatchManager().setPlayerKit(event.getPlayer(), Kit.NONE);
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
@@ -118,6 +117,7 @@ public class UserManager implements Listener {
 			{
 				for(Player p : Bukkit.getOnlinePlayers())
 				{
+					main.getMatchManager().spawnPlayer(event.getPlayer());
 					getUser(p).updateScoreboard();
 				}
 			}

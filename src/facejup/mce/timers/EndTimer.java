@@ -37,10 +37,16 @@ public class EndTimer {
 			main.getMatchManager().getStartTimer().stopTimer();
 		time = MATCH_TIME;
 		running = true;
-		for(Player player : Bukkit.getOnlinePlayers())
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
-			main.getUserManager().getUser(player).updateScoreboard();
-		}
+			public void run()
+			{
+				for(Player player : Bukkit.getOnlinePlayers())
+				{
+					main.getUserManager().getUser(player).updateScoreboard();
+				}
+			}
+		}, 3L);
 		countdown();
 	}
 
@@ -52,7 +58,7 @@ public class EndTimer {
 	public int getTime() {
 		return this.time;
 	}
-	
+
 	private void countdown()
 	{
 		int minutes = (int) ((time) / 60.0);

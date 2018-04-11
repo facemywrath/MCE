@@ -3,12 +3,13 @@ package facejup.mce.listeners;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
@@ -54,6 +55,15 @@ public class KitPowerListeners implements Listener {
 			event.getPlayer().teleport(event.getTo());
 		}
 	}
+	
+	@EventHandler
+	public void projectileLaunch(ProjectileLaunchEvent event)
+	{
+		if(event.getEntity().getType() == EntityType.FISHING_HOOK && ((Projectile) event.getEntity()).getShooter() instanceof Player)
+		{
+			event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(2));
+		}
+	}
 
 	@EventHandler
 	public void projectileHit(ProjectileHitEvent event)
@@ -68,15 +78,10 @@ public class KitPowerListeners implements Listener {
 				main.getEventManager().getDeathListeners().setLastDamagedBy(target, marker);
 				target.damage(1);
 				event.getHitEntity().teleport(player);
+				player.setCooldown(Material.FISHING_ROD, 40);
 			}
 			event.getEntity().remove();
 		}
-	}
-
-	@EventHandler
-	public void fishermanHook(PlayerFishEvent event)
-	{
-		event.getPlayer().setCooldown(Material.FISHING_ROD, 40);
 	}
 
 }

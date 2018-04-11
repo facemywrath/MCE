@@ -38,10 +38,13 @@ public class DeathListeners implements Listener {
 	public void playerRespawn(PlayerRespawnEvent event)
 	{
 		Player player = event.getPlayer();
-		if(main.getMatchManager().getLives(player) > 0 && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE)
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
-			main.getMatchManager().spawnPlayer(player);
-		}
+			public void run()
+			{
+				main.getMatchManager().spawnPlayer(player);
+			}
+		}, 3L);
 	}
 
 	@EventHandler
@@ -100,22 +103,30 @@ public class DeathListeners implements Listener {
 	@EventHandler
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
-		if(!em.getMain().getMatchManager().isMatchRunning())
+		if(!em.getMain().getMatchManager().isMatchRunning()) // Only run this function during a match
 			return;
-		event.setKeepInventory(true);
+		event.setKeepInventory(true); // Let the player keep their items.
 		Player player = event.getEntity();
-		main.getMatchManager().decLives(player);
-		main.getUserManager().getUser(player).incDeaths();
+		main.getMatchManager().decLives(player); // Lower their lives.
+		main.getUserManager().getUser(player).incDeaths(); // Increase their deaths.
+		for(Player player2 : Bukkit.getOnlinePlayers())
+		{ // Update every players scoreboard
+			main.getUserManager().getUser(player2).updateScoreboard();
+		}
 		if(!lastDamagedBy.containsKey(event.getEntity()))
-		{
-			for(Player player2 : Bukkit.getOnlinePlayers())
-			{
-				main.getUserManager().getUser(player2).updateScoreboard();
-			}
+		{ // If they weren't killed by a player:
+			// Broadcast msg
 			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + player.getName() + " &ahas died from natural causes."));
 			if(main.getMatchManager().getPlayersAlive().size() == 1)
-			{
+			{ // If there's only one player left
 				Player winner = main.getMatchManager().getPlayersAlive().get(0);
+				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+				{
+					public void run()
+					{
+						main.getMatchManager().spawnPlayer(winner);
+					}
+				}, 1L);
 				main.getUserManager().getUser(winner).incWin(1);
 				main.getUserManager().getUser(player).incRunnerup(1);
 				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
@@ -141,12 +152,25 @@ public class DeathListeners implements Listener {
 			{
 				main.getMatchManager().kill(player);
 				Player winner = main.getMatchManager().getPlayersAlive().get(0);
-				main.getMatchManager().spawnPlayer(winner);
+				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+				{
+					public void run()
+					{
+						main.getMatchManager().spawnPlayer(winner);
+
+					}
+				}, 1L);
 				main.getUserManager().getUser(winner).incWin(1);
 				main.getUserManager().getUser(player).incRunnerup(1);
 				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
 				Chat.bc(msg);
-				main.getMatchManager().startTimer.startTimer();
+				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+				{
+					public void run()
+					{
+						main.getMatchManager().startTimer.startTimer();
+					}
+				}, 1L);
 			}
 			else
 			{
@@ -157,7 +181,8 @@ public class DeathListeners implements Listener {
 		{
 			public void run()
 			{
-				player.spigot().respawn();
+				if(player.isDead())
+					player.spigot().respawn();
 			}
 		}, 100L);
 	}

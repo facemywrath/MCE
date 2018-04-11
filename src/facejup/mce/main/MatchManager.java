@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -67,13 +68,14 @@ public class MatchManager {
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
 			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
+			endTimer.startTimer();
 			for(Player player : desiredKits.keySet())
 			{
 				main.getUserManager().getUser(player).incGamesplayed(1);
 				lives.put(player, 5);
 				spawnPlayer(player);
+				main.getUserManager().getUser(player).updateScoreboard();
 			}
-			endTimer.startTimer();
 		}
 		else
 		{
@@ -85,6 +87,7 @@ public class MatchManager {
 
 	public void spawnPlayer(Player player) 
 	{
+		player.setGameMode(GameMode.SURVIVAL);
 		if(!this.isMatchRunning())
 		{
 			if(player.isOp())
@@ -131,6 +134,7 @@ public class MatchManager {
 				main.getServer().dispatchCommand(player, "spawn");
 				player.setOp(false);
 			}
+			return;
 		}
 		if (desiredKits.containsKey(player) && !(desiredKits.get(player).equals(kits.get(player)))) {
 			kits.put(player, desiredKits.get(player));
@@ -145,15 +149,32 @@ public class MatchManager {
 				player.getInventory().clear();
 				player.setHealth(player.getMaxHealth());
 				player.setFoodLevel(20);
-				player.getInventory().setItem(8, ItemCreator.getKitSelector());
-				Kit kit = kits.get(player);
-				kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
-				player.getInventory().setHelmet(kit.helmet);
-				player.getInventory().setChestplate(kit.chestplate);
-				player.getInventory().setLeggings(kit.leggings);
-				player.getInventory().setBoots(kit.boots);
-				Location loc = am.getArena().getRandomSpawn();
-				player.teleport(loc);
+				if(isMatchRunning())
+				{
+					player.getInventory().setItem(8, ItemCreator.getKitSelector());
+					Kit kit = kits.get(player);
+					kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
+					player.getInventory().setHelmet(kit.helmet);
+					player.getInventory().setChestplate(kit.chestplate);
+					player.getInventory().setLeggings(kit.leggings);
+					player.getInventory().setBoots(kit.boots);
+					Location loc = am.getArena().getRandomSpawn();
+					player.teleport(loc);
+				}
+				else
+				{
+					if(player.isOp())
+					{
+						main.getServer().dispatchCommand(player, "spawn");
+					}
+					else
+					{
+						player.setOp(true);
+						main.getServer().dispatchCommand(player, "spawn");
+						player.setOp(false);
+					}
+
+				}
 			}
 
 		}, 5L);
@@ -174,7 +195,13 @@ public class MatchManager {
 					User user = main.getUserManager().getUser(player);
 					user.incRunnerup(1);
 					if(player.isOnline())
-						main.getMatchManager().spawnPlayer(player);
+						main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+						{
+							public void run()
+							{
+								main.getMatchManager().spawnPlayer(player);
+							}
+						}, 1L);
 				}
 				String msg = Tag + "&6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
 				Chat.bc(msg);
@@ -191,7 +218,13 @@ public class MatchManager {
 					for(Player player : players)
 					{
 						if(player.isOnline())
-							main.getMatchManager().spawnPlayer(player);
+							main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+							{
+								public void run()
+								{
+									main.getMatchManager().spawnPlayer(player);
+								}
+							}, 1L);
 						User user = main.getUserManager().getUser(player);
 						user.incRunnerup(1);
 					}
@@ -204,9 +237,21 @@ public class MatchManager {
 					String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
 					Chat.bc(msg);
 					if(winner.isOnline())
-						main.getMatchManager().spawnPlayer(winner);
+						main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+						{
+							public void run()
+							{
+								main.getMatchManager().spawnPlayer(winner);
+							}
+						}, 1L);
 					if(runnerup.isOnline())
-						main.getMatchManager().spawnPlayer(runnerup);
+						main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+						{
+							public void run()
+							{
+								main.getMatchManager().spawnPlayer(runnerup);
+							}
+						}, 1L);
 					main.getUserManager().getUser(winner).incWin(1);
 					main.getUserManager().getUser(runnerup).incRunnerup(1);
 				}

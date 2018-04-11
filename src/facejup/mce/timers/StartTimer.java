@@ -3,6 +3,7 @@ package facejup.mce.timers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.players.User;
@@ -37,7 +38,8 @@ public class StartTimer {
 		running = true;
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
-			main.getUserManager().getUser(player).updateScoreboard();
+			main.getMatchManager().setPlayerKit(player, Kit.NONE);
+				main.getUserManager().getUser(player).updateScoreboard();
 		}
 		countdown();
 	}
