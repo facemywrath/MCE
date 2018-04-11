@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -55,12 +56,19 @@ public class InventoryListeners implements Listener {
 			{
 				if(kit == Kit.NONE && matchrunning)
 					return;
-				if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE)
+				if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE && kit != Kit.NONE)
 				{
-					Chat.bc(Lang.Tag + ChatColor.GREEN + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
+					main.getMatchManager().setPlayerDesiredKit(player, kit);
+					Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
+				}
+				else if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE && kit == Kit.NONE)
+				{
+					main.getMatchManager().setPlayerDesiredKit(player, kit);
+					Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has left queue. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
 				}
 				main.getMatchManager().setPlayerDesiredKit(player, kit);
-				player.sendMessage(Chat.translate(Lang.Tag + "&aYou will spawn with &bKit " + StringUtils.capitalize(kit.toString().toLowerCase())));
+				if(kit != Kit.NONE)
+					player.sendMessage(Chat.translate(Lang.Tag + "&aYou will spawn with &bKit " + StringUtils.capitalize(kit.toString().toLowerCase())));
 				player.openInventory(InventoryBuilder.createKitInventory(player));
 			}
 			else
@@ -87,6 +95,14 @@ public class InventoryListeners implements Listener {
 		{
 			event.setCancelled(true);
 		}
+	}
+
+	@EventHandler
+	public void blockBreak(BlockBreakEvent event)
+	{
+		if(event.getPlayer().isOp())
+			return;
+		event.setCancelled(true);
 	}
 
 	@EventHandler

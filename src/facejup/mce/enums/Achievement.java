@@ -43,7 +43,7 @@ public enum Achievement {
 					score = Achievement.values().length - 1;
 					coinreward = score * 80;
 				}
-			}, 20L);
+			}, 1L);
 			
 		}
 		if(kitreward1 != null)

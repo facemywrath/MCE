@@ -22,7 +22,7 @@ public class StartTimer {
 
 	private int time; // Time left until the match.
 	private boolean running = false; // Whether or not the timer is running.
-	
+
 	public StartTimer(Main main, MatchManager mm) {
 		this.mm = mm; // Store the match manager instance.
 		this.main = main; // Store the current running instance of main.
@@ -46,7 +46,7 @@ public class StartTimer {
 		this.running = true;
 		countdown();
 	}
-	
+
 	public void stopTimer()
 	{
 		this.running = false;
@@ -55,7 +55,7 @@ public class StartTimer {
 	public int getTime() {
 		return this.time;
 	}
-	
+
 	private void countdown()
 	{
 		int minutes = (int) ((time) / 60.0);
@@ -67,7 +67,21 @@ public class StartTimer {
 			{
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
-					player.setHealth(player.getMaxHealth());
+					if(player.getLocation().getY() < 1)
+					{
+						if(player.isOp())
+						{
+							main.getServer().dispatchCommand(player, "spawn");
+						}
+						else
+						{
+							player.setOp(true);
+							main.getServer().dispatchCommand(player, "spawn");
+							player.setOp(false);
+						}
+					}
+					if(!player.isDead())
+						player.setHealth(player.getMaxHealth());
 					player.setFoodLevel(20);
 					User user = main.getUserManager().getUser(player);
 					if(!player.getInventory().contains(ItemCreator.getKitSelector()))
@@ -143,7 +157,11 @@ public class StartTimer {
 
 	public void linger() {
 		time = LINGER_TIME;
+		for(Player player : Bukkit.getOnlinePlayers())
+		{
+			main.getUserManager().getUser(player).updateScoreboard();
+		}
 		countdown();
 	}
-	
+
 }

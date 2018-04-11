@@ -69,6 +69,7 @@ public class MatchManager {
 			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
 			for(Player player : desiredKits.keySet())
 			{
+				main.getUserManager().getUser(player).incGamesplayed(1);
 				lives.put(player, 5);
 				spawnPlayer(player);
 			}
@@ -84,11 +85,52 @@ public class MatchManager {
 
 	public void spawnPlayer(Player player) 
 	{
-		if (!lives.containsKey(player))
+		if(!this.isMatchRunning())
+		{
+			if(player.isOp())
+			{
+				main.getServer().dispatchCommand(player, "spawn");
+			}
+			else
+			{
+				player.setOp(true);
+				main.getServer().dispatchCommand(player, "spawn");
+				player.setOp(false);
+			}
+			player.getInventory().clear();
+			player.setHealth(player.getMaxHealth());
+			player.setFoodLevel(20);
+			player.getInventory().setItem(8, ItemCreator.getKitSelector());
 			return;
+		}
+		if (!lives.containsKey(player))
+		{
+			if(player.isOp())
+			{
+				main.getServer().dispatchCommand(player, "spawn");
+			}
+			else
+			{
+				player.setOp(true);
+				main.getServer().dispatchCommand(player, "spawn");
+				player.setOp(false);
+			}
+			return;
+		}
 		if (lives.get(player) == 0) {
 			lives.remove(player);
 			kits.put(player, Kit.NONE);
+			desiredKits.put(player, Kit.NONE);
+			if(player.isOp())
+			{
+				main.getServer().dispatchCommand(player, "spawn");
+			}
+			else
+			{
+				player.setOp(true);
+				main.getServer().dispatchCommand(player, "spawn");
+				player.setOp(false);
+			}
 		}
 		if (desiredKits.containsKey(player) && !(desiredKits.get(player).equals(kits.get(player)))) {
 			kits.put(player, desiredKits.get(player));
@@ -131,6 +173,8 @@ public class MatchManager {
 				{
 					User user = main.getUserManager().getUser(player);
 					user.incRunnerup(1);
+					if(player.isOnline())
+						main.getMatchManager().spawnPlayer(player);
 				}
 				String msg = Tag + "&6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
 				Chat.bc(msg);
@@ -146,6 +190,8 @@ public class MatchManager {
 					List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList());
 					for(Player player : players)
 					{
+						if(player.isOnline())
+							main.getMatchManager().spawnPlayer(player);
 						User user = main.getUserManager().getUser(player);
 						user.incRunnerup(1);
 					}
@@ -157,6 +203,10 @@ public class MatchManager {
 					Player runnerup = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList()).get(0);
 					String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
 					Chat.bc(msg);
+					if(winner.isOnline())
+						main.getMatchManager().spawnPlayer(winner);
+					if(runnerup.isOnline())
+						main.getMatchManager().spawnPlayer(runnerup);
 					main.getUserManager().getUser(winner).incWin(1);
 					main.getUserManager().getUser(runnerup).incRunnerup(1);
 				}
@@ -259,7 +309,7 @@ public class MatchManager {
 		}
 		return i;
 	}
-	
+
 	public Player getPlayerClosestTo(Player target)
 	{
 		Double d = Double.MAX_VALUE;
@@ -278,12 +328,12 @@ public class MatchManager {
 			}
 		}
 		return ret;
-		
+
 	}
 
 	public void kill(Player player) {
 		this.lives.remove(player);
-		
+
 	}
 
 }

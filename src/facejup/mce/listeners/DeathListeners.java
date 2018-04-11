@@ -2,13 +2,13 @@ package facejup.mce.listeners;
 
 import java.util.HashMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -45,8 +45,19 @@ public class DeathListeners implements Listener {
 	}
 
 	@EventHandler
+	public void anyDamage(EntityDamageEvent event)
+	{
+		if(!main.getMatchManager().isMatchRunning())
+		{
+			event.setCancelled(true);
+			return;
+		}
+	}
+
+	@EventHandler
 	public void registerLastHit(EntityDamageByEntityEvent event)
 	{
+
 		if(!(event.getEntity() instanceof Player))
 			return;
 		if(!(event.getDamager() instanceof Projectile || event.getDamager() instanceof Player))
@@ -70,7 +81,7 @@ public class DeathListeners implements Listener {
 			}
 		}, 160L);
 	}
-	
+
 	public void setLastDamagedBy(Player player, DamageMarker marker)
 	{
 		if(!em.getMain().getMatchManager().isMatchRunning())
@@ -130,6 +141,7 @@ public class DeathListeners implements Listener {
 			{
 				main.getMatchManager().kill(player);
 				Player winner = main.getMatchManager().getPlayersAlive().get(0);
+				main.getMatchManager().spawnPlayer(winner);
 				main.getUserManager().getUser(winner).incWin(1);
 				main.getUserManager().getUser(player).incRunnerup(1);
 				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();

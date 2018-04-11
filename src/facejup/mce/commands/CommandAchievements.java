@@ -30,7 +30,7 @@ public class CommandAchievements implements CommandExecutor{
 		if (!(sender instanceof Player)) {
 			if(args.length < 2 || getAchievementByName(args[1]) == null)
 			{
-				if(!Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
+				if(args.length == 1 && !Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
 				{
 					sender.sendMessage(Lang.NullPlayer);
 					return true;
@@ -50,12 +50,13 @@ public class CommandAchievements implements CommandExecutor{
 		{
 			if(args.length < 2 || getAchievementByName(args[1]) == null)
 			{
-				if(!Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
+				if(args.length == 1 && !Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
 				{
 					sender.sendMessage(Lang.NullPlayer);
 					return true;
 				}
-				sender.sendMessage(Lang.InvalidSyn);
+				Player player = (Player) sender;
+				player.openInventory(InventoryBuilder.createAchievementInventory(player));
 				return true;
 			}
 			if(args.length > 1 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getAchievementByName(args[1]) != null)
@@ -64,11 +65,13 @@ public class CommandAchievements implements CommandExecutor{
 				sender.sendMessage(Chat.translate(Lang.Tag + "You've given &b" + Bukkit.getOfflinePlayer(args[0]).getName() + "&a the achievement &b" + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				User user = main.getUserManager().getUser(Bukkit.getOfflinePlayer(args[0]));
 				user.setScore(ach, ach.score);
+				return true;
 			}
 		}
 
 		Player player = (Player) sender;
 		player.openInventory(InventoryBuilder.createAchievementInventory(player));
+
 
 		return true;
 	}

@@ -66,6 +66,7 @@ public class EndTimer {
 				{
 					if (mm.getPlayersAlive().contains(player)) {
 						player.setMaxHealth(20);
+						player.setFoodLevel(20);
 						player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100.0D);
 						if(mm.getPlayerClosestTo(player) != null)
 							player.setCompassTarget(mm.getPlayerClosestTo(player).getLocation());
