@@ -87,6 +87,8 @@ public class MatchManager {
 
 	public void spawnPlayer(Player player) 
 	{
+		if (player.isDead())
+			return;
 		player.setGameMode(GameMode.SURVIVAL);
 		if(!this.isMatchRunning())
 		{
