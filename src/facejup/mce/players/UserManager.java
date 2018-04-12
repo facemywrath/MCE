@@ -142,6 +142,7 @@ public class UserManager implements Listener {
 				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
 				Chat.bc(msg);
 				main.getMatchManager().startTimer.startTimer();
+				main.getMatchManager().spawnPlayer(winner);
 			}
 			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 			{

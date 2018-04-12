@@ -212,12 +212,12 @@ public class User {
 	{
 		section.set("Achievements." + ach.toString() + ".Score", score);
 		if (score == getCurrentAchievementMaxScore(ach)) {
-			if(ach.kitreward == null)
+			if(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight() == null)
 			{
-				incCoins(ach.coinrewards.get(getAchievementLevelIndex(ach)));
+				incCoins(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getLeft());
 			}
 			else
-				unlockKit(ach.kitreward);
+				unlockKit(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight());
 			if (this.player.isOnline()) {
 				((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + getAchievementTypeByScore(ach) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 			}
@@ -265,12 +265,12 @@ public class User {
 			int score = section.getInt("Achievements." + ach.toString() + ".Score") + 1;
 			section.set("Achievements." + ach.toString() + ".Score", score);
 			if (score == getCurrentAchievementMaxScore(ach)) {
-				if(ach.kitreward == null)
+				if(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight() == null)
 				{
-					incCoins(ach.coinrewards.get(getAchievementLevelIndex(ach)));
+					incCoins(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getLeft());
 				}
 				else
-					unlockKit(ach.kitreward);
+					unlockKit(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight());
 				if (this.player.isOnline()) {
 					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + getAchievementTypeByScore(ach) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				}
@@ -445,7 +445,7 @@ public class User {
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Player ").setScore(13);
 			objective.getScore(ChatColor.GREEN + "  Name: " + ChatColor.LIGHT_PURPLE + player.getName()).setScore(12);
 			objective.getScore(ChatColor.GREEN + "  Coins: " + ChatColor.LIGHT_PURPLE + getCoins()).setScore(11);
-			objective.getScore(ChatColor.GREEN + "  Achievements: " + ChatColor.LIGHT_PURPLE + getAchievementCount() + "/" + Achievement.values().length).setScore(10);
+			objective.getScore(ChatColor.GREEN + "  Achievements: " + ChatColor.LIGHT_PURPLE + getAchievementCount() + "/" + Achievement.getMaxAchievementCount()).setScore(10);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(9);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(8);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Stats ").setScore(7);

@@ -2,6 +2,7 @@ package facejup.mce.timers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
@@ -69,6 +70,11 @@ public class StartTimer {
 			{
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
+					mm.afkCheck(player);
+					for(PotionEffect pot : player.getActivePotionEffects())
+					{
+						player.removePotionEffect(pot.getType());
+					}
 					if(player.getLocation().getY() < 1)
 					{
 						if(player.isOp())

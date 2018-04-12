@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import facejup.mce.enums.Kit;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.main.Main;
+import facejup.mce.markers.DamageMarker;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
 import facejup.mce.util.Numbers;
@@ -50,7 +51,7 @@ public class DeathListeners implements Listener {
 	@EventHandler
 	public void anyDamage(EntityDamageEvent event)
 	{
-		if(!main.getMatchManager().isMatchRunning())
+		if(!main.getMatchManager().isMatchRunning() || !em.getMain().getMatchManager().getPlayersAlive().contains(event.getEntity()))
 		{
 			event.setCancelled(true);
 			return;
@@ -105,6 +106,8 @@ public class DeathListeners implements Listener {
 	{
 		if(!em.getMain().getMatchManager().isMatchRunning()) // Only run this function during a match
 			return;
+		if(!em.getMain().getMatchManager().getPlayersAlive().contains(event.getEntity()))
+			return;
 		event.setKeepInventory(true); // Let the player keep their items.
 		Player player = event.getEntity();
 		main.getMatchManager().decLives(player); // Lower their lives.
@@ -152,14 +155,6 @@ public class DeathListeners implements Listener {
 			{
 				main.getMatchManager().kill(player);
 				Player winner = main.getMatchManager().getPlayersAlive().get(0);
-				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-				{
-					public void run()
-					{
-						main.getMatchManager().spawnPlayer(winner);
-
-					}
-				}, 1L);
 				main.getUserManager().getUser(winner).incWin(1);
 				main.getUserManager().getUser(player).incRunnerup(1);
 				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
@@ -169,6 +164,7 @@ public class DeathListeners implements Listener {
 					public void run()
 					{
 						main.getMatchManager().startTimer.startTimer();
+						main.getMatchManager().spawnPlayer(winner);
 					}
 				}, 1L);
 			}

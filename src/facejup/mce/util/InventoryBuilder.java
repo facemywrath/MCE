@@ -72,7 +72,10 @@ public class InventoryBuilder {
 			if(tester == Kit.NONE && main.getMatchManager().getEndTimer().isRunning())
 				continue;
 			boolean achkit = (tester.achcost != null);
-			ItemCreator item = new ItemCreator(tester.icon).hideFlags(63).setDisplayname((kit == tester)?"&6Kit: " + name:(user.hasKit(tester)?"&2Kit: " + name:"&4Locked: " + name)).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":(user.hasKit(tester)?"&a&lClick to select":(achkit?("&bRequires achievement &6" + tester.achcost.icon.getItemMeta().getDisplayName() + "&b to unlock."):user.getCoins() >= tester.coincost?"&aCost: " + tester.coincost:"&4Cost: " + tester.coincost))), (user.hasKit(tester)?"":(achkit?"":(user.getCoins() >= tester.coincost?"&aYour coins: " + user.getCoins():"&4Your coins: " + user.getCoins()))), (user.hasKit(tester)?"":(achkit?"&7Type &6&l/achievements &7or click here to":(user.getCoins() >= tester.coincost)?"&6Click to purchase!":"")), (user.hasKit(tester)?"":(achkit?"&7view your list of achievements.":""))));
+			String level = "";
+			if(achkit && tester.achcost.scores.size() > 1)
+				level = Achievement.getAchievementKitRewardLevel(tester.achcost, tester);
+			ItemCreator item = new ItemCreator(tester.icon).hideFlags(63).setDisplayname((kit == tester)?"&6Kit: " + name:(user.hasKit(tester)?"&2Kit: " + name:"&4Locked: " + name)).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":(user.hasKit(tester)?"&a&lClick to select":(achkit?("&bRequires achievement &6" + level + tester.achcost.icon.getItemMeta().getDisplayName() + "&b to unlock."):user.getCoins() >= tester.coincost?"&aCost: " + tester.coincost:"&4Cost: " + tester.coincost))), (user.hasKit(tester)?"":(achkit?"":(user.getCoins() >= tester.coincost?"&aYour coins: " + user.getCoins():"&4Your coins: " + user.getCoins()))), (user.hasKit(tester)?"":(achkit?"&7Type &6&l/achievements &7or click here to":(user.getCoins() >= tester.coincost)?"&6Click to purchase!":"")), (user.hasKit(tester)?"":(achkit?"&7view your list of achievements.":""))));
 			if (kit == tester)
 				item.addGlowing();
 			ib.setItem(tester.slot, item.getItem());
@@ -88,45 +91,53 @@ public class InventoryBuilder {
 		InventoryBuilder ib = new InventoryBuilder(player, "Achievements", (int) (( Achievement.values().length / 9.0) + 1));
 
 		for (Achievement ach : Achievement.values()) {
-			ItemCreator item = new ItemCreator(ach.icon);
-			String name = ach.icon.getItemMeta().getDisplayName();
-			List<String> lore = ach.icon.getItemMeta().getLore();
-			boolean flag = user.hasAchievement(ach);
-			String newName = (flag ? "&aUnlocked: " : "&cLocked: ");
-			String level = "";
-			if(ach.scores.size() > 1)
-				switch(user.getAchievementLevel(ach))
-				{
-				case 0:
-					level = "Iron ";
-					break;
-				case 1:
-					level = "Gold ";
-					break;
-				case 2:
-					level = "Diamond ";
-					break;
-				}
-			newName += level + name;
-			for(int i = 0; i < lore.size(); i++)
-			{
-				String str = lore.get(i);
-				lore.set(i, str.replaceAll("%SCORE%", "&6" + user.getNextAchievementScore(ach)));
-			}
-			if(!flag) {
-				lore.add("&6Score: " + user.getScore(ach) + "/" + ach.scores.get(user.getAchievementLevel(ach)));
-				if(ach.kitreward == null)
-					lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.coinrewards.get(user.getAchievementLevel(ach)) + " coins"));
-				else
-					lore.addAll(Arrays.asList("", "&7&lReward: &bKit " + StringUtils.capitalize(ach.kitreward.toString().toLowerCase())));
-
-			} else {
-				item.addGlowing();
-			}
-			ib.addItem(item.setDisplayname(newName).setLore(lore).hideFlags(63).getItem());
+			ib.addItem(InventoryBuilder.getAchievementItem(ach, player));
 		}
 
 		return ib.getInventory();
+	}
+	
+	public static ItemStack getAchievementItem(Achievement ach, Player player)
+	{
+		Main main = Main.getPlugin(Main.class);
+		User user = main.getUserManager().getUser(player);
+		ItemCreator item = new ItemCreator(ach.icon);
+		String name = ach.icon.getItemMeta().getDisplayName();
+		List<String> lore = ach.icon.getItemMeta().getLore();
+		boolean flag = user.hasAchievement(ach);
+		String newName = (flag ? "&aUnlocked: " : "&cLocked: ");
+		String level = "";
+		if(ach.scores.size() > 1)
+			switch(user.getAchievementLevel(ach))
+			{
+			case 0:
+				level = "Iron ";
+				break;
+			case 1:
+				level = "Gold ";
+				break;
+			case 2:
+				level = "Diamond ";
+				break;
+			}
+		newName += level + name;
+		for(int i = 0; i < lore.size(); i++)
+		{
+			String str = lore.get(i);
+			lore.set(i, str.replaceAll("%SCORE%", "&6" + user.getNextAchievementScore(ach)));
+		}
+		if(!flag) {
+			lore.add("&6Score: " + user.getScore(ach) + "/" + ach.scores.get(user.getAchievementLevel(ach)));
+			if(ach.rewards.get(user.getAchievementLevel(ach)).getReward().getRight() == null)
+				lore.addAll(Arrays.asList("", "&7&lReward: &b" + ach.rewards.get(user.getAchievementLevel(ach)).getReward().getLeft() + " coins"));
+			else
+				lore.addAll(Arrays.asList("", "&7&lReward: &bKit " + StringUtils.capitalize(ach.rewards.get(user.getAchievementLevel(ach)).getReward().getRight().toString().toLowerCase())));
+
+		} else {
+			item.addGlowing();
+		}
+		return item.setDisplayname(newName).setLore(lore).hideFlags(63).getItem();
+	
 	}
 
 }

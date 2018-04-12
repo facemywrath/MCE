@@ -71,6 +71,9 @@ public class EndTimer {
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
 					if (mm.getPlayersAlive().contains(player)) {
+						mm.afkCheck(player);
+						if(player.getLocation().getY() < 1)
+							player.damage(player.getMaxHealth());
 						player.setMaxHealth(20);
 						player.setFoodLevel(20);
 						player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100.0D);
@@ -81,6 +84,14 @@ public class EndTimer {
 						if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 						{
 							Kit kit = mm.getPlayerKit(player);
+							if(kit == Kit.HARPY && player.isOnGround() && player.getLevel() < 100)
+							{
+								if(player.getLevel()+10 > 100)
+									player.setLevel(100);
+								else
+									player.setLevel(player.getLevel()+10);
+								player.setExp((float) (player.getLevel()/100.0));
+							}
 							if(kit.pot != null)
 							{
 								if (!player.hasPotionEffect(kit.pot.getType()))

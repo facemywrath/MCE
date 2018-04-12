@@ -57,7 +57,7 @@ public class CommandStats implements CommandExecutor {
 			player.sendMessage(ChatColor.BLUE + "Wins: " + ChatColor.GRAY + Wins);
 			player.sendMessage(ChatColor.BLUE + "RunnerUps: " + ChatColor.GRAY + Runnerups);
 			player.sendMessage(ChatColor.BLUE + "Games Played: " + ChatColor.GRAY + Gamesplayed);
-			player.sendMessage(ChatColor.BLUE + "Achievements Unlocked: " + ChatColor.GRAY + Achievements + "/" + Achievement.values().length);
+			player.sendMessage(ChatColor.BLUE + "Achievements Unlocked: " + ChatColor.GRAY + Achievements + "/" + Achievement.getMaxAchievementCount());
 		}
 		if (args.length == 1) {
 			if(args[0].equalsIgnoreCase("top"))
@@ -106,7 +106,7 @@ public class CommandStats implements CommandExecutor {
 				player.sendMessage(ChatColor.BLUE + "Wins: " + ChatColor.GRAY + Wins);
 				player.sendMessage(ChatColor.BLUE + "Runner Ups: " + ChatColor.GRAY + Runnerups);
 				player.sendMessage(ChatColor.BLUE + "Games Played: " + ChatColor.GRAY + Gamesplayed);
-				player.sendMessage(ChatColor.BLUE + "Achievements Unlocked: " + ChatColor.GRAY + Achievements + "/" + Achievement.values().length);
+				player.sendMessage(ChatColor.BLUE + "Achievements Unlocked: " + ChatColor.GRAY + Achievements + "/" + Achievement.getMaxAchievementCount());
 			}
 		}
 

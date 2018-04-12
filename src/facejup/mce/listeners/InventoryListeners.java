@@ -7,10 +7,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,7 +26,7 @@ import facejup.mce.util.Lang;
 import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("deprecation")
-public class InventoryListeners implements Listener {
+public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 
 	private Main main; // Dependency Injection Variable
 	@SuppressWarnings("unused")
@@ -43,6 +45,8 @@ public class InventoryListeners implements Listener {
 	{
 		if(event.getClickedInventory() == null)
 			return;
+		if(event.getClickedInventory().getType() == InventoryType.PLAYER && event.getSlot() == 40)
+			event.setCancelled(true);
 		if(event.getCurrentItem() == null)
 			return;
 		Inventory inv = event.getClickedInventory();
@@ -56,16 +60,6 @@ public class InventoryListeners implements Listener {
 			{
 				if(kit == Kit.NONE && matchrunning)
 					return;
-				if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE && kit != Kit.NONE)
-				{
-					main.getMatchManager().setPlayerDesiredKit(player, kit);
-					Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
-				}
-				else if(!main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE && kit == Kit.NONE)
-				{
-					main.getMatchManager().setPlayerDesiredKit(player, kit);
-					Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has left queue. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
-				}
 				main.getMatchManager().setPlayerDesiredKit(player, kit);
 				if(kit != Kit.NONE)
 					player.sendMessage(Chat.translate(Lang.Tag + "&aYou will spawn with &bKit " + StringUtils.capitalize(kit.toString().toLowerCase())));
@@ -95,6 +89,12 @@ public class InventoryListeners implements Listener {
 		{
 			event.setCancelled(true);
 		}
+	}
+	
+	@EventHandler
+	public void swapItem(PlayerSwapHandItemsEvent event)
+	{
+		event.setCancelled(true);
 	}
 
 	@EventHandler

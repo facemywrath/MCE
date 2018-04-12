@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.MaterialData;
 
 import net.minecraft.server.v1_12_R1.NBTTagByte;
@@ -38,6 +40,14 @@ public class ItemCreator{
 	{
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(Chat.translate(display));
+		item.setItemMeta(meta);
+		return this;
+	}
+	
+	public ItemCreator setDyeColor(DyeColor color)
+	{
+		LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+		meta.setColor(color.getColor());
 		item.setItemMeta(meta);
 		return this;
 	}

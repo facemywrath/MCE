@@ -1,6 +1,7 @@
 package facejup.mce.listeners;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -12,9 +13,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.util.Vector;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
+import facejup.mce.markers.DamageMarker;
 import facejup.mce.players.User;
 
 public class KitPowerListeners implements Listener {
@@ -55,7 +59,7 @@ public class KitPowerListeners implements Listener {
 			event.getPlayer().teleport(event.getTo());
 		}
 	}
-	
+
 	@EventHandler
 	public void projectileLaunch(ProjectileLaunchEvent event)
 	{
@@ -81,6 +85,84 @@ public class KitPowerListeners implements Listener {
 				player.setCooldown(Material.FISHING_ROD, 40);
 			}
 			event.getEntity().remove();
+		}
+	}
+
+	@EventHandler
+	public void harpyFlight(PlayerToggleSprintEvent event)
+	{
+		if(event.isSprinting())
+		{
+			Player player = event.getPlayer();
+			if(main.getMatchManager().getPlayerKit(player) == Kit.HARPY)
+			{
+				float stamina = player.getLevel();
+				if(stamina > 0)
+				{
+					main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+					{
+						public void run()
+						{
+							runHarpyFlight(player);
+						}
+					}, 1L);
+				}
+			}
+		}
+	}
+
+	public void runHarpyFlight(Player player)
+	{
+		if(player.isSprinting())
+		{
+			if(main.getMatchManager().getPlayerKit(player) == Kit.HARPY)
+			{
+				float stamina = player.getLevel();
+				if(stamina > 0)
+				{
+					player.setVelocity(player.getLocation().getDirection().multiply(0.4));
+					if(stamina-1 < 0)
+						stamina = 0;
+					else
+						stamina -= 1;
+					player.setExp((float) (stamina/100.0));
+					player.setLevel((int) stamina);
+					main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+					{
+						public void run()
+						{
+							runHarpyFlight(player);
+						}
+					}, 2L);
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void negateFallDamageHarpy(EntityDamageEvent event)
+	{
+		if(event.getCause() == DamageCause.FALL && event.getEntity() instanceof Player)
+		{
+			if(main.getMatchManager().getPlayerKit((Player) event.getEntity()) == Kit.HARPY)
+			{
+				event.setDamage(event.getDamage()/4);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void sniperHeadshot(ProjectileHitEvent event)
+	{
+		if(!(event.getEntity().getShooter() instanceof Player))
+			return;
+		if(event.getEntity() instanceof Arrow)
+		{
+			if(event.getHitEntity() == null)
+				return;
+			if(event.getEntity().getLocation().getY() > event.getHitEntity().getLocation().getY()+1.5)
+			{
+			}
 		}
 	}
 

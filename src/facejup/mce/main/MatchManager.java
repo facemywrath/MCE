@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.Kit;
+import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
 import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
@@ -32,6 +33,7 @@ public class MatchManager {
 	public EndTimer endTimer; // The timer variable which decides when a round begins.
 	public String Tag = Lang.Tag;
 
+	private HashMap<Player, MoveMarker> lastMovement = new HashMap<>();
 	private HashMap<Player, Integer> lives = new HashMap<>();
 	private HashMap<Player, Kit> kits = new HashMap<>();
 	private HashMap<Player, Kit> desiredKits = new HashMap<>();
@@ -54,6 +56,63 @@ public class MatchManager {
 	public boolean isMatchRunning()
 	{
 		return this.endTimer.isRunning();
+	}
+
+	public void afkCheck(Player player)
+	{
+		MoveMarker mm = new MoveMarker(player.getLocation());
+		if(!lastMovement.containsKey(player))
+		{
+			lastMovement.put(player, mm);
+			return;
+		}
+		if(lastMovement.get(player).getLocation().equals(mm.getLocation()))
+		{
+			if(isMatchRunning() && lastMovement.get(player).timePassedSince() >= 30)
+			{
+				switch(lastMovement.get(player).timePassedSince())
+				{
+				case 30:
+					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 10 seconds if you don't move."));
+					break;
+				case 35:
+					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 5 seconds if you don't move."));
+					break;
+				case 36:
+					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 4 seconds if you don't move."));
+					break;
+				case 37:
+					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 3 seconds if you don't move."));
+					break;
+				case 38:
+					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 2 seconds if you don't move."));
+					break;
+				case 39:
+					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 1 second if you don't move."));
+					break;
+				case 40:
+					player.kickPlayer("AFK");
+					break;
+				}
+			}
+			else 
+			{
+				if(!isMatchRunning() && desiredKits.containsKey(player) && desiredKits.get(player) != Kit.NONE)
+					switch(lastMovement.get(player).timePassedSince())
+					{
+					case 180:
+						player.sendMessage(Chat.translate(Lang.afkcheckTag + "If you don't move, your kit will be deselected in 10 seconds."));
+						break;
+					case 190:
+						player.sendMessage(Chat.translate(Lang.afkcheckTag + "Your kit has been deselected."));
+						setPlayerDesiredKit(player, Kit.NONE);
+					}
+			}
+		}
+		else 
+		{
+			lastMovement.put(player, mm);
+		}
 	}
 
 	public void startMatch()
@@ -155,6 +214,8 @@ public class MatchManager {
 				{
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
+					if(kit == Kit.HARPY)
+						player.setLevel(100);
 					kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
 					player.getInventory().setHelmet(kit.helmet);
 					player.getInventory().setChestplate(kit.chestplate);
@@ -269,6 +330,16 @@ public class MatchManager {
 
 	public void setPlayerDesiredKit(Player player, Kit kit)
 	{
+		if(!isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE && kit != Kit.NONE)
+		{
+			this.desiredKits.put(player, kit);
+			Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
+		}
+		else if(!isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE && kit == Kit.NONE)
+		{
+			this.desiredKits.put(player, kit);
+			Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has left queue. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
+		}
 		this.desiredKits.put(player, kit);
 	}
 

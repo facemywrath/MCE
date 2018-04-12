@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
@@ -25,7 +26,8 @@ public enum Kit {
 	NINJA(null, 2500, 5, Material.ENDER_PEARL, (new InventoryBuilder(null, InventoryType.PLAYER).addItem(new ItemCreator(Material.GOLD_SWORD).addEnchant(Enchantment.DAMAGE_ALL, 1).getItem()).addItem(new ItemStack(Material.ENDER_PEARL, 8)).addItem(new ItemStack(Material.COOKED_BEEF, 4)).getInventory()).getContents(), null, new ItemStack(Material.GOLD_CHESTPLATE, 1), new ItemStack(Material.GOLD_LEGGINGS, 1), null, new PotionEffect(PotionEffectType.SPEED, 100, 1)),
 	FISHERMAN(null, 2000, 6, Material.FISHING_ROD, (new InventoryBuilder(null, InventoryType.PLAYER).addItem(new ItemStack(Material.FISHING_ROD, 1)).addItem(new ItemCreator(Material.STONE_SWORD).addEnchant(Enchantment.KNOCKBACK, 2).getItem()).addItem(new ItemStack(Material.COOKED_BEEF, 4)).getInventory()).getContents(), new ItemStack(Material.LEATHER_HELMET, 1), new ItemStack(Material.LEATHER_CHESTPLATE, 1), new ItemStack(Material.LEATHER_LEGGINGS, 1), new ItemStack(Material.LEATHER_BOOTS, 1), null),
 	MAGE(null, 3500, 7, Material.POTION, (new InventoryBuilder(null, InventoryType.PLAYER).addItem(new ItemCreator(Material.WOOD_SWORD).addEnchant(Enchantment.KNOCKBACK, 1).addEnchant(Enchantment.DAMAGE_ALL, 1).getItem()).addItem(ItemManager.getItemByName("mage_wand").toItemStack()).addItem(new ItemCreator(Material.POTION).setData((short) 16396).getItem()).addItem(new ItemStack(Material.GOLDEN_APPLE, 1)).getInventory()).getContents(), new ItemStack(Material.LEATHER_HELMET, 1), new ItemStack(Material.LEATHER_CHESTPLATE, 1), new ItemStack(Material.LEATHER_LEGGINGS, 1), new ItemStack(Material.LEATHER_BOOTS), null),
-	MASTER("MASTER", 0, 8, Material.BOOK, (new InventoryBuilder(null, InventoryType.PLAYER).addItem(new ItemStack(Material.STONE_SWORD)).addItem(ItemManager.getItemByName("master_wand").toItemStack())).getInventory().getStorageContents(), new ItemStack(Material.IRON_HELMET, 1), new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), new ItemStack(Material.CHAINMAIL_BOOTS, 1), new PotionEffect(PotionEffectType.REGENERATION, 100, 0));
+	HARPY("SKYLORD", 0, 8, Material.FEATHER, (new InventoryBuilder(null, InventoryType.PLAYER).addItem(new ItemCreator(Material.STONE_SWORD).addEnchant(Enchantment.KNOCKBACK, 1).getItem()).addItem(new ItemStack(Material.COOKED_BEEF, 4))).getInventory().getStorageContents(), new ItemCreator(Material.LEATHER_HELMET).setDyeColor(DyeColor.RED).getItem(), new ItemStack(Material.ELYTRA, 1), new ItemCreator(Material.LEATHER_LEGGINGS).setDyeColor(DyeColor.RED).getItem(), new ItemCreator(Material.LEATHER_BOOTS).setDyeColor(DyeColor.RED).getItem(), new PotionEffect(PotionEffectType.JUMP, 100, 2)),
+	MASTER("MASTER", 0, 9, Material.BOOK, (new InventoryBuilder(null, InventoryType.PLAYER).addItem(new ItemStack(Material.STONE_SWORD)).addItem(ItemManager.getItemByName("master_wand").toItemStack())).getInventory().getStorageContents(), new ItemStack(Material.IRON_HELMET, 1), new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), new ItemStack(Material.CHAINMAIL_BOOTS, 1), new PotionEffect(PotionEffectType.REGENERATION, 100, 0));
 
 	public PotionEffect pot;
 	public List<ItemStack> storage;

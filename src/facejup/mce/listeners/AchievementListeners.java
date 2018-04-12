@@ -80,4 +80,13 @@ public class AchievementListeners implements Listener{
 			user.incScore(Achievement.SPREE);
 		}
 	}
+	
+	@EventHandler
+	public void SkylordAchievementModifier(PlayerKillEvent event)
+	{
+		if(event.getPlayer().getVelocity().getY() < 0)
+		{
+			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.SKYLORD);
+		}
+	}
 }
