@@ -26,12 +26,14 @@ public class CommandPreprocess implements Listener {
 		if(event.getMessage().startsWith("/pl") && !player.isOp())
 		{
 			player.sendMessage(Lang.NoPerm);
+			event.setCancelled(true);
 			return;
 		}
 		if(event.getMessage().equalsIgnoreCase("/help"))
 		{
 			//TODO: SHOW HELP MESSAGE;
 			player.sendMessage(Chat.translate("&a&lPlayer Commands:"));
+			player.sendMessage(Chat.translate("   &b&o/spectate &ato toggle spectator mode."));
 			player.sendMessage(Chat.translate("   &b&o/stats &ato view your stats."));
 			player.sendMessage(Chat.translate("   &b&o/stats (player) &ato view another player's stats."));
 			player.sendMessage(Chat.translate("   &b&o/stats top &ato view top stats."));
@@ -39,11 +41,6 @@ public class CommandPreprocess implements Listener {
 			player.sendMessage(Chat.translate("   &b&o/kits &aor rightclick with the &5&lKit Selector &ato open the kit menu."));
 			player.sendMessage(Chat.translate("   &b&o/buy &ato view our buycraft menu."));
 			player.sendMessage(" ");
-			event.setCancelled(true);
-		}
-		if(event.getMessage().equalsIgnoreCase("/pl"))
-		{
-			player.sendMessage(Chat.translate("&cNo Plugins For You"));
 			event.setCancelled(true);
 		}
 	}

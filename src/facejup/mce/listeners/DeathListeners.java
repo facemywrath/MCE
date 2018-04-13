@@ -12,8 +12,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import facejup.mce.enums.Kit;
 import facejup.mce.events.PlayerKillEvent;
+import facejup.mce.events.PlayerKillThroughEnvironmentEvent;
 import facejup.mce.main.Main;
 import facejup.mce.markers.DamageMarker;
 import facejup.mce.util.Chat;
@@ -26,7 +26,7 @@ public class DeathListeners implements Listener {
 	private EventManager em;
 	private Main main;
 
-	private HashMap<Player, DamageMarker> lastDamagedBy = new HashMap<>();
+	public HashMap<Player, DamageMarker> lastDamagedBy = new HashMap<>();
 
 	public DeathListeners(EventManager em)
 	{
@@ -56,12 +56,22 @@ public class DeathListeners implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+		if(!(event.getEntity() instanceof Player))
+			return;
+		Player player = (Player) event.getEntity();
+		if(player.getHealth() <= event.getFinalDamage())
+		{
+			if(lastDamagedBy.containsKey(player))
+			{
+				PlayerKillThroughEnvironmentEvent eventcall = new PlayerKillThroughEnvironmentEvent(lastDamagedBy.get(player).getDamager(), player, event.getCause());
+				main.getServer().getPluginManager().callEvent(eventcall);
+			}
+		}
 	}
 
 	@EventHandler
 	public void registerLastHit(EntityDamageByEntityEvent event)
 	{
-
 		if(!(event.getEntity() instanceof Player))
 			return;
 		if(!(event.getDamager() instanceof Projectile || event.getDamager() instanceof Player))

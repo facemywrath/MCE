@@ -11,4 +11,6 @@ commands:
   achievements:
     description: Achievements command for MCE
   kits:
-    description: Achievements command for MCE
+    description: Kits command for MCE
+  spectate:
+    description: Spectate command for MCE

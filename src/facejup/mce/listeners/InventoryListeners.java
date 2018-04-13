@@ -1,6 +1,8 @@
 package facejup.mce.listeners;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +17,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
@@ -45,7 +48,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 	{
 		if(event.getClickedInventory() == null)
 			return;
-		if(event.getClickedInventory().getType() == InventoryType.PLAYER && event.getSlot() == 40)
+		if(event.getClickedInventory().getType() == InventoryType.PLAYER && (event.getSlot() == 40 || event.getSlot() == 8))
 			event.setCancelled(true);
 		if(event.getCurrentItem() == null)
 			return;
@@ -128,6 +131,22 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		if(event.getAction().toString().contains("RIGHT_CLICK") && event.getPlayer().getInventory().getItemInMainHand().equals(ItemCreator.getKitSelector()))
 		{
 			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
+		}
+		if(event.getAction().toString().contains("LEFT_CLICK"))
+		{
+			Player player = event.getPlayer();
+			if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player) && main.getMatchManager().getPlayerKit(player) == Kit.SHADE && main.getMatchManager().isHidden(player))
+			{
+				player.removePotionEffect(PotionEffectType.INVISIBILITY);
+				for(Player player2 : Bukkit.getOnlinePlayers())
+				{
+					if(!(player.equals(player2)))
+					{
+						player2.showPlayer(player);
+					}
+				}
+			}
+			main.getMatchManager().updateMoveMarker(event.getPlayer());
 		}
 		if(event.getItem() != null && (event.getItem().getType() == Material.POTION || event.getItem().getType() == Material.COOKED_BEEF))
 		{

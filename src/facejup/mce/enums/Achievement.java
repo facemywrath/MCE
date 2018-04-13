@@ -18,6 +18,8 @@ public enum Achievement {
 	SPREE(false, new ItemCreator(Material.POTION).setDisplayname("Spree").setLore(Arrays.asList("&7&oGet a &r%SCORE% &7&oplayer killing spree")).getItem(), Arrays.asList(5,10,15), Arrays.asList(new Reward(100),new Reward(200),new Reward(300))),
 	VICTOR(false, new ItemCreator(Material.GOLDEN_APPLE).setDisplayname("Victor").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&owins")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(100),new Reward(300),new Reward(700))),
 	FAILURE(false, new ItemCreator(Material.GOLDEN_APPLE).setAmount(2).setDisplayname("Failure").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&orunnerups")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(75),new Reward(250),new Reward(500))),
+	THISISSPARTA(false, new ItemCreator(Material.STONE_SWORD).setDisplayname("THIS IS SPARTA!!!").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fall damage.")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.GRAVITON))),
+	ASSASSINATE(false, new ItemCreator(Material.TOTEM).setDisplayname("Assassinate").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills without getting hit.")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.SHADE))),
 	SKYLORD(false, new ItemCreator(Material.FEATHER).setDisplayname("Skylord").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills while falling")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.HARPY)));
 	
 	public ItemStack icon;

@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
@@ -114,6 +115,18 @@ public class UserManager implements Listener {
 	public void playerMove(PlayerMoveEvent event)
 	{
 		BlockColor.updateArmor(event.getPlayer());
+		Player player = event.getPlayer();
+		if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player) && main.getMatchManager().getPlayerKit(player) == Kit.SHADE && main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+		{
+			player.removePotionEffect(PotionEffectType.INVISIBILITY);
+			for(Player player2 : Bukkit.getOnlinePlayers())
+			{
+				if(!(player.equals(player2)))
+				{
+					player2.showPlayer(player);
+				}
+			}
+		}
 	}
 	
 	@EventHandler

@@ -8,11 +8,13 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.events.PlayerKillEvent;
+import facejup.mce.events.PlayerKillThroughEnvironmentEvent;
 import facejup.mce.players.User;
 
 public class AchievementListeners implements Listener{
@@ -91,6 +93,24 @@ public class AchievementListeners implements Listener{
 		if(event.getPlayer().getVelocity().getY() < 0)
 		{
 			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.SKYLORD);
+		}
+	}
+	
+	@EventHandler
+	public void SpartaModifier(PlayerKillThroughEnvironmentEvent event)
+	{
+		if(event.getCause() == DamageCause.FALL)
+		{
+			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.THISISSPARTA);
+		}
+	}
+	
+	@EventHandler
+	public void assassinateModifier(PlayerKillEvent event)
+	{
+		if(!em.getDeathListeners().lastDamagedBy.containsKey(event.getPlayer()))
+		{
+			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.ASSASSINATE);
 		}
 	}
 }

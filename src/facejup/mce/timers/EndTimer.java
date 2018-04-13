@@ -85,6 +85,11 @@ public class EndTimer {
 						if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 						{
 							Kit kit = mm.getPlayerKit(player);
+							if(kit == Kit.SHADE)
+								mm.shadeCheck(player);
+							if(kit == Kit.MASTER)
+								if(player.getInventory().first(Material.ARROW) == -1 || player.getInventory().getItem(player.getInventory().first(Material.ARROW)).getAmount() < 12)
+									player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
 							if(kit == Kit.HARPY && player.isOnGround() && player.getLevel() < 100)
 							{
 								if(player.getLevel()+10 > 100)
@@ -97,6 +102,22 @@ public class EndTimer {
 							{
 								if (!player.hasPotionEffect(kit.pot.getType()))
 									player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
+							}
+						}
+						else
+						{
+							if(player.getLocation().getY() < 1)
+							{
+								if(player.isOp())
+								{
+									main.getServer().dispatchCommand(player, "spawn");
+								}
+								else
+								{
+									player.setOp(true);
+									main.getServer().dispatchCommand(player, "spawn");
+									player.setOp(false);
+								}
 							}
 						}
 					}

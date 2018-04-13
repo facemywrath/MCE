@@ -10,6 +10,7 @@ public class CommandManager {
 	private CommandAchievements cach;
 	private CommandKits ck;
 	private CommandPreprocess cpp;
+	private CommandSpectate cspec;
 	
 	public CommandManager(Main main)
 	{
@@ -18,11 +19,13 @@ public class CommandManager {
 		cs = new CommandStats(this);
 		cach = new CommandAchievements(main);
 		ck = new CommandKits(main);
+		cspec = new CommandSpectate(this);
 		cpp = new CommandPreprocess(main); // Don't need to set an executor for this.
 		main.getCommand(ca.name).setExecutor(ca);
 		main.getCommand(cs.name).setExecutor(cs);
 		main.getCommand(cach.name).setExecutor(cach);
 		main.getCommand(ck.name).setExecutor(ck);
+		main.getCommand(cspec.name).setExecutor(cspec);
 	}
 	
 	public CommandArena getCommandArena() 

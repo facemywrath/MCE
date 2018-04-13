@@ -124,6 +124,8 @@ public class BlockColor {
 		// Wood Colors
 		bc.new BlockColorData(Material.WOOD, 0, ColorData.BROWN);
 		bc.new BlockColorData(Material.LOG, 0, ColorData.BROWN);
+		bc.new BlockColorData(Material.WOOD, 17, ColorData.BROWN);
+		bc.new BlockColorData(Material.LOG, 17, ColorData.BROWN);
 		bc.new BlockColorData(Material.WOOD, 1, ColorData.BROWN);
 		bc.new BlockColorData(Material.LOG, 1, ColorData.BROWN);
 		bc.new BlockColorData(Material.WOOD, 2, ColorData.YELLOW);

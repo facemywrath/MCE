@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaManager;
@@ -58,7 +61,45 @@ public class MatchManager {
 	{
 		return this.endTimer.isRunning();
 	}
+	
+	public void updateMoveMarker(Player player)
+	{
+		lastMovement.put(player, new MoveMarker(player.getLocation()));
+	}
+	
+	public MoveMarker getMoveMarker(Player player)
+	{
+		if(lastMovement.containsKey(player))
+			return lastMovement.get(player);
+		return null;
+	}
 
+	public void shadeCheck(Player player) {
+		if(lastMovement.containsKey(player))
+		{
+			if(lastMovement.get(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+			{
+				if(lastMovement.get(player).timePassedSince() > 2)
+				{
+					player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10000, 0));
+					for(Player player2 : Bukkit.getOnlinePlayers())
+					{
+						if(!(player.equals(player2)))
+						{
+							player2.hidePlayer(player);
+						}
+					}
+					return;
+				}
+			}
+		}
+	}
+	
+	public boolean isHidden(Player player)
+	{
+		return (lastMovement.containsKey(player)?lastMovement.get(player).timePassedSince() > 2:false);
+	}
+	
 	public void afkCheck(Player player)
 	{
 		MoveMarker mm = new MoveMarker(player.getLocation());
@@ -67,31 +108,37 @@ public class MatchManager {
 			lastMovement.put(player, mm);
 			return;
 		}
-		if(lastMovement.get(player).getLocation().equals(mm.getLocation()))
+		if(lastMovement.get(player).getLocation().getBlock().equals(mm.getLocation().getBlock()))
 		{
-			if(isMatchRunning() && lastMovement.get(player).timePassedSince() >= 30)
+			if(isMatchRunning() && lastMovement.get(player).timePassedSince() >= 60)
 			{
 				switch(lastMovement.get(player).timePassedSince())
 				{
-				case 30:
+				case 60:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 10 seconds if you don't move."));
+					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
-				case 35:
+				case 65:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 5 seconds if you don't move."));
+					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
-				case 36:
+				case 66:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 4 seconds if you don't move."));
+					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
-				case 37:
+				case 67:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 3 seconds if you don't move."));
+					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
-				case 38:
+				case 68:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 2 seconds if you don't move."));
+					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
-				case 39:
+				case 69:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 1 second if you don't move."));
+					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
-				case 40:
+				case 70:
 					player.kickPlayer("AFK");
 					break;
 				}
@@ -147,8 +194,6 @@ public class MatchManager {
 
 	public void spawnPlayer(Player player) 
 	{
-		if (player.isDead())
-			return;
 		player.setGameMode(GameMode.SURVIVAL);
 		if(!this.isMatchRunning())
 		{
@@ -163,13 +208,6 @@ public class MatchManager {
 				player.setOp(false);
 			}
 			player.getInventory().clear();
-			if(player.isOp())
-			{
-				player.getInventory().addItem(new ItemCreator(Material.LEATHER_HELMET).setDisplayname("Chameleon Helmet").getItem());
-				player.getInventory().addItem(new ItemCreator(Material.LEATHER_CHESTPLATE).setDisplayname("Chameleon Chestplate").getItem());
-				player.getInventory().addItem(new ItemCreator(Material.LEATHER_LEGGINGS).setDisplayname("Chameleon Leggings").getItem());
-				player.getInventory().addItem(new ItemCreator(Material.LEATHER_BOOTS).setDisplayname("Chameleon Boots").getItem());
-			}
 			player.setHealth(player.getMaxHealth());
 			player.setFoodLevel(20);
 			player.getInventory().setItem(8, ItemCreator.getKitSelector());

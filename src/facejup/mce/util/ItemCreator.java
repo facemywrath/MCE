@@ -118,6 +118,19 @@ public class ItemCreator{
 		return tag.getByte(tagname);
 	}
 	
+	public static ItemStack getChameleonArmor(String str)
+	{
+		if(str.equalsIgnoreCase("helmet"))
+			return (new ItemCreator(Material.LEATHER_HELMET).setDisplayname("Chameleon Helmet").getItem());
+		if(str.equalsIgnoreCase("chestplate"))
+			return (new ItemCreator(Material.LEATHER_CHESTPLATE).setDisplayname("Chameleon Helmet").getItem());
+		if(str.equalsIgnoreCase("leggings"))
+			return (new ItemCreator(Material.LEATHER_LEGGINGS).setDisplayname("Chameleon Helmet").getItem());
+		if(str.equalsIgnoreCase("boots"))
+			return (new ItemCreator(Material.LEATHER_BOOTS).setDisplayname("Chameleon Helmet").getItem());
+		return null;
+	}
+	
 	public static ItemStack getKitSelector()
 	{
 		return new ItemCreator(Material.COMPASS).setDisplayname("&5&lKit Selector").setLore(Arrays.asList("&7&oRightclick with this to", "&7&oopen the kit menu.")).getItem();

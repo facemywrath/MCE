@@ -1,6 +1,7 @@
 package facejup.mce.listeners;
 
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.bukkit.util.Vector;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.markers.DamageMarker;
+import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
 
 public class KitPowerListeners implements Listener {
@@ -150,7 +152,7 @@ public class KitPowerListeners implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void sniperHeadshot(ProjectileHitEvent event)
 	{
@@ -163,6 +165,50 @@ public class KitPowerListeners implements Listener {
 			if(event.getEntity().getLocation().getY() > event.getHitEntity().getLocation().getY()+1.5)
 			{
 			}
+		}
+	}
+
+	@EventHandler
+	public void gravBomb(ProjectileHitEvent event)
+	{
+		if(event.getEntity().getType() != EntityType.ENDER_PEARL)
+			return;
+		if(!(event.getEntity().getShooter() instanceof Player))
+			return;
+		Player player = (Player) event.getEntity().getShooter(); 
+		if(main.getMatchManager().getPlayerKit(player) != Kit.GRAVITON)
+			return;
+		MoveMarker mm = new MoveMarker(event.getEntity().getLocation());
+		runGravPull(player, mm);
+	}
+	
+	@EventHandler
+	public void cancelGravTp(PlayerTeleportEvent event)
+	{
+		if(event.getCause() == TeleportCause.ENDER_PEARL && main.getMatchManager().getPlayersAlive().contains(event.getPlayer()) && main.getMatchManager().getPlayerKit(event.getPlayer()) == Kit.GRAVITON)
+			event.setCancelled(true);
+	}
+
+	public void runGravPull(Player shooter, MoveMarker mm)
+	{
+		if(mm.timePassedSince() < 5)
+		{
+			mm.getLocation().getWorld().spawnParticle(Particle.DRAGON_BREATH, mm.getLocation(), 1);
+			for(Player player : main.getMatchManager().getPlayersAlive())
+			{
+				if(player.equals(shooter))
+					continue;
+				Vector vector = mm.getLocation().toVector().subtract(player.getLocation().toVector());
+				if(player.getLocation().distance(mm.getLocation()) < 5)
+					player.setVelocity(vector.multiply(0.25));
+			}
+			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+			{
+				public void run()
+				{
+					runGravPull(shooter, mm);
+				}
+			}, 5L);
 		}
 	}
 
