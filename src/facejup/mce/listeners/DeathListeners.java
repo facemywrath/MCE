@@ -137,7 +137,10 @@ public class DeathListeners implements Listener {
 				{
 					public void run()
 					{
-						main.getMatchManager().spawnPlayer(winner);
+						for(Player player : Bukkit.getOnlinePlayers())
+						{
+							main.getMatchManager().spawnPlayer(player);
+						}
 					}
 				}, 1L);
 				main.getUserManager().getUser(winner).incWin(1);
@@ -174,7 +177,10 @@ public class DeathListeners implements Listener {
 					public void run()
 					{
 						main.getMatchManager().startTimer.startTimer();
-						main.getMatchManager().spawnPlayer(winner);
+						for(Player player : Bukkit.getOnlinePlayers())
+						{
+							main.getMatchManager().spawnPlayer(player);
+						}
 					}
 				}, 1L);
 			}

@@ -61,12 +61,12 @@ public class MatchManager {
 	{
 		return this.endTimer.isRunning();
 	}
-	
+
 	public void updateMoveMarker(Player player)
 	{
 		lastMovement.put(player, new MoveMarker(player.getLocation()));
 	}
-	
+
 	public MoveMarker getMoveMarker(Player player)
 	{
 		if(lastMovement.containsKey(player))
@@ -94,12 +94,12 @@ public class MatchManager {
 			}
 		}
 	}
-	
+
 	public boolean isHidden(Player player)
 	{
 		return (lastMovement.containsKey(player)?lastMovement.get(player).timePassedSince() > 2:false);
 	}
-	
+
 	public void afkCheck(Player player)
 	{
 		MoveMarker mm = new MoveMarker(player.getLocation());
@@ -194,6 +194,8 @@ public class MatchManager {
 
 	public void spawnPlayer(Player player) 
 	{
+		if(player.isDead())
+			player.spigot().respawn();
 		player.setGameMode(GameMode.SURVIVAL);
 		if(!this.isMatchRunning())
 		{
@@ -296,74 +298,78 @@ public class MatchManager {
 		{
 			Optional<Integer> i = lives.keySet().stream().map(player -> lives.get(player)).max((i1,i2) -> Integer.compare(i1, i2));
 
-			int j = (int) lives.keySet().stream().filter(player -> lives.get(player) == i.get()).count();
-			if(j > 1)
+			if(i.isPresent())
 			{
-				List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == i.get()).collect(Collectors.toList());
-				for(Player player : players)
+				int j = (int) lives.keySet().stream().filter(player -> lives.get(player) == i.get()).count();
+				if(j > 1)
 				{
-					User user = main.getUserManager().getUser(player);
-					user.incRunnerup(1);
-					if(player.isOnline())
-						main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-						{
-							public void run()
-							{
-								main.getMatchManager().spawnPlayer(player);
-							}
-						}, 1L);
-				}
-				String msg = Tag + "&6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
-				Chat.bc(msg);
-			}
-			else
-			{
-				Player winner = lives.keySet().stream().filter(player -> lives.get(player) == i.get()).collect(Collectors.toList()).get(0);
-				Optional<Integer> k = lives.keySet().stream().filter(player -> lives.get(player) != i.get()).map(player -> lives.get(player)).max((i1, i2) -> Integer.compare(i1, i2));
-
-				int l = (int) lives.keySet().stream().filter(player -> lives.get(player) == k.get()).count();
-				if(l > 1)
-				{
-					List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList());
+					List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == i.get()).collect(Collectors.toList());
 					for(Player player : players)
 					{
+						User user = main.getUserManager().getUser(player);
+						user.incRunnerup(1);
 						if(player.isOnline())
 							main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 							{
 								public void run()
 								{
-									main.getMatchManager().spawnPlayer(player);
+									for(Player player : Bukkit.getOnlinePlayers())
+									{
+										spawnPlayer(player);
+									}
 								}
 							}, 1L);
-						User user = main.getUserManager().getUser(player);
-						user.incRunnerup(1);
 					}
-					String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
-					Chat.bc(msg);	
+					String msg = Tag + "&6The match has ended in a tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
+					Chat.bc(msg);
 				}
 				else
 				{
-					Player runnerup = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList()).get(0);
-					String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
-					Chat.bc(msg);
-					if(winner.isOnline())
-						main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+					Player winner = lives.keySet().stream().filter(player -> lives.get(player) == i.get()).collect(Collectors.toList()).get(0);
+					Optional<Integer> k = lives.keySet().stream().filter(player -> lives.get(player) != i.get()).map(player -> lives.get(player)).max((i1, i2) -> Integer.compare(i1, i2));
+					if(k.isPresent())
+					{
+						int l = (int) lives.keySet().stream().filter(player -> lives.get(player) == k.get()).count();
+						if(l > 1)
 						{
-							public void run()
+							List<Player> players = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList());
+							for(Player player : players)
 							{
-								main.getMatchManager().spawnPlayer(winner);
+								main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+								{
+									public void run()
+									{
+										for(Player player : Bukkit.getOnlinePlayers())
+										{
+											spawnPlayer(player);
+										}
+									}
+								}, 1L);
+								User user = main.getUserManager().getUser(player);
+								user.incRunnerup(1);
 							}
-						}, 1L);
-					if(runnerup.isOnline())
-						main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+							String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup tie between: " + players.stream().map(Player::getName).collect(Collectors.joining(", "));
+							Chat.bc(msg);	
+						}
+						else
 						{
-							public void run()
+							Player runnerup = lives.keySet().stream().filter(player -> lives.get(player) == k.get()).collect(Collectors.toList()).get(0);
+							String msg = Tag + "&6The match has ended with " + winner.getName() + " winning, and a runnerup of " + runnerup.getName();
+							Chat.bc(msg);
+							main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 							{
-								main.getMatchManager().spawnPlayer(runnerup);
-							}
-						}, 1L);
-					main.getUserManager().getUser(winner).incWin(1);
-					main.getUserManager().getUser(runnerup).incRunnerup(1);
+								public void run()
+								{
+									for(Player player : Bukkit.getOnlinePlayers())
+									{
+										spawnPlayer(player);
+									}
+								}
+							}, 1L);
+							main.getUserManager().getUser(winner).incWin(1);
+							main.getUserManager().getUser(runnerup).incRunnerup(1);
+						}
+					}
 				}
 			}
 		}

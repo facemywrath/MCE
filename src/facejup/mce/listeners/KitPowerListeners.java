@@ -3,6 +3,7 @@ package facejup.mce.listeners;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -210,6 +211,13 @@ public class KitPowerListeners implements Listener {
 				}
 			}, 5L);
 		}
+	}
+	
+	@EventHandler
+	public void gravbombCooldown(ProjectileLaunchEvent event)
+	{
+		if(event.getEntity() instanceof EnderPearl && event.getEntity().getShooter() instanceof Player && main.getMatchManager().getPlayersAlive().contains((Player) event.getEntity().getShooter()) && main.getMatchManager().getPlayerKit((Player) event.getEntity().getShooter()) == Kit.GRAVITON)
+			((Player) event.getEntity().getShooter()).setCooldown(Material.ENDER_PEARL, 200);
 	}
 
 }
