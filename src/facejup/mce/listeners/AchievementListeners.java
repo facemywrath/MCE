@@ -28,6 +28,8 @@ public class AchievementListeners implements Listener{
 
 	@EventHandler
 	public void HitterAchievementModifier(EntityDamageByEntityEvent event) {
+		if(event.getFinalDamage() == 0)
+			return;
 		if (event.getDamager() instanceof Player) {
 			if (event.getEntity() instanceof Player) {
 				if (em.getMain().getMatchManager().isMatchRunning()) {
@@ -45,6 +47,8 @@ public class AchievementListeners implements Listener{
 	public void BowAchievementModifier(EntityDamageByEntityEvent event)
 	{
 		if(!(event.getEntity() instanceof Player))
+			return;
+		if(event.getFinalDamage() == 0)
 			return;
 		if(!(event.getDamager() instanceof Projectile) || !(((Projectile) event.getDamager()).getShooter() instanceof Player))
 			return;

@@ -6,17 +6,21 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
+import facejup.mce.util.BlockColor;
 import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
+import facejup.mce.util.ItemCreator;
 
 public class UserManager implements Listener {
 
@@ -106,6 +110,12 @@ public class UserManager implements Listener {
 
 	//EventHandlers
 
+	@EventHandler
+	public void playerMove(PlayerMoveEvent event)
+	{
+		BlockColor.updateArmor(event.getPlayer());
+	}
+	
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent event)
 	{

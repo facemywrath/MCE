@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import facejup.mce.arenas.Arena;
@@ -162,6 +163,13 @@ public class MatchManager {
 				player.setOp(false);
 			}
 			player.getInventory().clear();
+			if(player.isOp())
+			{
+				player.getInventory().addItem(new ItemCreator(Material.LEATHER_HELMET).setDisplayname("Chameleon Helmet").getItem());
+				player.getInventory().addItem(new ItemCreator(Material.LEATHER_CHESTPLATE).setDisplayname("Chameleon Chestplate").getItem());
+				player.getInventory().addItem(new ItemCreator(Material.LEATHER_LEGGINGS).setDisplayname("Chameleon Leggings").getItem());
+				player.getInventory().addItem(new ItemCreator(Material.LEATHER_BOOTS).setDisplayname("Chameleon Boots").getItem());
+			}
 			player.setHealth(player.getMaxHealth());
 			player.setFoodLevel(20);
 			player.getInventory().setItem(8, ItemCreator.getKitSelector());
@@ -221,6 +229,7 @@ public class MatchManager {
 					player.getInventory().setChestplate(kit.chestplate);
 					player.getInventory().setLeggings(kit.leggings);
 					player.getInventory().setBoots(kit.boots);
+					player.getInventory().setItemInOffHand(kit.offhand);
 					Location loc = am.getArena().getRandomSpawn();
 					player.teleport(loc);
 				}
