@@ -24,6 +24,8 @@ import facejup.mce.util.Lang;
 
 public class User {
 
+	private final boolean FREE_KIT = true;
+	
 	private UserManager um; // Dependency Injection Variable.
 
 	private ConfigurationSection section; // Section storing the players information.
@@ -52,6 +54,7 @@ public class User {
 			{
 				// Otherwise, set their default information and save. Then store their section.
 				config.set("Users." + player.getUniqueId() + ".Name", player.getName());
+				config.set("Users." + player.getUniqueId() + ".FreeKit", FREE_KIT);
 				config.set("Users." + player.getUniqueId() + ".Coins", 0);
 				config.set("Users." + player.getUniqueId() + ".Kills", 0);
 				config.set("Users." + player.getUniqueId() + ".Deaths", 0);
@@ -227,6 +230,15 @@ public class User {
 		}
 		um.getFileControl().save();
 		updateScoreboard();
+	}
+	
+	public void useFreeKit(Kit kit)
+	{
+		if(section.contains("FreeKit") && section.getBoolean("FreeKit"))
+		{
+			section.set("FreeKit", false);
+			unlockKit(kit);
+		}
 	}
 
 	public void incWin(int i) {
