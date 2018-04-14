@@ -51,13 +51,13 @@ public class DeathListeners implements Listener {
 	@EventHandler
 	public void anyDamage(EntityDamageEvent event)
 	{
+		if(!(event.getEntity() instanceof Player))
+			return;
 		if(!main.getMatchManager().isMatchRunning() || !em.getMain().getMatchManager().getPlayersAlive().contains(event.getEntity()))
 		{
 			event.setCancelled(true);
 			return;
 		}
-		if(!(event.getEntity() instanceof Player))
-			return;
 		Player player = (Player) event.getEntity();
 		if(player.getHealth() <= event.getFinalDamage())
 		{
@@ -132,22 +132,9 @@ public class DeathListeners implements Listener {
 			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + player.getName() + " &ahas died from natural causes."));
 			if(main.getMatchManager().getPlayersAlive().size() == 1)
 			{ // If there's only one player left
-				Player winner = main.getMatchManager().getPlayersAlive().get(0);
-				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-				{
-					public void run()
-					{
-						for(Player player : Bukkit.getOnlinePlayers())
-						{
-							main.getMatchManager().spawnPlayer(player);
-						}
-					}
-				}, 1L);
-				main.getUserManager().getUser(winner).incWin(1);
-				main.getUserManager().getUser(player).incRunnerup(1);
-				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
-				Chat.bc(msg);
-				main.getMatchManager().startTimer.startTimer();
+
+				main.getMatchManager().checkMatchEnd(player);
+			
 			}
 			return;
 		}
@@ -164,30 +151,7 @@ public class DeathListeners implements Listener {
 		main.getServer().getPluginManager().callEvent(new PlayerKillEvent(killer, player));
 		if(main.getMatchManager().getLives(player) == 0)
 		{
-			if(main.getMatchManager().getPlayersAlive().size() == 1)
-			{
-				main.getMatchManager().kill(player);
-				Player winner = main.getMatchManager().getPlayersAlive().get(0);
-				main.getUserManager().getUser(winner).incWin(1);
-				main.getUserManager().getUser(player).incRunnerup(1);
-				String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + player.getName();
-				Chat.bc(msg);
-				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-				{
-					public void run()
-					{
-						main.getMatchManager().startTimer.startTimer();
-						for(Player player : Bukkit.getOnlinePlayers())
-						{
-							main.getMatchManager().spawnPlayer(player);
-						}
-					}
-				}, 1L);
-			}
-			else
-			{
-				main.getMatchManager().kill(player);
-			}
+			main.getMatchManager().checkMatchEnd(player);
 		}
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{

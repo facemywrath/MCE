@@ -81,16 +81,48 @@ public class MatchManager {
 			{
 				if(lastMovement.get(player).timePassedSince() > 2)
 				{
-					player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10000, 0));
-					for(Player player2 : Bukkit.getOnlinePlayers())
+					int stamina = player.getLevel();
+					if(stamina > 0)
 					{
-						if(!(player.equals(player2)))
-						{
-							player2.hidePlayer(player);
-						}
+						if(stamina-7 > 0)
+							stamina-=7;
+						else
+							stamina = 0;
+						player.setLevel(stamina);
+						player.setExp((float) (stamina/100.0));
+						hidePlayer(player);
+						return;
 					}
-					return;
+					else
+					{
+						showPlayer(player);
+					}
 				}
+			}
+		}
+	}
+
+	public void showPlayer(Player player)
+	{
+		if(player.hasPotionEffect(PotionEffectType.INVISIBILITY))
+			player.removePotionEffect(PotionEffectType.INVISIBILITY);
+		for(Player player2 : Bukkit.getOnlinePlayers())
+		{
+			if(!(player.equals(player2)))
+			{
+				player2.showPlayer(player);
+			}
+		}
+	}
+
+	public void hidePlayer(Player player)
+	{
+		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10000, 0));
+		for(Player player2 : Bukkit.getOnlinePlayers())
+		{
+			if(!(player.equals(player2)))
+			{
+				player2.hidePlayer(player);
 			}
 		}
 	}
@@ -264,8 +296,11 @@ public class MatchManager {
 				{
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
-					if(kit == Kit.HARPY)
+					if(kit == Kit.HARPY || kit == Kit.SHADE)
 						player.setLevel(100);
+					else
+						player.setLevel(0);
+					player.setExp((float) (player.getLevel()/100.0));
 					kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
 					player.getInventory().setHelmet(kit.helmet);
 					player.getInventory().setChestplate(kit.chestplate);
@@ -292,6 +327,29 @@ public class MatchManager {
 			}
 
 		}, 5L);
+	}
+
+	public void checkMatchEnd(Player check)
+	{
+		if(getPlayersAlive().size() == 1)
+		{
+			Player winner = main.getMatchManager().getPlayersAlive().get(0);
+			main.getUserManager().getUser(check).incRunnerup(1);
+			main.getUserManager().getUser(winner).incWin(1);
+			String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + check.getName();
+			Chat.bc(msg);
+			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+			{
+				public void run()
+				{
+					main.getMatchManager().startTimer.startTimer();
+					for(Player player : Bukkit.getOnlinePlayers())
+					{
+						main.getMatchManager().spawnPlayer(player);
+					}
+				}
+			}, 1L);
+		}
 	}
 
 	public void endMatchByTime()

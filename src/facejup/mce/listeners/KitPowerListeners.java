@@ -2,6 +2,7 @@ package facejup.mce.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -182,7 +184,7 @@ public class KitPowerListeners implements Listener {
 		MoveMarker mm = new MoveMarker(event.getEntity().getLocation());
 		runGravPull(player, mm);
 	}
-	
+
 	@EventHandler
 	public void cancelGravTp(PlayerTeleportEvent event)
 	{
@@ -212,12 +214,25 @@ public class KitPowerListeners implements Listener {
 			}, 5L);
 		}
 	}
-	
+
 	@EventHandler
 	public void gravbombCooldown(ProjectileLaunchEvent event)
 	{
 		if(event.getEntity() instanceof EnderPearl && event.getEntity().getShooter() instanceof Player && main.getMatchManager().getPlayersAlive().contains((Player) event.getEntity().getShooter()) && main.getMatchManager().getPlayerKit((Player) event.getEntity().getShooter()) == Kit.GRAVITON)
 			((Player) event.getEntity().getShooter()).setCooldown(Material.ENDER_PEARL, 200);
+	}
+
+	@EventHandler
+	public void cancelIgnite(BlockIgniteEvent event)
+	{
+		final Block block = event.getBlock();
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				block.setType(Material.AIR);
+			}
+		}, 60L);
 	}
 
 }

@@ -103,7 +103,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 	@EventHandler
 	public void blockBreak(BlockBreakEvent event)
 	{
-		if(event.getPlayer().isOp())
+		if(event.getPlayer().getGameMode() == GameMode.CREATIVE)
 			return;
 		event.setCancelled(true);
 	}

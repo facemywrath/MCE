@@ -116,19 +116,23 @@ public class UserManager implements Listener {
 	{
 		BlockColor.updateArmor(event.getPlayer());
 		Player player = event.getPlayer();
-		if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player) && main.getMatchManager().getPlayerKit(player) == Kit.SHADE && main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+		if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player) && main.getMatchManager().getPlayerKit(player) == Kit.SHADE)
 		{
-			player.removePotionEffect(PotionEffectType.INVISIBILITY);
-			for(Player player2 : Bukkit.getOnlinePlayers())
+			if(main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
 			{
-				if(!(player.equals(player2)))
-				{
-					player2.showPlayer(player);
-				}
+				main.getMatchManager().showPlayer(player);
+			}
+			else if(!main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+			{
+				if(player.getLevel()+1 < 100)
+					player.setLevel(player.getLevel()+1);
+				else
+					player.setLevel(100);
+				player.setExp((float) (player.getLevel()/100.0));
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent event)
 	{

@@ -99,7 +99,7 @@ public class AchievementListeners implements Listener{
 	@EventHandler
 	public void SpartaModifier(PlayerKillThroughEnvironmentEvent event)
 	{
-		if(event.getCause() == DamageCause.FALL)
+		if(event.getCause() == DamageCause.FALL || event.getCause() == DamageCause.VOID)
 		{
 			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.THISISSPARTA);
 		}
