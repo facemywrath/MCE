@@ -139,6 +139,8 @@ public class MatchManager {
 					player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1);
 					break;
 				case 70:
+					if (player.isOp())
+						return;
 					player.kickPlayer("AFK");
 					break;
 				}
