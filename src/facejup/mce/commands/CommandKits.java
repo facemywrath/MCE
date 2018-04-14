@@ -30,7 +30,7 @@ public class CommandKits implements CommandExecutor{
 		if (!(sender instanceof Player)) {
 			if(args.length < 2 || getKitByName(args[1]) == null)
 			{
-				if(!Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
+				if(args.length == 1 && !Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
 				{
 					sender.sendMessage(Lang.NullPlayer);
 					return true;
@@ -52,7 +52,7 @@ public class CommandKits implements CommandExecutor{
 		{
 			if(args.length < 2 || getKitByName(args[1]) == null)
 			{
-				if(!Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
+				if(args.length == 1 && !Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore())
 				{
 					sender.sendMessage(Lang.NullPlayer);
 					return true;
