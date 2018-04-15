@@ -113,4 +113,13 @@ public class AchievementListeners implements Listener{
 			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.ASSASSINATE);
 		}
 	}
+	
+	@EventHandler
+	public void hellfireModifier(PlayerKillThroughEnvironmentEvent event)
+	{
+		if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LAVA)
+		{
+			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.HELLFIRE);
+		}
+	}
 }

@@ -1,5 +1,6 @@
 package facejup.mce.listeners;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -233,6 +234,78 @@ public class KitPowerListeners implements Listener {
 				block.setType(Material.AIR);
 			}
 		}, 60L);
+	}
+
+	@EventHandler
+	public void stopDemonFireDamage(EntityDamageEvent event)
+	{
+		if(!(event.getEntity() instanceof Player))
+			return;
+
+		Player player = (Player) event.getEntity();
+		if(main.getMatchManager().getPlayersAlive().contains((Player) event.getEntity()) && main.getMatchManager().getPlayerKit(player) == Kit.DEMON)
+		{
+			if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LAVA)
+			{
+				event.setCancelled(true);
+			}
+			else if(event.getCause() == DamageCause.FALL && event.getDamage() > 4)
+			{
+				callFireFall(player, 1);
+			}
+		}
+	}
+
+	public void callFireFall(Player player, int radius)
+	{
+		for(int x = -1*radius; x <= radius; x++)
+		{
+			for(int z = -1*radius; z <= radius; z++)
+			{
+				Location tempLoc = player.getLocation().add(new Vector(x,0,z));
+				if(tempLoc.distance(player.getLocation()) < (radius+0.5) && tempLoc.distance(player.getLocation()) > (radius-0.5))
+				{
+					if(tempLoc.getBlock().getType() == Material.AIR && tempLoc.clone().add(new Vector(0,-1,0)).getBlock().getType() != Material.AIR)
+					{
+						tempLoc.getBlock().setType(Material.FIRE);
+						deIgnite(tempLoc);
+					}
+					else if(tempLoc.getBlock().getType() != Material.AIR)
+					{
+						for(int y = tempLoc.getBlockY(); y > 0; y--)
+						{
+							if(new Location(tempLoc.getWorld(), tempLoc.getX(), y, tempLoc.getZ()).getBlock().getType() != Material.AIR)
+							{
+								Location newLoc = new Location(tempLoc.getWorld(), tempLoc.getX(), y+1, tempLoc.getZ());
+								newLoc.getBlock().setType(Material.FIRE);
+								deIgnite(newLoc);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		if(radius < 5)
+			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+			{
+				public void run()
+				{
+					callFireFall(player, radius+1);
+				}
+			}, 5L);
+	}
+
+	public void deIgnite(Location loc)
+	{
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				if(loc.getBlock().getType() == Material.FIRE)
+					loc.getBlock().setType(Material.AIR);
+			}
+		}, 7L);
 	}
 
 }
