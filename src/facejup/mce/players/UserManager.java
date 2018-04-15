@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -116,21 +117,45 @@ public class UserManager implements Listener {
 	{
 		BlockColor.updateArmor(event.getPlayer());
 		Player player = event.getPlayer();
-		if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player) && main.getMatchManager().getPlayerKit(player) == Kit.SHADE)
+		if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player))
 		{
-			if(main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+			if(main.getMatchManager().getPlayerKit(player) == Kit.SHADE)
 			{
-				main.getMatchManager().showPlayer(player);
+				if(main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+				{
+					main.getMatchManager().showPlayer(player);
+				}
+				else if(!main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+				{
+					if(player.getLevel()+1 < 100)
+						player.setLevel(player.getLevel()+1);
+					else
+						player.setLevel(100);
+					player.setExp((float) (player.getLevel()/100.0));
+				}
 			}
-			else if(!main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+			else if(main.getMatchManager().getPlayerKit(player) == Kit.DEMON)
 			{
-				if(player.getLevel()+1 < 100)
-					player.setLevel(player.getLevel()+1);
-				else
-					player.setLevel(100);
-				player.setExp((float) (player.getLevel()/100.0));
+				if(player.getLocation().getBlock().getType() == Material.AIR)
+				{
+					player.getLocation().getBlock().setType(Material.FIRE);
+					deIgnite(player.getLocation());
+				}
 			}
 		}
+	}
+
+
+	public void deIgnite(Location loc)
+	{
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				if(loc.getBlock().getType() == Material.FIRE)
+					loc.getBlock().setType(Material.AIR);
+			}
+		}, 7L);
 	}
 
 	@EventHandler
