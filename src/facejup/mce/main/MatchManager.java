@@ -106,6 +106,8 @@ public class MatchManager {
 	{
 		if(player.hasPotionEffect(PotionEffectType.INVISIBILITY))
 			player.removePotionEffect(PotionEffectType.INVISIBILITY);
+		if(player.hasPotionEffect(PotionEffectType.REGENERATION))
+			player.removePotionEffect(PotionEffectType.REGENERATION);
 		for(Player player2 : Bukkit.getOnlinePlayers())
 		{
 			if(!(player.equals(player2)))
@@ -118,6 +120,7 @@ public class MatchManager {
 	public void hidePlayer(Player player)
 	{
 		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10000, 0));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10000, 2));
 		for(Player player2 : Bukkit.getOnlinePlayers())
 		{
 			if(!(player.equals(player2)))
@@ -129,6 +132,8 @@ public class MatchManager {
 
 	public boolean isHidden(Player player)
 	{
+		if(player.hasPotionEffect(PotionEffectType.INVISIBILITY))
+			return true;
 		return (lastMovement.containsKey(player)?lastMovement.get(player).timePassedSince() > 2:false);
 	}
 
@@ -301,6 +306,7 @@ public class MatchManager {
 					else
 						player.setLevel(0);
 					player.setExp((float) (player.getLevel()/100.0));
+					main.getEventManager().getAchievementListeners().killsPerLife.put(player, 0);
 					kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
 					player.getInventory().setHelmet(kit.helmet);
 					player.getInventory().setChestplate(kit.chestplate);

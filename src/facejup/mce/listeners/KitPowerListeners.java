@@ -3,6 +3,7 @@ package facejup.mce.listeners;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EnderPearl;
@@ -12,10 +13,13 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
@@ -245,43 +249,60 @@ public class KitPowerListeners implements Listener {
 		Player player = (Player) event.getEntity();
 		if(main.getMatchManager().getPlayersAlive().contains((Player) event.getEntity()) && main.getMatchManager().getPlayerKit(player) == Kit.DEMON)
 		{
-			if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LAVA)
+			if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.HOT_FLOOR)
 			{
 				event.setCancelled(true);
 			}
-			else if(event.getCause() == DamageCause.FALL && event.getDamage() > 4)
+		}
+	}
+	
+	@EventHandler
+	public void stopDemonFireTick(EntityCombustEvent event)
+	{
+		if(event.getEntityType() != EntityType.PLAYER)
+			return;
+		Player player =  (Player) event.getEntity();
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) == Kit.DEMON)
+		{
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void demonLeap(PlayerStatisticIncrementEvent event)
+	{
+		if(event.getStatistic() != Statistic.JUMP)
+			return;
+		Player player =  event.getPlayer();
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) == Kit.DEMON)
+		{
+			if(player.isSneaking() && player.getLevel() == 100)
 			{
-				callFireFall(player, 1);
+				player.setLevel(0);
+				player.setExp(0);
+				callFireFall(player.getLocation(), 1);
+				player.setVelocity(player.getLocation().getDirection().multiply(2));
 			}
 		}
 	}
 
-	public void callFireFall(Player player, int radius)
+	public void callFireFall(Location loc, int radius)
 	{
 		for(int x = -1*radius; x <= radius; x++)
 		{
 			for(int z = -1*radius; z <= radius; z++)
 			{
-				Location tempLoc = player.getLocation().add(new Vector(x,0,z));
-				if(tempLoc.distance(player.getLocation()) < (radius+0.5) && tempLoc.distance(player.getLocation()) > (radius-0.5))
+				Location tempLoc = loc.clone().add(new Vector(x,0,z));
+				if(tempLoc.distance(loc) < (radius+0.5) && tempLoc.distance(loc) > (radius-0.5))
 				{
-					if(tempLoc.getBlock().getType() == Material.AIR && tempLoc.clone().add(new Vector(0,-1,0)).getBlock().getType() != Material.AIR)
+					if(tempLoc.getBlock().getType() == Material.AIR)
 					{
-						tempLoc.getBlock().setType(Material.FIRE);
+						tempLoc.getWorld().spawnFallingBlock(tempLoc, Material.FIRE, (byte) 0);
 						deIgnite(tempLoc);
-					}
-					else if(tempLoc.getBlock().getType() != Material.AIR)
-					{
-						for(int y = tempLoc.getBlockY(); y > 0; y--)
-						{
-							if(new Location(tempLoc.getWorld(), tempLoc.getX(), y, tempLoc.getZ()).getBlock().getType() != Material.AIR)
-							{
-								Location newLoc = new Location(tempLoc.getWorld(), tempLoc.getX(), y+1, tempLoc.getZ());
-								newLoc.getBlock().setType(Material.FIRE);
-								deIgnite(newLoc);
-								break;
-							}
-						}
 					}
 				}
 			}
@@ -291,9 +312,18 @@ public class KitPowerListeners implements Listener {
 			{
 				public void run()
 				{
-					callFireFall(player, radius+1);
+					callFireFall(loc, radius+1);
 				}
 			}, 5L);
+	}
+	
+	@EventHandler
+	public void removeFire(EntityChangeBlockEvent event)
+	{
+		if(event.getTo() == Material.FIRE)
+		{
+			deIgnite(event.getBlock().getLocation());
+		}
 	}
 
 	public void deIgnite(Location loc)
@@ -305,7 +335,7 @@ public class KitPowerListeners implements Listener {
 				if(loc.getBlock().getType() == Material.FIRE)
 					loc.getBlock().setType(Material.AIR);
 			}
-		}, 7L);
+		}, 25L);
 	}
 
 }

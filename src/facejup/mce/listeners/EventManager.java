@@ -38,6 +38,11 @@ public class EventManager {
 		return this.dl;
 	}
 	
+	public AchievementListeners getAchievementListeners()
+	{
+		return this.al;
+	}
+	
 	public Main getMain() 
 	{
 		//Return the main instance.

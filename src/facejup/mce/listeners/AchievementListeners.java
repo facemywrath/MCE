@@ -20,7 +20,7 @@ import facejup.mce.players.User;
 public class AchievementListeners implements Listener{
 
 	private EventManager em;
-	private HashMap<Player, Integer> killsPerLife = new HashMap<>();
+	public HashMap<Player, Integer> killsPerLife = new HashMap<>();
 
 	public AchievementListeners(EventManager em) {
 		this.em = em;
@@ -59,7 +59,7 @@ public class AchievementListeners implements Listener{
 		if (em.getMain().getMatchManager().isMatchRunning()) {
 			if (em.getMain().getMatchManager().getPlayerKit(damager) != Kit.NONE) {
 				User user = em.getMain().getUserManager().getUser(damager);
-				user.incScore(Achievement.BOW);
+				user.incScore(Achievement.ARCHERY);
 			}
 		}
 	}
@@ -117,7 +117,7 @@ public class AchievementListeners implements Listener{
 	@EventHandler
 	public void hellfireModifier(PlayerKillThroughEnvironmentEvent event)
 	{
-		if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LAVA)
+		if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.HOT_FLOOR)
 		{
 			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.HELLFIRE);
 		}

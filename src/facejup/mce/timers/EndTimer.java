@@ -90,6 +90,14 @@ public class EndTimer {
 							if(kit == Kit.MASTER)
 								if(player.getInventory().first(Material.ARROW) == -1 || player.getInventory().getItem(player.getInventory().first(Material.ARROW)).getAmount() < 12)
 									player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+							if(kit == kit.DEMON)
+							{
+								if(player.getLevel() <= 90)
+									player.setLevel(player.getLevel()+10);
+								else
+									player.setLevel(100);
+								player.setExp((float) (player.getLevel()/100.0));
+							}
 							if(kit == Kit.HARPY && player.isOnGround() && player.getLevel() < 100)
 							{
 								if(player.getLevel()+10 > 100)

@@ -136,10 +136,9 @@ public class UserManager implements Listener {
 			}
 			else if(main.getMatchManager().getPlayerKit(player) == Kit.DEMON)
 			{
-				if(player.getLocation().getBlock().getType() == Material.AIR)
+				if(!event.getTo().getBlock().equals(event.getFrom().getBlock()) && event.getTo().getBlock().getType() == Material.AIR)
 				{
-					player.getLocation().getBlock().setType(Material.FIRE);
-					deIgnite(player.getLocation());
+					player.getWorld().spawnFallingBlock(player.getLocation(), Material.FIRE, (byte) 0);
 				}
 			}
 		}

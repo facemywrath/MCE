@@ -14,7 +14,7 @@ public enum Achievement {
 	
 	MASTER(false, new ItemCreator(Material.BOOK).setDisplayname("Master").setLore(Arrays.asList("&7&oGet every other achievement")).getItem(), Arrays.asList(1), new ArrayList<>()),
 	HITTER(false, new ItemCreator(Material.WOOD_SWORD).setDisplayname("Hitter").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(250,500,1000), Arrays.asList(new Reward(50),new Reward(150),new Reward(300))),
-	BOW(false, new ItemCreator(Material.BOW).setDisplayname("Bow").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(125,250,500), Arrays.asList(new Reward(50),new Reward(150),new Reward(300))),
+	ARCHERY(false, new ItemCreator(Material.BOW).setDisplayname("Archery").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(125,250,500), Arrays.asList(new Reward(50),new Reward(150),new Reward(Kit.GUNNER))),
 	SPREE(false, new ItemCreator(Material.POTION).setDisplayname("Spree").setLore(Arrays.asList("&7&oGet a &r%SCORE% &7&oplayer killing spree")).getItem(), Arrays.asList(5,10,15), Arrays.asList(new Reward(100),new Reward(200),new Reward(300))),
 	VICTOR(false, new ItemCreator(Material.GOLDEN_APPLE).setDisplayname("Victor").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&owins")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(100),new Reward(300),new Reward(700))),
 	FAILURE(false, new ItemCreator(Material.GOLDEN_APPLE).setAmount(2).setDisplayname("Failure").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&orunnerups")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(75),new Reward(250),new Reward(500))),

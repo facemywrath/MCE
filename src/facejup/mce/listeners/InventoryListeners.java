@@ -138,6 +138,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 			if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player) && main.getMatchManager().getPlayerKit(player) == Kit.SHADE && main.getMatchManager().isHidden(player))
 			{
 				player.removePotionEffect(PotionEffectType.INVISIBILITY);
+				player.removePotionEffect(PotionEffectType.REGENERATION);
 				for(Player player2 : Bukkit.getOnlinePlayers())
 				{
 					if(!(player.equals(player2)))
@@ -159,6 +160,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 						event.getPlayer().setHealth(event.getPlayer().getHealth() + 1);
 					}
 				}
+				event.getPlayer().setFireTicks(0);
 				ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 				if(item.getAmount() > 1)
 					item.setAmount(item.getAmount()-1);
