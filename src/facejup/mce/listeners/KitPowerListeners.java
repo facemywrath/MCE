@@ -10,6 +10,7 @@ import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SplashPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -255,7 +256,7 @@ public class KitPowerListeners implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void stopDemonFireTick(EntityCombustEvent event)
 	{
@@ -269,7 +270,7 @@ public class KitPowerListeners implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void demonLeap(PlayerStatisticIncrementEvent event)
 	{
@@ -316,7 +317,7 @@ public class KitPowerListeners implements Listener {
 				}
 			}, 5L);
 	}
-	
+
 	@EventHandler
 	public void removeFire(EntityChangeBlockEvent event)
 	{
@@ -336,6 +337,25 @@ public class KitPowerListeners implements Listener {
 					loc.getBlock().setType(Material.AIR);
 			}
 		}, 25L);
+	}
+	
+	@EventHandler
+	public void potionVelocity(ProjectileLaunchEvent event)
+	{
+		if(!(event.getEntity().getShooter() instanceof Player))
+			return;
+		Player player = (Player) event.getEntity().getShooter();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) == Kit.MAGE)
+		{
+			if(event.getEntity() instanceof SplashPotion)
+			{
+				event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(2));
+			}
+		}
 	}
 
 }

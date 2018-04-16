@@ -12,7 +12,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.material.MaterialData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import net.minecraft.server.v1_12_R1.NBTTagByte;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
@@ -96,12 +99,24 @@ public class ItemCreator{
 		item = setTag(item, "HideFlags", i);
 		return this;
 	}
+	
+	public ItemCreator setPotionType(PotionEffect effect)
+	{
+		if(item.getItemMeta() instanceof PotionMeta)
+		{
+			PotionMeta meta = (PotionMeta) item.getItemMeta();
+			meta.addCustomEffect(effect, true);
+			item.setItemMeta(meta);
+		}
+		return this;
+	}
+
 
 	public ItemStack getItem()
 	{
 		return this.item;
 	}	
-
+	
 	private ItemStack setTag(ItemStack item, String tagname, int amt)
 	{
 		net.minecraft.server.v1_12_R1.ItemStack itemnms = CraftItemStack.asNMSCopy(item);

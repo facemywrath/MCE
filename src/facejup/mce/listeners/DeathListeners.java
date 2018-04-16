@@ -140,7 +140,7 @@ public class DeathListeners implements Listener {
 		}
 		Player killer = lastDamagedBy.get(event.getEntity()).getDamager();	
 		event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
-		if(Numbers.getRandom(0, 4) == 4)
+		if(Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0))
 			main.getMatchManager().incLives(killer);
 		for(Player player2 : Bukkit.getOnlinePlayers())
 		{

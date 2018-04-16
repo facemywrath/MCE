@@ -1,16 +1,18 @@
 package facejup.mce.timers;
 
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
-import facejup.mce.util.BlockColor;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
@@ -106,6 +108,13 @@ public class EndTimer {
 									player.setLevel(player.getLevel()+10);
 								player.setExp((float) (player.getLevel()/100.0));
 							}
+							if(kit == Kit.MAGE && time%15 == 0)
+							{
+								if(!player.getInventory().contains(Material.POTION))
+									player.getInventory().addItem(new ItemCreator(Material.POTION).setPotionType(new PotionEffect(PotionEffectType.HEAL, 0, 1)).getItem());
+								if(!player.getInventory().contains(Material.SPLASH_POTION))
+									player.getInventory().addItem(getRandomPotion());
+							}
 							if(kit.pot != null)
 							{
 								if (!player.hasPotionEffect(kit.pot.getType()))
@@ -126,6 +135,22 @@ public class EndTimer {
 									main.getServer().dispatchCommand(player, "spawn");
 									player.setOp(false);
 								}
+							}
+						}
+					}
+					else
+					{
+						if(player.getLocation().getY() < 1)
+						{
+							if(player.isOp())
+							{
+								main.getServer().dispatchCommand(player, "spawn");
+							}
+							else
+							{
+								player.setOp(true);
+								main.getServer().dispatchCommand(player, "spawn");
+								player.setOp(false);
 							}
 						}
 					}
@@ -184,6 +209,30 @@ public class EndTimer {
 				mm.endMatchByTime();
 			}
 		}
+	}
+
+	public ItemStack getRandomPotion()
+	{
+		int i = new Random().nextInt(7);
+		switch(i)
+		{
+		case 0:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.GLOWING, 200, 1)).setDisplayname("&9Potion Of Glowing").getItem();
+		case 1:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.POISON, 200, 0)).setDisplayname("&9Potion Of Poison").getItem();
+		case 2:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.WEAKNESS, 200, 2)).setDisplayname("&9Potion Of Weakness").getItem();
+		case 3:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.CONFUSION, 200, 2)).setDisplayname("&9Potion Of Confusion").getItem();
+		case 4:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.BLINDNESS, 200, 2)).setDisplayname("&9Potion Of Blindness").getItem();
+		case 5:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.SLOW, 200, 2)).setDisplayname("&9Potion Of Slowness").getItem();
+		case 6:
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.LEVITATION, 200, 2)).setDisplayname("&9Potion Of Levitation").getItem();
+		}
+
+		return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.POISON, 100, 1)).setDisplayname("&9Potion Of Poison").getItem();
 	}
 
 	public boolean isRunning() 

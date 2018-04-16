@@ -9,5 +9,6 @@ public class Lang {
 	public static String NullPlayer = Tag + Chat.translate("&cThat player could not be found!");
 	public static String CurrentlyPlaying = Tag + Chat.translate("&cYou are currently playing!");
 	public static String MatchNotRunning = Tag + Chat.translate("&cThere is no match currently running!");
+	public static String NotEnoughMana = Tag + Chat.translate("&cNot enough mana");
 	public static String afkcheckTag = Chat.translate("&9&l(&b&l&oAFK&r&l&oCheck&9&l): &c&l");
 }

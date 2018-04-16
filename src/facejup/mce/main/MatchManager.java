@@ -301,7 +301,7 @@ public class MatchManager {
 				{
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
-					if(kit == Kit.HARPY || kit == Kit.SHADE)
+					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON)
 						player.setLevel(100);
 					else
 						player.setLevel(0);
@@ -313,6 +313,8 @@ public class MatchManager {
 					player.getInventory().setLeggings(kit.leggings);
 					player.getInventory().setBoots(kit.boots);
 					player.getInventory().setItemInOffHand(kit.offhand);
+					if(kit == Kit.MAGE)
+						player.getInventory().addItem(endTimer.getRandomPotion());
 					Location loc = am.getArena().getRandomSpawn();
 					player.teleport(loc);
 				}

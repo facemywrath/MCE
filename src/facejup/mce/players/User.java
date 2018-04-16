@@ -54,6 +54,7 @@ public class User {
 			{
 				// Otherwise, set their default information and save. Then store their section.
 				config.set("Users." + player.getUniqueId() + ".Name", player.getName());
+				config.set("Users." + player.getUniqueId() + ".TimePlayed", 0);
 				config.set("Users." + player.getUniqueId() + ".FreeKit", FREE_KIT);
 				config.set("Users." + player.getUniqueId() + ".Coins", 0);
 				config.set("Users." + player.getUniqueId() + ".Kills", 0);
@@ -259,6 +260,15 @@ public class User {
 			section.set("Runnerup", i);
 		incCoins(10);
 		incScore(Achievement.FAILURE);
+		this.um.getFileControl().save();
+		updateScoreboard();
+	}
+
+	public void incTimePlayed(int i) {
+		if(section.contains("TimePlayed"))
+			section.set("TimePlayed", section.getInt("TimePlayed") + i);
+		else
+			section.set("TimePlayed", i);
 		this.um.getFileControl().save();
 		updateScoreboard();
 	}
