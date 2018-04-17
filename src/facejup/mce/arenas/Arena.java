@@ -37,6 +37,11 @@ public class Arena {
 		return null;
 	}
 	
+	public World getWorld()
+	{
+		return this.world;
+	}
+	
 	public Location getRandomSpawn()
 	{
 		List<Location> currentSpawnPoints = getSpawnPoints();

@@ -118,13 +118,25 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		if(event.getPlayer().getGameMode() == GameMode.CREATIVE)
 			return;
 		if(!main.getUserManager().getUser(event.getPlayer()).hasAchievement(Achievement.ARCHITECT))
+		{
 			event.setCancelled(true);
+			return;
+		}
 		if(!main.getMatchManager().isMatchRunning())
-			return;
-		if(!main.getMatchManager().getPlayersAlive().contains(player))
-			return;
-		if(event.getBlock().getType() != Material.OBSIDIAN)
+		{
 			event.setCancelled(true);
+			return;
+		}
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+		{
+			event.setCancelled(true);
+			return;
+		}
+		if(event.getBlock().getType() != Material.OBSIDIAN)
+		{
+			event.setCancelled(true);
+			return;
+		}
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
 			public void run()

@@ -309,7 +309,7 @@ public class MatchManager {
 				{
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
-					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON)
+					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON)
 						player.setLevel(100);
 					else
 						player.setLevel(0);

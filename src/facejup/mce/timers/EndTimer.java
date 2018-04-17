@@ -72,6 +72,8 @@ public class EndTimer {
 		{
 			if(time > 0)
 			{
+				if(main.getMatchManager().getArenaManager().getArena().getWorld().getTime() > 1700)
+					main.getMatchManager().getArenaManager().getArena().getWorld().setTime(600);
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
 					if (mm.getPlayersAlive().contains(player)) {
@@ -106,10 +108,42 @@ public class EndTimer {
 							}
 							if(kit == Kit.HARPY && player.isOnGround() && player.getLevel() < 100)
 							{
-								if(player.getLevel()+10 > 100)
-									player.setLevel(100);
+								if(player.hasPotionEffect(PotionEffectType.SLOW))
+									if(player.getLevel()-5 < 0)
+										player.setLevel(0);
+									else
+										player.setLevel(player.getLevel()-5);
 								else
-									player.setLevel(player.getLevel()+10);
+									if(player.getLevel()+10 > 100)
+										player.setLevel(100);
+									else
+										player.setLevel(player.getLevel()+10);
+								player.setExp((float) (player.getLevel()/100.0));
+							}
+							if(kit == Kit.GRAVITON)
+							{
+								if(player.getInventory().first(Material.SNOW_BALL) == -1 && player.getInventory().first(Material.MAGMA_CREAM) == -1)
+									player.getInventory().addItem(new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Toggle Levitation On").getItem());
+								if(player.hasPotionEffect(PotionEffectType.LEVITATION) && player.getLevel() == 0)
+								{
+									player.removePotionEffect(PotionEffectType.LEVITATION);
+									player.getInventory().setItem(player.getInventory().first(Material.MAGMA_CREAM), new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Toggle Levitation On").getItem());
+								}
+								else if(!player.hasPotionEffect(PotionEffectType.LEVITATION))
+								{
+									if(player.getLevel() + 7 < 100)
+										player.setLevel(player.getLevel()+7);
+									else
+										player.setLevel(100);
+								}
+								else if(player.hasPotionEffect(PotionEffectType.LEVITATION))
+								{
+									player.setFallDistance(0);
+									if(player.getLevel() - 9 > 0)
+										player.setLevel(player.getLevel()-9);
+									else
+										player.setLevel(0);
+								}
 								player.setExp((float) (player.getLevel()/100.0));
 							}
 							if(kit == Kit.MAGE && time%15 == 0)
@@ -121,7 +155,15 @@ public class EndTimer {
 							}
 							if(kit.pot != null)
 							{
-								if (!player.hasPotionEffect(kit.pot.getType()))
+								if(kit == Kit.DEMON)
+								{
+									if (player.getFireTicks() > 0 && !player.hasPotionEffect(kit.pot.getType()))
+										player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
+									else if(player.getFireTicks() <= 0)
+										player.removePotionEffect(kit.pot.getType());
+
+								}
+								else
 									player.addPotionEffect(new PotionEffect(kit.pot.getType(), time * 20, kit.pot.getAmplifier()));
 							}
 						}

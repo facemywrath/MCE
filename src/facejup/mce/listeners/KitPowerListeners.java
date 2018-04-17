@@ -41,6 +41,7 @@ import facejup.mce.main.Main;
 import facejup.mce.markers.DamageMarker;
 import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
+import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Numbers;
 import think.rpgitems.item.ItemManager;
 
@@ -144,10 +145,13 @@ public class KitPowerListeners implements Listener {
 				if(stamina > 0)
 				{
 					player.setVelocity(player.getLocation().getDirection().multiply(0.4));
-					if(stamina-1 < 0)
+					int red = 1;
+					if(player.hasPotionEffect(PotionEffectType.SLOW))
+						red = 2;
+					if(stamina-red < 0)
 						stamina = 0;
 					else
-						stamina -= 1;
+						stamina -= red;
 					player.setExp((float) (stamina/100.0));
 					player.setLevel((int) stamina);
 					main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
@@ -239,6 +243,37 @@ public class KitPowerListeners implements Listener {
 		if(event.getEntity() instanceof EnderPearl && event.getEntity().getShooter() instanceof Player && main.getMatchManager().getPlayersAlive().contains((Player) event.getEntity().getShooter()) && main.getMatchManager().getPlayerKit((Player) event.getEntity().getShooter()) == Kit.GRAVITON)
 			((Player) event.getEntity().getShooter()).setCooldown(Material.ENDER_PEARL, 200);
 	}
+	
+	@EventHandler
+	public void gravityToggle(PlayerInteractEvent event)
+	{
+		Player player = event.getPlayer();
+		if(!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
+			return;
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) != Kit.GRAVITON)
+			return;
+		Material toggleOn = Material.SNOW_BALL;
+		Material toggleOff = Material.MAGMA_CREAM;
+		if(player.getInventory().getItemInMainHand().getType() == toggleOn && player.getLevel() > 0)
+		{
+			event.setCancelled(true);
+			player.getInventory().setItemInHand(new ItemCreator(toggleOff).setDisplayname("&9Toggle Levitation Off").getItem());
+			if(!player.hasPotionEffect(PotionEffectType.LEVITATION))
+				player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 30000, 2));
+		}
+		else if(player.getInventory().getItemInHand().getType() == toggleOff)
+		{
+			event.setCancelled(true);
+			player.getInventory().setItemInHand(new ItemCreator(toggleOn).setDisplayname("&9Toggle Levitation On").getItem());
+			if(player.hasPotionEffect(PotionEffectType.LEVITATION))
+				player.removePotionEffect(PotionEffectType.LEVITATION);
+		}
+	}
+	
 
 	@EventHandler
 	public void cancelIgnite(BlockIgniteEvent event)
@@ -269,7 +304,7 @@ public class KitPowerListeners implements Listener {
 		}
 	}
 
-	@EventHandler
+	//@EventHandler
 	public void stopDemonFireTick(EntityCombustEvent event)
 	{
 		if(event.getEntityType() != EntityType.PLAYER)
