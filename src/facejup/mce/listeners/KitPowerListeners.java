@@ -147,7 +147,7 @@ public class KitPowerListeners implements Listener {
 					player.setVelocity(player.getLocation().getDirection().multiply(0.4));
 					int red = 1;
 					if(player.hasPotionEffect(PotionEffectType.SLOW))
-						red = 2;
+						red = 2+player.getPotionEffect(PotionEffectType.SLOW).getAmplifier();
 					if(stamina-red < 0)
 						stamina = 0;
 					else
