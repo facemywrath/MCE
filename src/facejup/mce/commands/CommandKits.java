@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
@@ -38,7 +39,7 @@ public class CommandKits implements CommandExecutor{
 				sender.sendMessage(Lang.ConsoleUse);
 				return true;
 			}
-			if(args.length > 0 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getKitByName(args[1]) != null)
+			if(args.length > 1 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getKitByName(args[1]) != null)
 			{
 				Kit kit = getKitByName(args[1]);
 				if(Bukkit.getOfflinePlayer(args[0]).isOnline())
@@ -46,6 +47,7 @@ public class CommandKits implements CommandExecutor{
 				sender.sendMessage(Chat.translate(Lang.Tag + "&aYou've given &b" + Bukkit.getOfflinePlayer(args[0]).getName() + " &athe kit &b" + StringUtils.capitalize(kit.name().toLowerCase())));
 				User user = main.getUserManager().getUser(Bukkit.getOfflinePlayer(args[0]));
 				user.unlockKit(kit);
+				user.incScore(Achievement.SPENDER);
 			}
 		}
 		else if(((Player) sender).isOp())

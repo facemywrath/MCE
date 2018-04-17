@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -105,6 +106,8 @@ public class InventoryBuilder {
 		String name = ach.icon.getItemMeta().getDisplayName();
 		List<String> lore = ach.icon.getItemMeta().getLore();
 		boolean flag = user.hasAchievement(ach);
+		if(ach.secret && !flag)
+			return new ItemStack(Material.AIR);
 		String newName = (flag ? "&aUnlocked: " : "&cLocked: ");
 		String level = "";
 		if(ach.scores.size() > 1)

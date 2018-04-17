@@ -11,26 +11,38 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import facejup.mce.enums.Kit;
+import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.main.Main;
 import facejup.mce.markers.DamageMarker;
 import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
+import facejup.mce.util.Numbers;
+import think.rpgitems.item.ItemManager;
 
 public class KitPowerListeners implements Listener {
 
@@ -238,7 +250,7 @@ public class KitPowerListeners implements Listener {
 			{
 				block.setType(Material.AIR);
 			}
-		}, 60L);
+		}, 30L);
 	}
 
 	@EventHandler
@@ -338,7 +350,7 @@ public class KitPowerListeners implements Listener {
 			}
 		}, 25L);
 	}
-	
+
 	@EventHandler
 	public void potionVelocity(ProjectileLaunchEvent event)
 	{
@@ -356,6 +368,215 @@ public class KitPowerListeners implements Listener {
 				event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(2));
 			}
 		}
+	}
+
+	@EventHandler
+	public void gunnerGrenadeSpeed2(EntityBlockFormEvent event)
+	{
+		if(event.getEntity() instanceof TNTPrimed)
+		{
+			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+			{
+				public void run()
+				{
+					((TNTPrimed) event.getEntity()).setFuseTicks(20);
+				}
+			}, 3L);
+		}
+	}
+
+	@EventHandler
+	public void cancelGunnerKnockback(EntityDamageByEntityEvent event)
+	{
+		if(!(event.getDamager() instanceof Projectile) || !(((Projectile) event.getDamager()).getShooter() instanceof Player))
+			return;
+		Player player = (Player) ((Projectile) event.getDamager()).getShooter();
+		if(!(event.getEntity() instanceof Player))
+			return;
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) == Kit.GUNNER)
+		{
+			event.setCancelled(true);
+			((Player) event.getEntity()).damage(Numbers.getRandom(2, 4));
+		}
+	}
+
+	@EventHandler
+	public void gunnerGrenadeSpeed(ExplosionPrimeEvent event)
+	{
+		if(event.getEntity() instanceof TNTPrimed)
+		{
+			event.setFire(true);
+		}
+	}
+
+	@EventHandler
+	public void tricksterTeleport(ProjectileHitEvent event)
+	{
+		if(!(event.getEntity().getShooter() instanceof Player))
+			return;
+		Player player = (Player) event.getEntity().getShooter();
+		if(!(event.getHitEntity() != null && event.getHitEntity() instanceof Player))
+			return;
+		Player target = (Player) event.getHitEntity();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) == Kit.TRICKSTER)
+		{
+			Location loc = player.getLocation().clone();
+			player.teleport(target);
+			target.teleport(loc);
+		}
+
+	}
+
+	@EventHandler
+	public void tricksterBowCooldown(ProjectileLaunchEvent event)
+	{
+		if(!(event.getEntity().getShooter() instanceof Player))
+			return;
+		Player player = (Player) event.getEntity().getShooter();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) == Kit.TRICKSTER)
+		{
+			player.setCooldown(Material.BOW, 80);
+		}
+
+
+	}
+
+	@EventHandler
+	public void tricksterInvis(PlayerInteractEvent event)
+	{
+		Player player = event.getPlayer();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) != Kit.TRICKSTER)
+			return;
+		if(player.getInventory().getItemInMainHand() != null && ItemManager.toRPGItem(player.getInventory().getItemInMainHand()) != null)
+		{
+			if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)
+			{
+				event.setCancelled(true);
+				if(!main.getMatchManager().isHidden(player) && player.getCooldown(Material.FIREBALL) == 0)
+				{
+					main.getMatchManager().hidePlayer(player);
+					player.setCooldown(Material.FIREBALL, 60);
+					main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+					{
+						public void run()
+						{
+							if(main.getMatchManager().isHidden(player))
+								main.getMatchManager().showPlayer(player);
+						}
+					}, 60L);
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void upgraderUpgrade(PlayerKillEvent event)
+	{
+		Player killer = event.getPlayer();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(killer))
+			return;
+		if(main.getMatchManager().getPlayerKit(killer) != Kit.UPGRADER)
+			return;
+		upgradeArmor(killer);
+		if(Numbers.getRandom(0, 2) == 2)
+			upgradeArmor(killer);
+	}
+
+	public void upgradeArmor(Player player)
+	{
+		int random = Numbers.getRandom(0, 4);
+		switch(random)
+		{
+		case 0:
+			player.getInventory().setItemInMainHand(getNextLevel(player.getInventory().getItemInMainHand()));
+			break;
+		case 1:
+			player.getInventory().setHelmet(getNextLevel(player.getInventory().getHelmet()));
+			break;
+		case 2:
+			player.getInventory().setChestplate(getNextLevel(player.getInventory().getChestplate()));
+			break;
+		case 3:
+			player.getInventory().setLeggings(getNextLevel(player.getInventory().getLeggings()));
+			break;
+		case 4:
+			player.getInventory().setBoots(getNextLevel(player.getInventory().getBoots()));
+			break;
+		}
+	}
+
+	public ItemStack getNextLevel(ItemStack item)
+	{
+		Material mat = item.getType();
+		String materialtype = mat.toString().substring(0, mat.toString().indexOf('_'));
+		String itemtype = mat.toString().substring(mat.toString().indexOf('_')+1, mat.toString().length());
+		String materialName = "";
+		switch(materialtype)
+		{
+		case "WOOD":
+			materialName = "STONE_" + itemtype;
+			break;
+		case "LEATHER":
+			materialName = "CHAINMAIL_" + itemtype;
+			break;
+		case "STONE":
+			materialName = "IRON_" + itemtype;
+			break;
+		case "IRON":
+			if(!itemtype.equals("SWORD"))
+				materialName = "DIAMOND_" + itemtype;
+			break;
+		case "CHAINMAIL":
+			materialName = "IRON_" + itemtype;
+			break;
+		}
+		if(Material.getMaterial(materialName) != null)
+			return new ItemStack(Material.getMaterial(materialName));
+		return item;
+	}
+
+	@EventHandler
+	public void wightSlowListener(EntityDamageByEntityEvent event)
+	{
+		if(!(event.getDamager() instanceof Player && event.getEntity() instanceof Player))
+			return;
+		Player killer = (Player) event.getDamager();
+		Player target = (Player) event.getEntity();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(killer))
+			return;
+		if(main.getMatchManager().getPlayerKit(killer) != Kit.WIGHT)
+			return;
+		if(target.hasPotionEffect(PotionEffectType.SLOW))
+		{
+			int level = target.getPotionEffect(PotionEffectType.SLOW).getAmplifier();
+			target.removePotionEffect(PotionEffectType.SLOW);
+			if(level+1 < 4)
+				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, level+1));
+			else
+				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, level));
+		}
+		else
+			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0));
 	}
 
 }

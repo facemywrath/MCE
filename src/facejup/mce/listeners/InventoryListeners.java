@@ -1,5 +1,7 @@
 package facejup.mce.listeners;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -8,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -19,6 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
@@ -26,7 +30,6 @@ import facejup.mce.util.Chat;
 import facejup.mce.util.InventoryBuilder;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
-import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("deprecation")
 public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
@@ -93,7 +96,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void swapItem(PlayerSwapHandItemsEvent event)
 	{
@@ -106,6 +109,39 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		if(event.getPlayer().getGameMode() == GameMode.CREATIVE)
 			return;
 		event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void blockPlace(BlockPlaceEvent event)
+	{
+		Player player = event.getPlayer();
+		if(event.getPlayer().getGameMode() == GameMode.CREATIVE)
+			return;
+		if(!main.getUserManager().getUser(event.getPlayer()).hasAchievement(Achievement.ARCHITECT))
+			event.setCancelled(true);
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(event.getBlock().getType() != Material.OBSIDIAN)
+			event.setCancelled(true);
+		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		{
+			public void run()
+			{
+				event.getBlock().setType(Material.AIR);
+				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+				{
+					public void run()
+					{
+						if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player))
+						{
+							player.getInventory().addItem(new ItemCreator(Material.OBSIDIAN).setDisplayname("&aSpecial Stone").setLore(Arrays.asList("&5&lA reward for your architecture.", "&7&oThese blocks automatically", "&7&odespawn after 10 seconds.")).getItem());
+						}
+					}
+				}, 30L);
+			}
+		}, 200L);
 	}
 
 	@EventHandler

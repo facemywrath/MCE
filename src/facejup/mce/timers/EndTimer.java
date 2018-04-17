@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -92,10 +93,13 @@ public class EndTimer {
 							if(kit == Kit.MASTER)
 								if(player.getInventory().first(Material.ARROW) == -1 || player.getInventory().getItem(player.getInventory().first(Material.ARROW)).getAmount() < 12)
 									player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+							if(kit == Kit.TRICKSTER)
+								if(player.getInventory().first(Material.ARROW) == -1 || player.getInventory().getItem(player.getInventory().first(Material.ARROW)).getAmount() < 4)
+									player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
 							if(kit == kit.DEMON)
 							{
-								if(player.getLevel() <= 90)
-									player.setLevel(player.getLevel()+10);
+								if(player.getLevel() <= 93)
+									player.setLevel(player.getLevel()+7);
 								else
 									player.setLevel(100);
 								player.setExp((float) (player.getLevel()/100.0));

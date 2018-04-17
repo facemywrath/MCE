@@ -21,7 +21,11 @@ public enum Achievement {
 	THISISSPARTA(false, new ItemCreator(Material.STONE_SWORD).setDisplayname("THIS IS SPARTA!!!").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fall damage.")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.GRAVITON))),
 	ASSASSINATE(false, new ItemCreator(Material.TOTEM).setDisplayname("Assassinate").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills without being hit within the last 8 seconds.")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.SHADE))),
 	HELLFIRE(false, new ItemCreator(Material.FIREBALL).setDisplayname("Hellfire").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fire damage.")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.DEMON))),
-	SKYLORD(false, new ItemCreator(Material.FEATHER).setDisplayname("Skylord").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills while falling")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.HARPY)));
+	SKYLORD(false, new ItemCreator(Material.FEATHER).setDisplayname("Skylord").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills while falling")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.HARPY))),
+	PUBLICITY(true, new ItemCreator(Material.SKULL).setData(3).setDisplayname("Publicity").setLore(Arrays.asList("&d&lGet us members by streaming.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),
+	BETA(true, new ItemCreator(Material.EYE_OF_ENDER).setDisplayname("Beta").setLore(Arrays.asList("&d&lBe a beta tester.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(2000))),
+	SPENDER(true, new ItemCreator(Material.GOLD_INGOT).setDisplayname("Spender").setLore(Arrays.asList("&d&lPurchase a kit.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),
+	ARCHITECT(true, new ItemCreator(Material.BRICK).setDisplayname("Architect").setLore(Arrays.asList("&d&lGet an arena accepted by the staff.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100)));
 	
 	public ItemStack icon;
 	public List<Integer> scores;

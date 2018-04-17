@@ -1,6 +1,7 @@
 package facejup.mce.main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -16,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaManager;
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
@@ -120,7 +123,8 @@ public class MatchManager {
 	public void hidePlayer(Player player)
 	{
 		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10000, 0));
-		player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10000, 2));
+		if(getPlayerKit(player) == Kit.SHADE)
+			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10000, 2));
 		for(Player player2 : Bukkit.getOnlinePlayers())
 		{
 			if(!(player.equals(player2)))
@@ -218,7 +222,10 @@ public class MatchManager {
 			for(Player player : desiredKits.keySet())
 			{
 				main.getUserManager().getUser(player).incGamesplayed(1);
-				lives.put(player, 5);
+				if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
+					lives.put(player, 5);
+				else
+					lives.put(player, 6);
 				spawnPlayer(player);
 				main.getUserManager().getUser(player).updateScoreboard();
 			}
@@ -233,6 +240,7 @@ public class MatchManager {
 
 	public void spawnPlayer(Player player) 
 	{
+		showPlayer(player);
 		if(player.isDead())
 			player.spigot().respawn();
 		player.setGameMode(GameMode.SURVIVAL);
@@ -313,6 +321,8 @@ public class MatchManager {
 					player.getInventory().setLeggings(kit.leggings);
 					player.getInventory().setBoots(kit.boots);
 					player.getInventory().setItemInOffHand(kit.offhand);
+					if(main.getUserManager().getUser(player).hasAchievement(Achievement.ARCHITECT))
+						player.getInventory().addItem(new ItemCreator(Material.OBSIDIAN).setAmount(16).setDisplayname("&aSpecial Stone").setLore(Arrays.asList("&5&lA reward for your architecture.", "&7&oThese blocks automatically", "&7&odespawn after 10 seconds.")).getItem());
 					if(kit == Kit.MAGE)
 						player.getInventory().addItem(endTimer.getRandomPotion());
 					Location loc = am.getArena().getRandomSpawn();

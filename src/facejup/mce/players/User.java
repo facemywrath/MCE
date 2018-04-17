@@ -23,8 +23,6 @@ import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
 
 public class User {
-
-	private final boolean FREE_KIT = true;
 	
 	private UserManager um; // Dependency Injection Variable.
 
@@ -55,7 +53,7 @@ public class User {
 				// Otherwise, set their default information and save. Then store their section.
 				config.set("Users." + player.getUniqueId() + ".Name", player.getName());
 				config.set("Users." + player.getUniqueId() + ".TimePlayed", 0);
-				config.set("Users." + player.getUniqueId() + ".FreeKit", FREE_KIT);
+				config.set("Users." + player.getUniqueId() + ".FreeKit", true);
 				config.set("Users." + player.getUniqueId() + ".Coins", 0);
 				config.set("Users." + player.getUniqueId() + ".Kills", 0);
 				config.set("Users." + player.getUniqueId() + ".Deaths", 0);
@@ -310,6 +308,8 @@ public class User {
 
 	public void incCoins(int i)
 	{
+		if(hasAchievement(Achievement.PUBLICITY))
+			i *= 3;
 		if(section.contains("Coins"))
 			section.set("Coins", section.getInt("Coins") + i);
 		else
@@ -320,10 +320,13 @@ public class User {
 
 	public void incCoins()
 	{
+		int i = 1;
+		if(hasAchievement(Achievement.PUBLICITY))
+			i = 3;
 		if(section.contains("Coins"))
-			section.set("Coins", section.getInt("Coins") + 1);
+			section.set("Coins", section.getInt("Coins") + i);
 		else
-			section.set("Coins", 1);
+			section.set("Coins", i);
 		this.um.getFileControl().save();
 		updateScoreboard();
 	}

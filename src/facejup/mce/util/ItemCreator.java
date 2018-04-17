@@ -82,7 +82,7 @@ public class ItemCreator{
 
 	public ItemCreator addEnchant(Enchantment ench, int i) {
 		if(!item.containsEnchantment(ench))
-			item.addEnchantment(ench, i);
+			item.addUnsafeEnchantment(ench, i);
 		return this;
 	}
 
