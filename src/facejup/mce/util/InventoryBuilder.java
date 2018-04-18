@@ -79,6 +79,9 @@ public class InventoryBuilder {
 			ItemCreator item = new ItemCreator(tester.icon).hideFlags(63).setDisplayname((kit == tester)?"&6Kit: " + name:(user.hasKit(tester)?"&2Kit: " + name:"&4Locked: " + name)).setLore(Arrays.asList((kit == tester?"&7&lThis is your kit":(user.hasKit(tester)?"&a&lClick to select":(achkit?("&bRequires achievement &6" + level + tester.achcost.icon.getItemMeta().getDisplayName() + "&b to unlock."):user.getCoins() >= tester.coincost?"&aCost: " + tester.coincost:"&4Cost: " + tester.coincost))), (user.hasKit(tester)?"":(achkit?"":(user.getCoins() >= tester.coincost?"&aYour coins: " + user.getCoins():"&4Your coins: " + user.getCoins()))), (user.hasKit(tester)?"":(achkit?"&7Type &6&l/achievements &7or click here to":(user.getCoins() >= tester.coincost)?"&6Click to purchase!":"")), (user.hasKit(tester)?"":(achkit?"&7view your list of achievements.":""))));
 			if (kit == tester)
 				item.addGlowing();
+			List<String> lore = item.getItem().getItemMeta().getLore();
+			lore.addAll(tester.description);
+			item.setLore(lore);
 			ib.setItem(tester.slot, item.getItem());
 		}
 
