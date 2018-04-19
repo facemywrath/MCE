@@ -1,5 +1,8 @@
 package facejup.mce.listeners;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -49,6 +52,8 @@ public class KitPowerListeners implements Listener {
 
 	private EventManager em;
 	private Main main;
+	
+	public List<MoveMarker> ignitedBlocks = new ArrayList<>();
 
 	public KitPowerListeners(EventManager em)
 	{
@@ -278,14 +283,7 @@ public class KitPowerListeners implements Listener {
 	@EventHandler
 	public void cancelIgnite(BlockIgniteEvent event)
 	{
-		final Block block = event.getBlock();
-		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-		{
-			public void run()
-			{
-				block.setType(Material.AIR);
-			}
-		}, 30L);
+		ignitedBlocks.add(new MoveMarker(event.getBlock().getLocation()));
 	}
 
 	@EventHandler
@@ -350,7 +348,6 @@ public class KitPowerListeners implements Listener {
 					if(tempLoc.getBlock().getType() == Material.AIR)
 					{
 						tempLoc.getWorld().spawnFallingBlock(tempLoc, Material.FIRE, (byte) 0);
-						deIgnite(tempLoc);
 					}
 				}
 			}
@@ -370,20 +367,8 @@ public class KitPowerListeners implements Listener {
 	{
 		if(event.getTo() == Material.FIRE)
 		{
-			deIgnite(event.getBlock().getLocation());
+			ignitedBlocks.add(new MoveMarker(event.getBlock().getLocation()));
 		}
-	}
-
-	public void deIgnite(Location loc)
-	{
-		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-		{
-			public void run()
-			{
-				if(loc.getBlock().getType() == Material.FIRE)
-					loc.getBlock().setType(Material.AIR);
-			}
-		}, 25L);
 	}
 
 	@EventHandler

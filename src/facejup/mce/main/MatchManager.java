@@ -212,7 +212,7 @@ public class MatchManager {
 		if(arena == null)
 		{
 			startTimer.linger();
-			Chat.bc(Tag + "&cError: No Arena Found.");
+			Chat.bc(Tag + "&cError: No Arena found within parameters.");
 			return;
 		}
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
@@ -241,6 +241,7 @@ public class MatchManager {
 	public void spawnPlayer(Player player) 
 	{
 		showPlayer(player);
+		player.setFallDistance(0);
 		if(player.isDead())
 			player.spigot().respawn();
 		player.setGameMode(GameMode.SURVIVAL);

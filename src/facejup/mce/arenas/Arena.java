@@ -68,6 +68,36 @@ public class Arena {
 		return locs;
 	}
 	
+	public double getXMin()
+	{
+		return (bound1.getX() < bound2.getX()?bound1.getX():bound2.getX());
+	}
+	
+	public double getXMax()
+	{
+		return (bound1.getX() > bound2.getX()?bound1.getX():bound2.getX());
+	}
+
+	public double getYMin()
+	{
+		return (bound1.getY() < bound2.getY()?bound1.getY():bound2.getY());
+	}
+
+	public double getYMax()
+	{
+		return (bound1.getY() > bound2.getY()?bound1.getY():bound2.getY());
+	}
+
+	public double getZMin()
+	{
+		return (bound1.getZ() < bound2.getZ()?bound1.getZ():bound2.getZ());
+	}
+
+	public double getZMax()
+	{
+		return (bound1.getZ() > bound2.getZ()?bound1.getZ():bound2.getZ());
+	}
+	
 	private double getDistanceToNearestPlayer(Location loc)
 	{
 		double i = Double.MAX_VALUE;

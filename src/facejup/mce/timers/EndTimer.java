@@ -1,19 +1,23 @@
 package facejup.mce.timers;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import facejup.mce.arenas.Arena;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
+import facejup.mce.markers.MoveMarker;
+import facejup.mce.markers.OutOfBoundsMarker;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
@@ -30,6 +34,8 @@ public class EndTimer {
 	private int time; // Time left to the match.
 	private boolean running = false; // Whether or not the timer is running.
 
+	private HashMap<Player, OutOfBoundsMarker> oobs = new HashMap<>();
+	
 	public EndTimer(Main main, MatchManager mm) {
 		this.mm = mm;
 		this.main = main; // Store the current running instance of main.
@@ -74,10 +80,49 @@ public class EndTimer {
 			{
 				if(main.getMatchManager().getArenaManager().getArena().getWorld().getTime() > 1700)
 					main.getMatchManager().getArenaManager().getArena().getWorld().setTime(600);
+				if(!main.getEventManager().getKitPowerListeners().ignitedBlocks.isEmpty())
+				{
+					for(MoveMarker marker : main.getEventManager().getKitPowerListeners().ignitedBlocks)
+					{
+						if(marker.MillisPassedSince() > 1250)
+							marker.getLocation().getBlock().setType(Material.AIR);
+					}
+				}
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
 					if (mm.getPlayersAlive().contains(player)) {
 						mm.afkCheck(player);
+						Location loc = player.getLocation();
+						Arena a = mm.getArenaManager().getArena();
+						if(!oobs.containsKey(player) && (loc.getX() < a.getXMin() || loc.getX() > a.getXMax() || loc.getY() > a.getYMax() || loc.getZ() < a.getZMin() || loc.getZ() > a.getZMax()))
+							oobs.put(player, new OutOfBoundsMarker(player));
+						else
+							oobs.remove(player);
+						if(oobs.containsKey(player))
+						{
+							switch(oobs.get(player).timePassedSince())
+							{
+							case 0:
+								player.sendMessage(Chat.translate(Lang.Tag + "&cYou are out of bounds. Return to the map or you will be killed in 5..."));
+								break;
+							case 1:
+								player.sendMessage(Chat.translate("&c4..."));
+								break;
+							case 2:
+								player.sendMessage(Chat.translate("&c3..."));
+								break;
+							case 3:
+								player.sendMessage(Chat.translate("&c2..."));
+								break;
+							case 4:
+								player.sendMessage(Chat.translate("&c1..."));
+								break;
+							case 5:
+								player.damage(player.getHealth());
+								oobs.remove(player);
+								break;
+							}
+						}
 						if(player.getLocation().getY() < 1)
 							player.damage(player.getMaxHealth());
 						player.setMaxHealth(20);

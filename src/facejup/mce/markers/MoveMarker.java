@@ -25,4 +25,9 @@ public class MoveMarker {
 		return (int) (((System.currentTimeMillis() - timeMoved)/1000.0));
 	}
 	
+	public int MillisPassedSince()
+	{
+		return (int) (System.currentTimeMillis() - timeMoved);
+	}
+	
 }

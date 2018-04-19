@@ -112,10 +112,12 @@ public class ArenaManager {
 			return arenas;
 		for(String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false))
 		{
-			if(fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size() >= size)
+			int spawnamts = fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size();
+			if(spawnamts >= size && spawnamts <= size*3);
 				arenas.add(fc.getConfig().getConfigurationSection("Arenas." + str));
 		}
 		return arenas;
 	}
+
 
 }

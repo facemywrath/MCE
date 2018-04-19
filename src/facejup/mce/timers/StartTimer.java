@@ -18,7 +18,7 @@ import net.minecraft.server.v1_12_R1.MinecraftServer;
 
 public class StartTimer {
 
-	private final int WAIT_TIME = 300; // Timer start time.
+	private final int WAIT_TIME = 180; // Timer start time.
 	private final int LINGER_TIME = 120; // Time needed to wait if there are not enough players ready.
 	private final String tag = Lang.Tag;
 
@@ -66,7 +66,7 @@ public class StartTimer {
 	{
 		int minutes = (int) ((time) / 60.0);
 		int seconds = (int) ((time) % 60.0);
-		MinecraftServer.getServer().setMotd(Chat.translate("    &9&l(&b&l&oMC&f&l&oEliminations&9&l) &7&l : &e&l Version: 1.8 - 1.12 \n        &a&lMatch starting in: &b" + minutes + ":" + seconds + " &a&lminutes!"));
+		MinecraftServer.getServer().setMotd(Chat.translate("    &9&l(&b&l&oMC&f&l&oEliminations&9&l) &7&l : &e&l Version: 1.9 - 1.12 \n        &a&lMatch starting in: &b" + minutes + ":" + seconds + " &a&lminutes!"));
 		if(running)
 		{
 			if(time > 0)

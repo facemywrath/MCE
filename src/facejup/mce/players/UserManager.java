@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
 
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.util.BlockColor;
@@ -25,6 +26,8 @@ import facejup.mce.util.FileControl;
 import facejup.mce.util.ItemCreator;
 
 public class UserManager implements Listener {
+	
+	private final boolean BETA = true;
 
 	private Main main; // Dependency Injection Variable.
 
@@ -161,6 +164,8 @@ public class UserManager implements Listener {
 	public void playerJoin(PlayerJoinEvent event)
 	{
 		addUser(event.getPlayer());
+		if(!users.get(event.getPlayer()).hasAchievement(Achievement.BETA) && BETA)
+			users.get(event.getPlayer()).setScore(Achievement.BETA, 1);
 		this.main.getMatchManager().setPlayerKit(event.getPlayer(), Kit.NONE);
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{

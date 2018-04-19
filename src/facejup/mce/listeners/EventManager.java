@@ -49,4 +49,8 @@ public class EventManager {
 		return this.main;
 	}
 
+	public KitPowerListeners getKitPowerListeners() {
+		return this.kpl;
+	}
+
 }

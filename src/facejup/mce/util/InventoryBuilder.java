@@ -80,6 +80,14 @@ public class InventoryBuilder {
 			if (kit == tester)
 				item.addGlowing();
 			List<String> lore = item.getItem().getItemMeta().getLore();
+			if(lore.size() > 2 && lore.get(2).equals(""))
+			{
+				lore.remove(2);
+			}
+			if(lore.size() > 2 && lore.get(2).equals(""))
+			{
+				lore.remove(2);
+			}
 			lore.addAll(tester.description);
 			item.setLore(lore);
 			ib.setItem(tester.slot, item.getItem());
