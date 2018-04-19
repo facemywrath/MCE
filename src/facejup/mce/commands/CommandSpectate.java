@@ -56,7 +56,7 @@ public class CommandSpectate implements CommandExecutor{
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', Lang.Tag + "&aYou are now spectating. Re-type this command to return to lobby."));
 					player.getInventory().clear();
 				}
-			}, 20L);
+			}, 5L);
 		}
 		else
 		{

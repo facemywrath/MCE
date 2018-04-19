@@ -61,6 +61,19 @@ public class KitPowerListeners implements Listener {
 		this.main = em.getMain();
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
+	
+	@EventHandler
+	public void archerBowCooldown(ProjectileLaunchEvent event)
+	{
+		if(event.getEntity() instanceof Arrow && (event.getEntity().getShooter() instanceof Player))
+		{
+			Player player = (Player) event.getEntity().getShooter();
+			if(main.getMatchManager().getPlayerKit(player) == Kit.ARCHER)
+			{
+				player.setCooldown(Material.BOW, 4);
+			}
+		}
+	}
 
 	@EventHandler
 	public void negateNinjaFallDamage(EntityDamageEvent event)
