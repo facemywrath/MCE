@@ -48,6 +48,7 @@ import facejup.mce.main.Main;
 import facejup.mce.markers.DamageMarker;
 import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
+import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Numbers;
 import think.rpgitems.item.ItemManager;
@@ -59,7 +60,7 @@ public class KitPowerListeners implements Listener {
 
 	public List<MoveMarker> ignitedBlocks = new ArrayList<>();
 	
-	public HashMap<Player, List<ItemStack>> stolenItems = new HashMap<>();
+	public HashMap<Player, ArrayList<ItemStack>> stolenItems = new HashMap<>();
 
 	public KitPowerListeners(EventManager em)
 	{
@@ -500,9 +501,7 @@ public class KitPowerListeners implements Listener {
 			return;
 		if(!main.getMatchManager().getPlayersAlive().contains(player))
 			return;
-		if(main.getMatchManager().getPlayerKit(player) != Kit.TRICKSTER)
-			return;
-		if(player.getInventory().getItemInMainHand() != null && ItemManager.toRPGItem(player.getInventory().getItemInMainHand()) != null)
+		if(player.getInventory().getItemInMainHand() != null && player.getInventory().getItemInMainHand().getType() == Material.FIREBALL && ItemManager.toRPGItem(player.getInventory().getItemInMainHand()) != null)
 		{
 			if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)
 			{
@@ -652,18 +651,22 @@ public class KitPowerListeners implements Listener {
 			if(slot > -1)
 			{
 				ItemStack item = target.getInventory().getItem(slot);
+				if(item == null)
+					return;
 				damager.getInventory().addItem(new ItemCreator(item).setAmount(1).getItem());
+				damager.sendMessage(Chat.translate("&8You stole 1 &7" + item.getType().toString()));
+				target.sendMessage(Chat.translate("&8You lost 1 &7" + item.getType().toString() + " &8to a Goblin."));
 				if(stolenItems.containsKey(target))
 				{
-					List<ItemStack> items = stolenItems.get(target);
+					ArrayList<ItemStack> items = stolenItems.get(target);
 					if(items == null || items.isEmpty())
-						items = new ArrayList<>();
+						items = new ArrayList<ItemStack>();
 					items.add(new ItemCreator(item).setAmount(1).getItem());
 					stolenItems.put(target, items);
 				}
 				else
 				{
-					stolenItems.put(target, Arrays.asList(new ItemCreator(item).setAmount(1).getItem()));
+					stolenItems.put(target, (ArrayList<ItemStack>) Arrays.asList(new ItemCreator(item).setAmount(1).getItem()));
 				}
 				if(item.getAmount() > 1)
 				{
@@ -707,7 +710,7 @@ public class KitPowerListeners implements Listener {
 	public int getRandomItemSlot(Player target)
 	{
 		Inventory inv = target.getInventory();
-		List<Material> blacklist = Arrays.asList(Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
+		List<Material> blacklist = Arrays.asList(Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
 		List<Integer> slots = new ArrayList<>();
 		for(int i = 0; i < 8; i++)
 		{
@@ -721,7 +724,7 @@ public class KitPowerListeners implements Listener {
 		}
 		if(slots.isEmpty())
 			return -1;
-		return slots.get(Numbers.getRandom(0, slots.size()));
+		return slots.get(Numbers.getRandom(0, slots.size()-1));
 	}
 
 	@EventHandler

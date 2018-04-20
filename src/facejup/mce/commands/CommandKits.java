@@ -59,8 +59,6 @@ public class CommandKits implements CommandExecutor{
 					sender.sendMessage(Lang.NullPlayer);
 					return true;
 				}
-				sender.sendMessage(Lang.InvalidSyn);
-				return true;
 			}
 			if(args.length > 0 && Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && getKitByName(args[1]) != null)
 			{

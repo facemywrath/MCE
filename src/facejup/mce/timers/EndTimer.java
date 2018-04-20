@@ -151,6 +151,8 @@ public class EndTimer {
 									disguise.setVelocitySent(true);
 									disguise.setModifyBoundingBox(true);
 									disguise.setShowName(true);
+									disguise.getWatcher().setCustomName(player.getName());
+									disguise.getWatcher().setCustomNameVisible(true);
 									disguise.startDisguise();
 								}
 							}
