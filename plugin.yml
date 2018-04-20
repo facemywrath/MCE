@@ -2,7 +2,7 @@ name: MCE
 main: facejup.mce.main.Main
 author: facejup
 version: 1.12
-depend: [ RPGItems ]
+depend: [ RPGItems, LibsDisguises ]
 commands:
   arena:
     description: Main command for MCE

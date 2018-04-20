@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -200,9 +201,46 @@ public class CommandArena implements CommandExecutor{
 		if(args[0].equalsIgnoreCase("start"))
 		{
 			if(cm.getMain().getMatchManager().isMatchRunning())
+			{
+				sender.sendMessage(Chat.translate(Lang.Tag + "&cMatch currently in progress."));
 				return true;
-			if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
-				cm.getMain().getMatchManager().startMatch();
+			}
+			if(args.length == 1)
+			{
+				if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
+					cm.getMain().getMatchManager().startMatch();
+				else
+					sender.sendMessage(Chat.translate(Lang.Tag + "&cNot enough players queued up."));
+				return true;
+			}
+			else if(args.length == 2 && cm.getMain().getMatchManager().getArenaManager().getArenaSection(args[1]) != null)
+			{
+				if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
+					cm.getMain().getMatchManager().startMatch(args[1]);
+				else
+					sender.sendMessage(Chat.translate(Lang.Tag + "&cNot enough players queued up."));
+				return true;
+			}
+			else if(cm.getMain().getMatchManager().getArenaManager().getArenaSection(args[1]) == null)
+			{
+				sender.sendMessage(Chat.translate(Lang.Tag + "&cArena not found."));
+				return true;
+			}
+			return true;
+		}
+		if(args[0].equalsIgnoreCase("interrupt"))
+		{
+			if(!cm.getMain().getMatchManager().isMatchRunning())
+			{
+				sender.sendMessage(Chat.translate(Lang.Tag + "&cNo match is running"));
+				return true;
+			}
+			Chat.bc(Lang.Tag + Chat.translate("&c&lMatch interrupted by &b" + sender.getName()));
+			for(Player p : Bukkit.getOnlinePlayers())
+				if(p.getGameMode() != GameMode.CREATIVE)
+					cm.getMain().getMatchManager().spawnPlayer(p);
+			cm.getMain().getMatchManager().startTimer.startTimer();
+			return true;
 		}
 		return true;
 	}

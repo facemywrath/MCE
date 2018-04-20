@@ -117,11 +117,6 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		Player player = event.getPlayer();
 		if(event.getPlayer().getGameMode() == GameMode.CREATIVE)
 			return;
-		if(!main.getUserManager().getUser(event.getPlayer()).hasAchievement(Achievement.ARCHITECT))
-		{
-			event.setCancelled(true);
-			return;
-		}
 		if(!main.getMatchManager().isMatchRunning())
 		{
 			event.setCancelled(true);
@@ -158,14 +153,6 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 
 	@EventHandler
 	public void playerDropItem(PlayerDropItemEvent event)
-	{
-		if(event.getPlayer().isOp())
-			return;
-		event.setCancelled(true);
-	}
-
-	@EventHandler
-	public void playerPickupItem(PlayerPickupItemEvent event)
 	{
 		if(event.getPlayer().isOp())
 			return;

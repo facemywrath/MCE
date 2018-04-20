@@ -21,6 +21,9 @@ import facejup.mce.markers.OutOfBoundsMarker;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import me.libraryaddict.disguise.DisguiseAPI;
+import me.libraryaddict.disguise.disguisetypes.DisguiseType;
+import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_12_R1.MinecraftServer;
 
 public class EndTimer {
@@ -35,7 +38,7 @@ public class EndTimer {
 	private boolean running = false; // Whether or not the timer is running.
 
 	private HashMap<Player, OutOfBoundsMarker> oobs = new HashMap<>();
-	
+
 	public EndTimer(Main main, MatchManager mm) {
 		this.mm = mm;
 		this.main = main; // Store the current running instance of main.
@@ -94,30 +97,33 @@ public class EndTimer {
 						mm.afkCheck(player);
 						Location loc = player.getLocation();
 						Arena a = mm.getArenaManager().getArena();
-						if(!oobs.containsKey(player) && (loc.getX() < a.getXMin() || loc.getX() > a.getXMax() || loc.getY() > a.getYMax() || loc.getZ() < a.getZMin() || loc.getZ() > a.getZMax()))
-							oobs.put(player, new OutOfBoundsMarker(player));
-						else
+						if(!oobs.containsKey(player))
+						{
+							if(loc.getX() < a.getXMin() || loc.getX() > a.getXMax() || loc.getY() > a.getYMax() || loc.getZ() < a.getZMin() || loc.getZ() > a.getZMax())
+								oobs.put(player, new OutOfBoundsMarker(player));
+						}
+						else if(!(loc.getX() < a.getXMin() || loc.getX() > a.getXMax() || loc.getY() > a.getYMax() || loc.getZ() < a.getZMin() || loc.getZ() > a.getZMax()))
 							oobs.remove(player);
 						if(oobs.containsKey(player))
 						{
 							switch(oobs.get(player).timePassedSince())
 							{
-							case 0:
+							case 2:
 								player.sendMessage(Chat.translate(Lang.Tag + "&cYou are out of bounds. Return to the map or you will be killed in 5..."));
 								break;
-							case 1:
+							case 3:
 								player.sendMessage(Chat.translate("&c4..."));
 								break;
-							case 2:
+							case 4:
 								player.sendMessage(Chat.translate("&c3..."));
 								break;
-							case 3:
+							case 5:
 								player.sendMessage(Chat.translate("&c2..."));
 								break;
-							case 4:
+							case 6:
 								player.sendMessage(Chat.translate("&c1..."));
 								break;
-							case 5:
+							case 7:
 								player.damage(player.getHealth());
 								oobs.remove(player);
 								break;
@@ -135,6 +141,19 @@ public class EndTimer {
 						if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 						{
 							Kit kit = mm.getPlayerKit(player);
+							if(kit == Kit.GOBLIN)
+							{
+								if(!DisguiseAPI.isDisguised(player))
+								{
+									MobDisguise disguise = new MobDisguise(DisguiseType.ZOMBIE, false);
+									disguise.setEntity(player);
+									disguise.setViewSelfDisguise(false);
+									disguise.setVelocitySent(true);
+									disguise.setModifyBoundingBox(true);
+									disguise.setShowName(true);
+									disguise.startDisguise();
+								}
+							}
 							if(kit == Kit.SHADE)
 								mm.shadeCheck(player);
 							if(kit == Kit.MASTER)

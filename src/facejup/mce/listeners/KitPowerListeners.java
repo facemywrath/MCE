@@ -1,13 +1,14 @@
 package facejup.mce.listeners;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Statistic;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
@@ -25,7 +26,9 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -33,6 +36,7 @@ import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -52,8 +56,10 @@ public class KitPowerListeners implements Listener {
 
 	private EventManager em;
 	private Main main;
-	
+
 	public List<MoveMarker> ignitedBlocks = new ArrayList<>();
+	
+	public HashMap<Player, List<ItemStack>> stolenItems = new HashMap<>();
 
 	public KitPowerListeners(EventManager em)
 	{
@@ -61,7 +67,7 @@ public class KitPowerListeners implements Listener {
 		this.main = em.getMain();
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
-	
+
 	@EventHandler
 	public void archerBowCooldown(ProjectileLaunchEvent event)
 	{
@@ -261,7 +267,7 @@ public class KitPowerListeners implements Listener {
 		if(event.getEntity() instanceof EnderPearl && event.getEntity().getShooter() instanceof Player && main.getMatchManager().getPlayersAlive().contains((Player) event.getEntity().getShooter()) && main.getMatchManager().getPlayerKit((Player) event.getEntity().getShooter()) == Kit.GRAVITON)
 			((Player) event.getEntity().getShooter()).setCooldown(Material.ENDER_PEARL, 200);
 	}
-	
+
 	@EventHandler
 	public void gravityToggle(PlayerInteractEvent event)
 	{
@@ -291,7 +297,7 @@ public class KitPowerListeners implements Listener {
 				player.removePotionEffect(PotionEffectType.LEVITATION);
 		}
 	}
-	
+
 
 	@EventHandler
 	public void cancelIgnite(BlockIgniteEvent event)
@@ -610,6 +616,127 @@ public class KitPowerListeners implements Listener {
 		}
 		else
 			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0));
+	}
+
+	@EventHandler
+	public void goblinTheftListener(EntityDamageByEntityEvent event)
+	{
+		if(event.getFinalDamage() == 0)
+			return;
+		if(!(event.getDamager() instanceof Player && event.getEntity() instanceof Player))
+			return;
+		Player damager = (Player) event.getDamager();
+		Player target = (Player) event.getEntity();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(damager))
+			return;
+		if(main.getMatchManager().getPlayerKit(target) == Kit.GOBLIN)
+		{
+			if(target.hasPotionEffect(PotionEffectType.SPEED))
+				target.removePotionEffect(PotionEffectType.SPEED);
+			target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));
+		}
+		if(main.getMatchManager().getPlayerKit(damager) != Kit.GOBLIN)
+			return;
+			if(Numbers.getRandom(0, 2) != 2)
+				return;
+		if(Numbers.getRandom(1, 20) == 20)
+		{
+			int i = Numbers.getRandom(0, 3);
+
+		}
+		else
+		{
+			int slot = getRandomItemSlot(target);
+			if(slot > -1)
+			{
+				ItemStack item = target.getInventory().getItem(slot);
+				damager.getInventory().addItem(new ItemCreator(item).setAmount(1).getItem());
+				if(stolenItems.containsKey(target))
+				{
+					List<ItemStack> items = stolenItems.get(target);
+					if(items == null || items.isEmpty())
+						items = new ArrayList<>();
+					items.add(new ItemCreator(item).setAmount(1).getItem());
+					stolenItems.put(target, items);
+				}
+				else
+				{
+					stolenItems.put(target, Arrays.asList(new ItemCreator(item).setAmount(1).getItem()));
+				}
+				if(item.getAmount() > 1)
+				{
+					target.getInventory().setItem(slot, new ItemCreator(item).setAmount(item.getAmount()-1).getItem());
+				}
+				else
+				{
+					target.getInventory().setItem(slot, new ItemStack(Material.AIR));
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void dropStolenItems(PlayerDeathEvent event)
+	{
+		Player target = (Player) event.getEntity();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(target))
+			return;
+		if(main.getMatchManager().getPlayerKit(target) == Kit.GOBLIN)
+		{
+			if(stolenItems.containsKey(target) && !stolenItems.get(target).isEmpty())
+			{
+				stolenItems.get(target).stream().filter(item -> target.getInventory().contains(item)).forEach(item -> target.getWorld().dropItemNaturally(target.getLocation(), item));
+				stolenItems.remove(target);
+			}
+		}
+	}
+
+	/*	public Pair<Boolean, Integer> compareArmor(Player target, Player damager, int i)
+	{
+		switch(i)
+		{
+		case 0:
+			if(target.getInventory().getHelmet().getItemMeta())
+		}
+	}*/
+
+	public int getRandomItemSlot(Player target)
+	{
+		Inventory inv = target.getInventory();
+		List<Material> blacklist = Arrays.asList(Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
+		List<Integer> slots = new ArrayList<>();
+		for(int i = 0; i < 8; i++)
+		{
+			if(inv.getItem(i) != null && !blacklist.contains(inv.getItem(i).getType()))
+			{
+				if(!inv.getItem(i).equals(target.getInventory().getItemInOffHand()))
+				{
+					slots.add(i);
+				}
+			}
+		}
+		if(slots.isEmpty())
+			return -1;
+		return slots.get(Numbers.getRandom(0, slots.size()));
+	}
+
+	@EventHandler
+	public void shrinkGoblin(EntityToggleGlideEvent event)
+	{
+		if(!(event.getEntity() instanceof Player))
+			return;
+		Player player = (Player) event.getEntity();
+		if(!main.getMatchManager().isMatchRunning())
+			return;
+		if(!main.getMatchManager().getPlayersAlive().contains(player))
+			return;
+		if(main.getMatchManager().getPlayerKit(player) != Kit.GOBLIN)
+			return;
+		event.setCancelled(true);
 	}
 
 }

@@ -144,6 +144,13 @@ public class UserManager implements Listener {
 					player.getWorld().spawnFallingBlock(player.getLocation(), Material.FIRE, (byte) 0);
 				}
 			}
+			else if(main.getMatchManager().getPlayerKit(player) == Kit.GOBLIN)
+			{
+				if(!player.isSneaking() || (player.isGliding() && (player.getVelocity().getY() < -0.08 || player.getVelocity().getY() >= 0.1)))
+					player.setGliding(false);
+				else if(!player.isGliding() && player.isSneaking())
+					player.setGliding(true);
+			}
 		}
 	}
 

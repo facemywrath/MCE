@@ -92,6 +92,12 @@ public class ArenaManager {
 	{
 		return this.arena;
 	}
+	
+	public Arena setArena(Arena arena)
+	{
+		this.arena = arena;
+		return this.arena;
+	}
 
 	public Arena getRandomArena(int playercount)
 	{
@@ -113,7 +119,7 @@ public class ArenaManager {
 		for(String str : fc.getConfig().getConfigurationSection("Arenas").getKeys(false))
 		{
 			int spawnamts = fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size();
-			if(spawnamts >= size && spawnamts <= size*3);
+			if(spawnamts >= size && spawnamts <= 10+size*3);
 				arenas.add(fc.getConfig().getConfigurationSection("Arenas." + str));
 		}
 		return arenas;

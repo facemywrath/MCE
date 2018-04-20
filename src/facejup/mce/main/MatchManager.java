@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -27,6 +28,7 @@ import facejup.mce.timers.StartTimer;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import me.libraryaddict.disguise.DisguiseAPI;
 import net.md_5.bungee.api.ChatColor;
 
 public class MatchManager {
@@ -238,9 +240,44 @@ public class MatchManager {
 		}
 	}
 
+	public void startMatch(String arenaname)
+	{
+		Arena arena = am.setArena(new Arena(am, am.getArenaSection(arenaname)));
+		if(arena == null)
+		{
+			startTimer.linger();
+			Chat.bc(Tag + "&cError: The chosen arena doesn't exist.");
+			return;
+		}
+		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
+		{
+			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
+			endTimer.startTimer();
+			for(Player player : desiredKits.keySet())
+			{
+				main.getUserManager().getUser(player).incGamesplayed(1);
+				if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
+					lives.put(player, 5);
+				else
+					lives.put(player, 6);
+				spawnPlayer(player);
+				main.getUserManager().getUser(player).updateScoreboard();
+			}
+		}
+		else
+		{
+			startTimer.linger();
+			Chat.bc(Tag + "&cError: No Arena found within parameters.");
+			return;
+		}
+	}
+
 	public void spawnPlayer(Player player) 
 	{
 		showPlayer(player);
+		player.getInventory().clear();
+		if(DisguiseAPI.isDisguised(player))
+			DisguiseAPI.undisguiseToAll(player);
 		player.setFallDistance(0);
 		if(player.isDead())
 			player.spigot().respawn();
@@ -303,7 +340,6 @@ public class MatchManager {
 
 			@SuppressWarnings("deprecation")
 			public void run() {
-				player.getInventory().clear();
 				player.setHealth(player.getMaxHealth());
 				player.setFoodLevel(20);
 				if(isMatchRunning())
