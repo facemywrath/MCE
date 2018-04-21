@@ -423,6 +423,8 @@ public class User {
 			{
 				kits.add(Kit.valueOf(str));
 			}
+			if(kits.isEmpty())
+				return Arrays.asList(Kit.NONE, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
 			return kits;
 		}
 		else
@@ -464,7 +466,8 @@ public class User {
 			objective.getScore("           ").setScore(14);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Server ").setScore(20);
 			objective.getScore(ChatColor.GREEN + "  IP: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getIp()).setScore(19);
-			objective.getScore(ChatColor.GREEN + "  Online: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getOnlinePlayers().size()).setScore(16);
+			objective.getScore(ChatColor.GREEN + "  Online: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getOnlinePlayers().size()).setScore(17);
+			objective.getScore(ChatColor.GREEN + "  Queued: " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getPlayersQueued() + "/" + Bukkit.getServer().getOnlinePlayers().size()).setScore(16);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(15);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(14);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Player ").setScore(13);

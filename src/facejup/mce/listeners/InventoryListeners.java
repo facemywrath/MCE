@@ -1,10 +1,14 @@
 package facejup.mce.listeners;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,13 +20,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
@@ -30,13 +32,58 @@ import facejup.mce.util.Chat;
 import facejup.mce.util.InventoryBuilder;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Marker;
 
 @SuppressWarnings("deprecation")
 public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 
 	private Main main; // Dependency Injection Variable
-	@SuppressWarnings("unused")
 	private EventManager em; // Other Dependency Injection Variable
+
+	public HashMap<Player, List<Marker<Location>>> specialBlocks = new HashMap<>();
+
+	public void updateSpecialBlocks(Player player)
+	{
+		if(specialBlocks.isEmpty())
+			return;
+		if(!specialBlocks.containsKey(player))
+			return;
+		if(specialBlocks.get(player).isEmpty())
+			return;
+		ItemStack specialBlock = new ItemCreator(Material.OBSIDIAN).setDisplayname("&aSpecial Stone").setLore(Arrays.asList("&5&lA reward for your architecture.", "&7&oThese blocks automatically", "&7&odespawn after 10 seconds.")).getItem();
+
+		List<Marker<Location>> removeQueue = new ArrayList<>();
+		for(Marker<Location> loc : specialBlocks.get(player))
+		{
+			if(loc.getSecondsPassedSince() == 10 || loc.getSecondsPassedSince() == 11)
+			{
+				loc.getItem().getBlock().setType(Material.AIR);
+			}
+			if(loc.getSecondsPassedSince() == 12)
+			{
+				player.getInventory().addItem(specialBlock);
+			}
+		}
+		for(Marker<Location> remove : removeQueue)
+		{
+			specialBlocks.get(player).remove(remove);
+		}
+	}
+	
+	public void clearSpecialBlocks(Player player)
+	{
+		if(specialBlocks.isEmpty())
+			return;
+		if(!specialBlocks.containsKey(player))
+			return;
+		if(specialBlocks.get(player).isEmpty())
+			return;
+		for(Marker<Location> loc : specialBlocks.get(player))
+		{
+			loc.getItem().getBlock().setType(Material.AIR);
+		}
+		specialBlocks.remove(player);
+	}
 
 	public InventoryListeners(EventManager eventManager)
 	{
@@ -132,23 +179,15 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
+		if(specialBlocks.containsKey(player))
 		{
-			public void run()
-			{
-				event.getBlock().setType(Material.AIR);
-				main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-				{
-					public void run()
-					{
-						if(main.getMatchManager().isMatchRunning() && main.getMatchManager().getPlayersAlive().contains(player))
-						{
-							player.getInventory().addItem(new ItemCreator(Material.OBSIDIAN).setDisplayname("&aSpecial Stone").setLore(Arrays.asList("&5&lA reward for your architecture.", "&7&oThese blocks automatically", "&7&odespawn after 10 seconds.")).getItem());
-						}
-					}
-				}, 30L);
-			}
-		}, 200L);
+			List<Marker<Location>> blocks = new ArrayList<>();
+			blocks.addAll(specialBlocks.get(player));
+			blocks.add(new Marker<Location>(event.getBlock().getLocation()));
+			specialBlocks.put(player, blocks);
+		}
+		else
+			specialBlocks.put(player, Arrays.asList(new Marker<Location>(event.getBlock().getLocation())));
 	}
 
 	@EventHandler

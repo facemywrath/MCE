@@ -15,9 +15,9 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.events.PlayerKillThroughEnvironmentEvent;
 import facejup.mce.main.Main;
-import facejup.mce.markers.DamageMarker;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Marker;
 import facejup.mce.util.Numbers;
 import net.md_5.bungee.api.ChatColor;
 
@@ -26,7 +26,7 @@ public class DeathListeners implements Listener {
 	private EventManager em;
 	private Main main;
 
-	public HashMap<Player, DamageMarker> lastDamagedBy = new HashMap<>();
+	public HashMap<Player, Marker<Player>> lastDamagedBy = new HashMap<>();
 
 	public DeathListeners(EventManager em)
 	{
@@ -63,7 +63,7 @@ public class DeathListeners implements Listener {
 		{
 			if(lastDamagedBy.containsKey(player))
 			{
-				PlayerKillThroughEnvironmentEvent eventcall = new PlayerKillThroughEnvironmentEvent(lastDamagedBy.get(player).getDamager(), player, event.getCause());
+				PlayerKillThroughEnvironmentEvent eventcall = new PlayerKillThroughEnvironmentEvent(lastDamagedBy.get(player).getItem(), player, event.getCause());
 				main.getServer().getPluginManager().callEvent(eventcall);
 			}
 		}
@@ -84,7 +84,7 @@ public class DeathListeners implements Listener {
 		else
 			damager = (Player) event.getDamager();
 		Player target = (Player) event.getEntity();
-		DamageMarker marker = new DamageMarker(damager, System.currentTimeMillis());
+		Marker<Player> marker = new Marker<Player>(damager);
 		lastDamagedBy.put(target, marker);
 		em.getMain().getServer().getScheduler().scheduleSyncDelayedTask(em.getMain(), new Runnable()
 		{
@@ -96,7 +96,7 @@ public class DeathListeners implements Listener {
 		}, 160L);
 	}
 
-	public void setLastDamagedBy(Player player, DamageMarker marker)
+	public void setLastDamagedBy(Player player, Marker<Player> marker)
 	{
 		if(!em.getMain().getMatchManager().isMatchRunning())
 			return;
@@ -114,6 +114,7 @@ public class DeathListeners implements Listener {
 	@EventHandler
 	public void playerDeathEvent(PlayerDeathEvent event) 
 	{
+		em.getInventoryListeners().clearSpecialBlocks(event.getEntity());
 		if(!em.getMain().getMatchManager().isMatchRunning()) // Only run this function during a match
 			return;
 		if(!em.getMain().getMatchManager().getPlayersAlive().contains(event.getEntity()))
@@ -138,7 +139,7 @@ public class DeathListeners implements Listener {
 			}
 			return;
 		}
-		Player killer = lastDamagedBy.get(event.getEntity()).getDamager();	
+		Player killer = lastDamagedBy.get(event.getEntity()).getItem();	
 		event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
 		if(Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0))
 			main.getMatchManager().incLives(killer);

@@ -124,11 +124,11 @@ public class UserManager implements Listener {
 		{
 			if(main.getMatchManager().getPlayerKit(player) == Kit.SHADE)
 			{
-				if(main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+				if(main.getMatchManager().isHidden(player) && !main.getMatchManager().getMoveMarker(player).getItem().getBlock().equals(player.getLocation().getBlock()))
 				{
 					main.getMatchManager().showPlayer(player);
 				}
-				else if(!main.getMatchManager().getMoveMarker(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+				else if(!main.getMatchManager().getMoveMarker(player).getItem().getBlock().equals(player.getLocation().getBlock()))
 				{
 					if(player.getLevel()+1 < 100)
 						player.setLevel(player.getLevel()+1);
@@ -148,7 +148,7 @@ public class UserManager implements Listener {
 			{
 				if(!player.isSneaking() || (player.isGliding() && (player.getVelocity().getY() < -0.08 || player.getVelocity().getY() >= 0.1)))
 					player.setGliding(false);
-				else if(!player.isGliding() && player.isSneaking())
+				else if(player.isOnGround() && !player.isGliding() && player.isSneaking())
 					player.setGliding(true);
 			}
 		}

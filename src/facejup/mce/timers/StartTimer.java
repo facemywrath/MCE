@@ -42,6 +42,7 @@ public class StartTimer {
 		running = true;
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
+			main.getMatchManager().spawnPlayer(player);
 			main.getMatchManager().setPlayerKit(player, Kit.NONE);
 				main.getUserManager().getUser(player).updateScoreboard();
 		}

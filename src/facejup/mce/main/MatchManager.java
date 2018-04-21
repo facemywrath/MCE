@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -21,13 +21,14 @@ import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
-import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
 import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Marker;
+import facejup.mce.util.Numbers;
 import me.libraryaddict.disguise.DisguiseAPI;
 import net.md_5.bungee.api.ChatColor;
 
@@ -42,7 +43,8 @@ public class MatchManager {
 	public EndTimer endTimer; // The timer variable which decides when a round begins.
 	public String Tag = Lang.Tag;
 
-	private HashMap<Player, MoveMarker> lastMovement = new HashMap<>();
+	public boolean randomKits = false;
+	private HashMap<Player, Marker<Location>> lastMovement = new HashMap<>();
 	private HashMap<Player, Integer> lives = new HashMap<>();
 	private HashMap<Player, Kit> kits = new HashMap<>();
 	private HashMap<Player, Kit> desiredKits = new HashMap<>();
@@ -69,10 +71,10 @@ public class MatchManager {
 
 	public void updateMoveMarker(Player player)
 	{
-		lastMovement.put(player, new MoveMarker(player.getLocation()));
+		lastMovement.put(player, new Marker<Location>(player.getLocation()));
 	}
 
-	public MoveMarker getMoveMarker(Player player)
+	public Marker<Location> getMoveMarker(Player player)
 	{
 		if(lastMovement.containsKey(player))
 			return lastMovement.get(player);
@@ -82,9 +84,9 @@ public class MatchManager {
 	public void shadeCheck(Player player) {
 		if(lastMovement.containsKey(player))
 		{
-			if(lastMovement.get(player).getLocation().getBlock().equals(player.getLocation().getBlock()))
+			if(lastMovement.get(player).getItem().getBlock().equals(player.getLocation().getBlock()))
 			{
-				if(lastMovement.get(player).timePassedSince() > 2)
+				if(lastMovement.get(player).getSecondsPassedSince() > 2)
 				{
 					int stamina = player.getLevel();
 					if(stamina > 0)
@@ -140,22 +142,22 @@ public class MatchManager {
 	{
 		if(player.hasPotionEffect(PotionEffectType.INVISIBILITY))
 			return true;
-		return (lastMovement.containsKey(player)?lastMovement.get(player).timePassedSince() > 2:false);
+		return (lastMovement.containsKey(player)?lastMovement.get(player).getSecondsPassedSince() > 2:false);
 	}
 
 	public void afkCheck(Player player)
 	{
-		MoveMarker mm = new MoveMarker(player.getLocation());
+		Marker<Location> mm = new Marker<Location>(player.getLocation());
 		if(!lastMovement.containsKey(player))
 		{
 			lastMovement.put(player, mm);
 			return;
 		}
-		if(lastMovement.get(player).getLocation().getBlock().equals(mm.getLocation().getBlock()))
+		if(lastMovement.get(player).getItem().getBlock().equals(mm.getItem().getBlock()))
 		{
-			if(isMatchRunning() && lastMovement.get(player).timePassedSince() >= 60)
+			if(isMatchRunning() && lastMovement.get(player).getSecondsPassedSince() >= 60)
 			{
-				switch(lastMovement.get(player).timePassedSince())
+				switch(lastMovement.get(player).getSecondsPassedSince())
 				{
 				case 60:
 					player.sendMessage(Chat.translate(Lang.afkcheckTag + "You will be removed for AFK in 10 seconds if you don't move."));
@@ -191,7 +193,7 @@ public class MatchManager {
 			else 
 			{
 				if(!isMatchRunning() && desiredKits.containsKey(player) && desiredKits.get(player) != Kit.NONE)
-					switch(lastMovement.get(player).timePassedSince())
+					switch(lastMovement.get(player).getSecondsPassedSince())
 					{
 					case 180:
 						player.sendMessage(Chat.translate(Lang.afkcheckTag + "If you don't move, your kit will be deselected in 10 seconds."));
@@ -221,6 +223,11 @@ public class MatchManager {
 		{
 			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
 			endTimer.startTimer();
+			randomKits = false;
+			if(Numbers.getRandom(0, 10) == 10)
+				randomKits = true;
+			if(randomKits)
+				Chat.bc(Lang.Tag + "&5Random Heroes Mode");
 			for(Player player : desiredKits.keySet())
 			{
 				main.getUserManager().getUser(player).incGamesplayed(1);
@@ -253,6 +260,11 @@ public class MatchManager {
 		{
 			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
 			endTimer.startTimer();
+			randomKits = false;
+			if(Numbers.getRandom(0, 1) == 1)
+				randomKits = true;
+			if(randomKits)
+				Chat.bc(Lang.Tag + "&5Random Heroes Mode");
 			for(Player player : desiredKits.keySet())
 			{
 				main.getUserManager().getUser(player).incGamesplayed(1);
@@ -314,6 +326,10 @@ public class MatchManager {
 			}
 			return;
 		}
+		if(randomKits)
+				setPlayerDesiredKit(player, Kit.values()[Numbers.getRandom(1, Kit.values().length-1)]);
+		if(randomKits)
+			player.sendMessage(Chat.translate(Lang.Tag + "You spawned with &bKit " + StringUtils.capitalize(getPlayerDesiredKit(player).toString().toLowerCase())));
 		if (lives.get(player) == 0) {
 			lives.remove(player);
 			kits.put(player, Kit.NONE);
@@ -344,6 +360,11 @@ public class MatchManager {
 				player.setFoodLevel(20);
 				if(isMatchRunning())
 				{
+					for(PotionEffect pot : player.getActivePotionEffects())
+					{
+						player.removePotionEffect(pot.getType());
+					}
+					if(!randomKits)
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
 					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON)
@@ -393,17 +414,7 @@ public class MatchManager {
 			main.getUserManager().getUser(winner).incWin(1);
 			String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + check.getName();
 			Chat.bc(msg);
-			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
-			{
-				public void run()
-				{
-					main.getMatchManager().startTimer.startTimer();
-					for(Player player : Bukkit.getOnlinePlayers())
-					{
-						main.getMatchManager().spawnPlayer(player);
-					}
-				}
-			}, 1L);
+			startTimer.startTimer();
 		}
 	}
 
@@ -501,11 +512,19 @@ public class MatchManager {
 		if(!isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) == Kit.NONE && kit != Kit.NONE)
 		{
 			this.desiredKits.put(player, kit);
+			for(Player p : Bukkit.getOnlinePlayers())
+			{
+				main.getUserManager().getUser(player).updateScoreboard();
+			}
 			Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
 		}
 		else if(!isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE && kit == Kit.NONE)
 		{
 			this.desiredKits.put(player, kit);
+			for(Player p : Bukkit.getOnlinePlayers())
+			{
+				main.getUserManager().getUser(player).updateScoreboard();
+			}
 			Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has left queue. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
 		}
 		this.desiredKits.put(player, kit);

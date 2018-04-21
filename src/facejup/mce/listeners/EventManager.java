@@ -43,6 +43,11 @@ public class EventManager {
 		return this.al;
 	}
 	
+	public InventoryListeners getInventoryListeners()
+	{
+		return this.invListener;
+	}
+	
 	public Main getMain() 
 	{
 		//Return the main instance.

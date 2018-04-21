@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -144,6 +145,11 @@ public class ItemCreator{
 		if(str.equalsIgnoreCase("boots"))
 			return (new ItemCreator(Material.LEATHER_BOOTS).setDisplayname("Chameleon Helmet").getItem());
 		return null;
+	}
+	
+	public static String formatItemName(ItemStack item)
+	{
+		return (item.getItemMeta().hasDisplayName()?item.getItemMeta().getDisplayName():StringUtils.capitaliseAllWords(item.getType().toString().replaceAll("_", " ").toLowerCase()));
 	}
 	
 	public static ItemStack getKitSelector()

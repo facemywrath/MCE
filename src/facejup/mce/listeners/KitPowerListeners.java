@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -45,11 +46,10 @@ import org.bukkit.util.Vector;
 import facejup.mce.enums.Kit;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.main.Main;
-import facejup.mce.markers.DamageMarker;
-import facejup.mce.markers.MoveMarker;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
+import facejup.mce.util.Marker;
 import facejup.mce.util.Numbers;
 import think.rpgitems.item.ItemManager;
 
@@ -58,9 +58,9 @@ public class KitPowerListeners implements Listener {
 	private EventManager em;
 	private Main main;
 
-	public List<MoveMarker> ignitedBlocks = new ArrayList<>();
-	
-	public HashMap<Player, ArrayList<ItemStack>> stolenItems = new HashMap<>();
+	public List<Marker<Location>> ignitedBlocks = new ArrayList<>();
+
+	public HashMap<Player, Inventory> stolenItems = new HashMap<>();
 
 	public KitPowerListeners(EventManager em)
 	{
@@ -77,7 +77,7 @@ public class KitPowerListeners implements Listener {
 			Player player = (Player) event.getEntity().getShooter();
 			if(main.getMatchManager().getPlayerKit(player) == Kit.ARCHER)
 			{
-				player.setCooldown(Material.BOW, 4);
+				player.setCooldown(Material.BOW, 10);
 			}
 		}
 	}
@@ -126,7 +126,7 @@ public class KitPowerListeners implements Listener {
 			if(event.getEntity().getShooter() instanceof Player && event.getHitEntity() instanceof Player)
 			{
 				Player player = (Player) event.getEntity().getShooter();
-				DamageMarker marker = new DamageMarker(player, System.currentTimeMillis());
+				Marker<Player> marker = new Marker<Player>(player);
 				Player target = (Player) event.getHitEntity();
 				main.getEventManager().getDeathListeners().setLastDamagedBy(target, marker);
 				target.damage(1);
@@ -228,7 +228,7 @@ public class KitPowerListeners implements Listener {
 		Player player = (Player) event.getEntity().getShooter(); 
 		if(main.getMatchManager().getPlayerKit(player) != Kit.GRAVITON)
 			return;
-		MoveMarker mm = new MoveMarker(event.getEntity().getLocation());
+		Marker<Location> mm = new Marker<Location>(event.getEntity().getLocation());
 		runGravPull(player, mm);
 	}
 
@@ -239,17 +239,17 @@ public class KitPowerListeners implements Listener {
 			event.setCancelled(true);
 	}
 
-	public void runGravPull(Player shooter, MoveMarker mm)
+	public void runGravPull(Player shooter, Marker<Location> mm)
 	{
-		if(mm.timePassedSince() < 5)
+		if(mm.getSecondsPassedSince() < 5)
 		{
-			mm.getLocation().getWorld().spawnParticle(Particle.DRAGON_BREATH, mm.getLocation(), 1);
+			mm.getItem().getWorld().spawnParticle(Particle.DRAGON_BREATH, mm.getItem(), 1);
 			for(Player player : main.getMatchManager().getPlayersAlive())
 			{
 				if(player.equals(shooter))
 					continue;
-				Vector vector = mm.getLocation().toVector().subtract(player.getLocation().toVector());
-				if(player.getLocation().distance(mm.getLocation()) < 5)
+				Vector vector = mm.getItem().toVector().subtract(player.getLocation().toVector());
+				if(player.getLocation().distance(mm.getItem()) < 5)
 					player.setVelocity(vector.multiply(0.25));
 			}
 			main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
@@ -303,7 +303,7 @@ public class KitPowerListeners implements Listener {
 	@EventHandler
 	public void cancelIgnite(BlockIgniteEvent event)
 	{
-		ignitedBlocks.add(new MoveMarker(event.getBlock().getLocation()));
+		ignitedBlocks.add(new Marker<Location>(event.getBlock().getLocation()));
 	}
 
 	@EventHandler
@@ -387,7 +387,7 @@ public class KitPowerListeners implements Listener {
 	{
 		if(event.getTo() == Material.FIRE)
 		{
-			ignitedBlocks.add(new MoveMarker(event.getBlock().getLocation()));
+			ignitedBlocks.add(new Marker<Location>(event.getBlock().getLocation()));
 		}
 	}
 
@@ -602,7 +602,7 @@ public class KitPowerListeners implements Listener {
 			return;
 		if(!main.getMatchManager().getPlayersAlive().contains(killer))
 			return;
-		if(main.getMatchManager().getPlayerKit(killer) != Kit.WIGHT)
+		if(main.getMatchManager().getPlayerKit(killer) != Kit.YETI)
 			return;
 		if(target.hasPotionEffect(PotionEffectType.SLOW))
 		{
@@ -634,52 +634,41 @@ public class KitPowerListeners implements Listener {
 		{
 			if(target.hasPotionEffect(PotionEffectType.SPEED))
 				target.removePotionEffect(PotionEffectType.SPEED);
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));
+			target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 1));
 		}
 		if(main.getMatchManager().getPlayerKit(damager) != Kit.GOBLIN)
 			return;
-			if(Numbers.getRandom(0, 2) != 2)
+		if(Numbers.getRandom(0, 4) != 4)
+			return;
+		int slot = getRandomItemSlot(target);
+		if(slot > -1)
+		{
+			ItemStack item = target.getInventory().getItem(slot);
+			if(item == null)
 				return;
-		if(Numbers.getRandom(1, 20) == 20)
-		{
-			int i = Numbers.getRandom(0, 3);
-
-		}
-		else
-		{
-			int slot = getRandomItemSlot(target);
-			if(slot > -1)
+			damager.getInventory().addItem(new ItemCreator(item).setAmount(1).getItem());
+			damager.sendMessage(Chat.translate("&8You stole 1 &7" + ItemCreator.formatItemName(item)));
+			target.sendMessage(Chat.translate("&8You lost 1 &7" + ItemCreator.formatItemName(item) + " &8to a Goblin."));
+			if(item.getAmount() > 1)
 			{
-				ItemStack item = target.getInventory().getItem(slot);
-				if(item == null)
-					return;
-				damager.getInventory().addItem(new ItemCreator(item).setAmount(1).getItem());
-				damager.sendMessage(Chat.translate("&8You stole 1 &7" + item.getType().toString()));
-				target.sendMessage(Chat.translate("&8You lost 1 &7" + item.getType().toString() + " &8to a Goblin."));
-				if(stolenItems.containsKey(target))
-				{
-					ArrayList<ItemStack> items = stolenItems.get(target);
-					if(items == null || items.isEmpty())
-						items = new ArrayList<ItemStack>();
-					items.add(new ItemCreator(item).setAmount(1).getItem());
-					stolenItems.put(target, items);
-				}
-				else
-				{
-					stolenItems.put(target, (ArrayList<ItemStack>) Arrays.asList(new ItemCreator(item).setAmount(1).getItem()));
-				}
-				if(item.getAmount() > 1)
-				{
-					target.getInventory().setItem(slot, new ItemCreator(item).setAmount(item.getAmount()-1).getItem());
-				}
-				else
-				{
-					target.getInventory().setItem(slot, new ItemStack(Material.AIR));
-				}
+				target.getInventory().setItem(slot, new ItemCreator(item).setAmount(item.getAmount()-1).getItem());
+			}
+			else
+			{
+				target.getInventory().setItem(slot, new ItemStack(Material.AIR));
+			}
+			if(stolenItems.containsKey(target))
+			{
+				stolenItems.get(target).addItem(new ItemCreator(item).setAmount(1).getItem());
+			}
+			else
+			{
+				stolenItems.put(target, Bukkit.createInventory(target, 27));
+				stolenItems.get(target).addItem(new ItemCreator(item).setAmount(1).getItem());
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void dropStolenItems(PlayerDeathEvent event)
 	{
@@ -690,9 +679,9 @@ public class KitPowerListeners implements Listener {
 			return;
 		if(main.getMatchManager().getPlayerKit(target) == Kit.GOBLIN)
 		{
-			if(stolenItems.containsKey(target) && !stolenItems.get(target).isEmpty())
+			if(stolenItems.containsKey(target) && stolenItems.get(target).firstEmpty() > -1)
 			{
-				stolenItems.get(target).stream().filter(item -> target.getInventory().contains(item)).forEach(item -> target.getWorld().dropItemNaturally(target.getLocation(), item));
+				Arrays.asList(stolenItems.get(target).getContents()).stream().filter(item -> target.getInventory().contains(item.getType())).forEach(item -> target.getWorld().dropItemNaturally(target.getLocation(), item));
 				stolenItems.remove(target);
 			}
 		}
