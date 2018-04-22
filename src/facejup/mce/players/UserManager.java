@@ -15,15 +15,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.potion.PotionEffectType;
 
+import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.util.BlockColor;
 import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
-import facejup.mce.util.ItemCreator;
 
 public class UserManager implements Listener {
 	
@@ -191,6 +190,12 @@ public class UserManager implements Listener {
 	public void playerLeave(PlayerQuitEvent event)
 	{
 		Player player = event.getPlayer();
+		if(main.getMatchManager().voted.containsKey(player))
+		{
+			ArenaSign sign = main.getMatchManager().voted.get(player);
+			main.getMatchManager().votesReceived.put(sign, main.getMatchManager().votesReceived.get(sign)+1);
+			main.getMatchManager().voted.remove(player);
+		}
 		if(main.getMatchManager().getPlayersAlive().contains(player))
 		{
 			this.main.getMatchManager().setLives(player, 0);

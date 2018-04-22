@@ -424,14 +424,14 @@ public class User {
 				kits.add(Kit.valueOf(str));
 			}
 			if(kits.isEmpty())
-				return Arrays.asList(Kit.NONE, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
+				return Arrays.asList(Kit.NONE, Kit.RANDOM, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
 			return kits;
 		}
 		else
 		{
-			section.set("Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
+			section.set("Kits", Arrays.asList("NONE", "RANDOM", "ARCHER", "WARRIOR", "GUARD"));
 		}
-		return Arrays.asList(Kit.NONE, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
+		return Arrays.asList(Kit.NONE, Kit.RANDOM, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
 	}
 
 	public void updateScoreboard() {

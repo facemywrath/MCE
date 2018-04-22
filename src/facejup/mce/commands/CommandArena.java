@@ -116,6 +116,23 @@ public class CommandArena implements CommandExecutor{
 			sender.sendMessage(ChatColor.AQUA + "----------==={" + ChatColor.GREEN + "Arenas" + ChatColor.AQUA + "}===----------");
 			sender.sendMessage(cm.getMain().getMatchManager().getArenaManager().getArenaList().stream().sorted().collect(Collectors.joining(", ")));
 		}
+		if(args[0].equalsIgnoreCase("setsign"))
+		{
+			if(args.length == 1)
+			{
+				sender.sendMessage(Lang.InvalidSyn);
+				return true;
+			}
+			String ArenaName = args[1];
+			if(am.getArenaSection(args[1]) == null)
+			{
+				sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of &6" + ArenaName + " &cdoes not exist!"));
+				return true;
+			}
+			sender.sendMessage(Lang.Tag + Chat.translate("Rightclick a sign for &6Arena " + ArenaName));
+			arenaAdd.put(player, ArenaName);
+			adding.put(player, AddType.SIGN);
+		}
 		if (args[0].equalsIgnoreCase("spawn")) 
 		{
 			if (args.length == 1) 
@@ -134,7 +151,7 @@ public class CommandArena implements CommandExecutor{
 				String ArenaName = args[2];
 				if (am.getArenaSection(ArenaName) == null) 
 				{
-					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of: &6" + ArenaName + " &cdoes not exist!"));
+					sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of &6" + ArenaName + " &cdoes not exist!"));
 					return true;
 				}
 				Location loc = player.getLocation();

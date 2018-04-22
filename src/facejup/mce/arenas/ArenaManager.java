@@ -24,11 +24,35 @@ public class ArenaManager {
 	{
 		this.mm = mm;
 		fc = new FileControl(new File(mm.getMain().getDataFolder(), "maps.yml"));
+		loadVoteSigns();
 	}
 
 	public MatchManager getMatchManager()
 	{
 		return this.mm;
+	}
+
+	public void loadVoteSigns()
+	{
+		FileConfiguration config = fc.getConfig();
+		for(String s : config.getConfigurationSection("Arenas").getKeys(false))
+		{
+			if(config.contains("Arenas." + s + ".Sign"))
+			{
+				ArenaSign sign = new ArenaSign(this, config.getConfigurationSection("Arenas." + s + ".Sign"));
+				boolean flag = false;
+				for(ArenaSign signTest : mm.votesReceived.keySet())
+				{
+					if(signTest.getArenaName().equals(sign.getArenaName()))
+						flag = true;
+				}
+				if(!flag)
+				{
+					mm.votesReceived.put(sign, 0);
+					sign.updateSign();
+				}
+			}
+		}
 	}
 
 	public void createArena(String arenaname, World w)
@@ -58,7 +82,7 @@ public class ArenaManager {
 		}
 		return arenas;
 	}
-	
+
 	public FileControl getFileControl() 
 	{
 		return this.fc;
@@ -92,7 +116,7 @@ public class ArenaManager {
 	{
 		return this.arena;
 	}
-	
+
 	public Arena setArena(Arena arena)
 	{
 		this.arena = arena;
@@ -120,7 +144,7 @@ public class ArenaManager {
 		{
 			int spawnamts = fc.getConfig().getConfigurationSection("Arenas." + str + ".SpawnPoints").getKeys(false).size();
 			if(spawnamts >= size);
-				arenas.add(fc.getConfig().getConfigurationSection("Arenas." + str));
+			arenas.add(fc.getConfig().getConfigurationSection("Arenas." + str));
 		}
 		return arenas;
 	}

@@ -699,7 +699,7 @@ public class KitPowerListeners implements Listener {
 	public int getRandomItemSlot(Player target)
 	{
 		Inventory inv = target.getInventory();
-		List<Material> blacklist = Arrays.asList(Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
+		List<Material> blacklist = Arrays.asList(Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
 		List<Integer> slots = new ArrayList<>();
 		for(int i = 0; i < 8; i++)
 		{

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -13,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,6 +27,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
@@ -69,7 +72,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 			specialBlocks.get(player).remove(remove);
 		}
 	}
-	
+
 	public void clearSpecialBlocks(Player player)
 	{
 		if(specialBlocks.isEmpty())
@@ -189,7 +192,6 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		else
 			specialBlocks.put(player, Arrays.asList(new Marker<Location>(event.getBlock().getLocation())));
 	}
-
 	@EventHandler
 	public void playerDropItem(PlayerDropItemEvent event)
 	{
@@ -201,10 +203,15 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 	@EventHandler
 	public void playerInteract(PlayerInteractEvent event)
 	{
+		if(event.getAction() == Action.PHYSICAL && event.getPlayer().getGameMode() != GameMode.CREATIVE)
+			event.setCancelled(true);
 		//Open the custom inventory for kit selection.
 		if(event.getAction().toString().contains("RIGHT_CLICK") && event.getPlayer().getInventory().getItemInMainHand().equals(ItemCreator.getKitSelector()))
 		{
-			event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
+			if(main.getMatchManager().randomKits)
+				event.getPlayer().sendMessage(Lang.Tag + Chat.translate("&cYou can't select a kit in Random Mode"));
+			else
+				event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
 		}
 		if(event.getAction().toString().contains("LEFT_CLICK"))
 		{
@@ -223,7 +230,32 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 			}
 			main.getMatchManager().updateMoveMarker(event.getPlayer());
 		}
-		if(event.getItem() != null && (event.getItem().getType() == Material.POTION || event.getItem().getType() == Material.COOKED_BEEF))
+		if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
+		{
+			if(event.getClickedBlock().getType() == Material.WALL_SIGN)
+			{
+				for(ArenaSign sign : ((Set<ArenaSign>) main.getMatchManager().votesReceived.keySet()))
+				{
+					if(sign.getLocation().equals(event.getClickedBlock().getLocation()))
+					{
+						Player player = event.getPlayer();
+						if(main.getMatchManager().voted.containsKey(player))
+						{
+							if(main.getMatchManager().voted.get(player).equals(sign))
+								return;
+							main.getMatchManager().votesReceived.put(main.getMatchManager().voted.get(player), main.getMatchManager().votesReceived.get(main.getMatchManager().voted.get(player))-1);
+							main.getMatchManager().voted.get(player).updateSign();
+						}
+						main.getMatchManager().votesReceived.put(sign, main.getMatchManager().votesReceived.get(sign)+1);
+						main.getMatchManager().voted.put(player, sign);
+						sign.updateSign();
+						player.sendMessage(Lang.Tag + Chat.translate("You voted for the arena &b" + sign.getArenaName()));
+						break;
+					}
+				}
+			}
+		}
+		if((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && event.getItem() != null && (event.getItem().getType() == Material.POTION || event.getItem().getType() == Material.COOKED_BEEF))
 		{
 			if(event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
 			{

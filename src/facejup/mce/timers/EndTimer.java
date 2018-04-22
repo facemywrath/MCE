@@ -137,7 +137,7 @@ public class EndTimer {
 						player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100.0D);
 						if(mm.getPlayerClosestTo(player) != null)
 							player.setCompassTarget(mm.getPlayerClosestTo(player).getLocation());
-						if(!player.getInventory().contains(ItemCreator.getKitSelector()) && !mm.randomKits)
+						if(!player.getInventory().contains(ItemCreator.getKitSelector()))
 							player.getInventory().setItem(8, ItemCreator.getKitSelector());
 						if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 						{

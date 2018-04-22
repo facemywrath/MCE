@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaManager;
+import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.players.User;
@@ -44,6 +45,8 @@ public class MatchManager {
 	public String Tag = Lang.Tag;
 
 	public boolean randomKits = false;
+	public HashMap<ArenaSign, Integer> votesReceived = new HashMap<>();
+	public HashMap<Player, ArenaSign> voted = new HashMap<>();
 	private HashMap<Player, Marker<Location>> lastMovement = new HashMap<>();
 	private HashMap<Player, Integer> lives = new HashMap<>();
 	private HashMap<Player, Kit> kits = new HashMap<>();
@@ -212,7 +215,23 @@ public class MatchManager {
 
 	public void startMatch()
 	{
+		Optional<Integer> votes = votesReceived.values().stream().max((int1, int2) -> Integer.compare(int1, int2));
 		Arena arena = am.getRandomArena(desiredKits.keySet().size());
+		if(votes.isPresent() && votes.get() > 0)
+		{
+			int count = (int) votesReceived.values().stream().filter(i -> i==votes.get()).count();
+			if(count > 1)
+			{
+				List<ArenaSign> signs = votesReceived.keySet().stream().filter(sign -> votesReceived.get(sign) == votes.get()).collect(Collectors.toList());
+				arena = am.setArena(new Arena(am, am.getArenaSection(signs.get(Numbers.getRandom(0, signs.size()-1)).getArenaName())));
+			}
+			else
+			{
+				ArenaSign sign2 = votesReceived.keySet().stream().filter(sign -> votesReceived.get(sign) == votes.get()).collect(Collectors.toList()).get(0);
+				arena = am.setArena(new Arena(am, am.getArenaSection(sign2.getArenaName())));
+			}
+		}
+
 		if(arena == null)
 		{
 			startTimer.linger();
@@ -327,7 +346,7 @@ public class MatchManager {
 			return;
 		}
 		if(randomKits)
-				setPlayerDesiredKit(player, Kit.values()[Numbers.getRandom(1, Kit.values().length-1)]);
+			setPlayerDesiredKit(player, Kit.values()[Numbers.getRandom(2, Kit.values().length-1)]);
 		if(randomKits)
 			player.sendMessage(Chat.translate(Lang.Tag + "You spawned with &bKit " + StringUtils.capitalize(getPlayerDesiredKit(player).toString().toLowerCase())));
 		if (lives.get(player) == 0) {
@@ -346,8 +365,14 @@ public class MatchManager {
 			}
 			return;
 		}
-		if (desiredKits.containsKey(player) && !(desiredKits.get(player).equals(kits.get(player)))) {
+		if (desiredKits.containsKey(player) && desiredKits.get(player) != Kit.RANDOM && !(desiredKits.get(player).equals(kits.get(player)))) {
 			kits.put(player, desiredKits.get(player));
+		}
+		else if(desiredKits.get(player) == Kit.RANDOM)
+		{
+			Kit kit = main.getUserManager().getUser(player).getKits().get(Numbers.getRandom(2, main.getUserManager().getUser(player).getKits().size()-1));
+			kits.put(player, kit);
+			player.sendMessage(Lang.Tag + Chat.translate("Your random kit was &b" + StringUtils.capitalize(kit.name().toLowerCase())));
 		} else if (!(kits.containsKey(player)) || kits.get(player) == Kit.NONE)
 			return;
 		if (am.getArena() == null)
@@ -364,7 +389,6 @@ public class MatchManager {
 					{
 						player.removePotionEffect(pot.getType());
 					}
-					if(!randomKits)
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
 					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON)

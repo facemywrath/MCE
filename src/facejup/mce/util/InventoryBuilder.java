@@ -67,7 +67,7 @@ public class InventoryBuilder {
 		User user = main.getUserManager().getUser(player);
 		if(kit == Kit.NONE)
 			kit = main.getMatchManager().getPlayerKit(player);
-		InventoryBuilder ib = new InventoryBuilder(player, "Kits", (int) (( Kit.values().length / 9.0) + 1));
+		InventoryBuilder ib = new InventoryBuilder(player, "Kits", (int) (( (Kit.values().length-1) / 9.0)+1));
 		for (Kit tester : Kit.values()) {
 			String name = StringUtils.capitalize(tester.toString().toLowerCase());
 			if(tester == Kit.NONE && main.getMatchManager().getEndTimer().isRunning())

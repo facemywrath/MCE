@@ -14,6 +14,7 @@ import facejup.mce.arenas.ArenaManager;
 import facejup.mce.commands.CommandArena;
 import facejup.mce.enums.AddType;
 import facejup.mce.util.Chat;
+import facejup.mce.util.Lang;
 
 public class ArenaModListener implements Listener{
 
@@ -55,6 +56,19 @@ public class ArenaModListener implements Listener{
 				ca.adding.remove(player);
 				ca.arenaAdd.remove(player);
 				return;
+			}
+			else if(ca.adding.get(player) == AddType.SIGN)
+			{
+				section.set("Sign.Name", ca.arenaAdd.get(player));
+				section.set("Sign.World", player.getWorld().getName());
+				section.set("Sign.x", loc.getX());
+				section.set("Sign.y", loc.getY());
+				section.set("Sign.z", loc.getZ());
+				am.getFileControl().save();				
+				player.sendMessage(Lang.Tag + Chat.translate("Sign placed for &6" + ca.arenaAdd.get(player)));
+				ca.adding.remove(player);
+				ca.arenaAdd.remove(player);
+				em.getMain().getMatchManager().am.loadVoteSigns();
 			}
 		}
 		

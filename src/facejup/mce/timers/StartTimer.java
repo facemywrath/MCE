@@ -1,16 +1,16 @@
 package facejup.mce.timers;
 
+import java.util.Set;
+
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.util.Vector;
 
+import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.players.User;
-import facejup.mce.util.BlockColor;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
@@ -46,6 +46,10 @@ public class StartTimer {
 			main.getMatchManager().setPlayerKit(player, Kit.NONE);
 				main.getUserManager().getUser(player).updateScoreboard();
 		}
+		if(mm.getArenaManager() != null)
+		{
+			mm.getArenaManager().loadVoteSigns();
+		}
 		countdown();
 	}
 
@@ -72,6 +76,10 @@ public class StartTimer {
 		{
 			if(time > 0)
 			{
+				for(ArenaSign sign : ((Set<ArenaSign>) mm.votesReceived.keySet()))
+				{
+					sign.updateSign();
+				}
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
 					mm.afkCheck(player);
