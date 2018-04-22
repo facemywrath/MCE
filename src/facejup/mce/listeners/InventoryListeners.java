@@ -249,7 +249,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 						main.getMatchManager().votesReceived.put(sign, main.getMatchManager().votesReceived.get(sign)+1);
 						main.getMatchManager().voted.put(player, sign);
 						sign.updateSign();
-						player.sendMessage(Lang.Tag + Chat.translate("You voted for the arena &b" + sign.getArenaName()));
+						player.sendMessage(Lang.Tag + Chat.translate("You voted for the arena &b" + Chat.formatName(sign.getArenaName())));
 						break;
 					}
 				}

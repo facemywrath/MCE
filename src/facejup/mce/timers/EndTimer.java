@@ -1,7 +1,6 @@
 package facejup.mce.timers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -14,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.arenas.Arena;
+import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
@@ -50,6 +50,12 @@ public class EndTimer {
 			main.getMatchManager().getStartTimer().stopTimer();
 		time = MATCH_TIME;
 		running = true;
+		mm.voted.clear();
+		for(ArenaSign sign : mm.votesReceived.keySet())
+		{
+			mm.votesReceived.put(sign, 0);
+			sign.updateSign();
+		}
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
 			public void run()

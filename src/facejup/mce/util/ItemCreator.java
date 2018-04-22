@@ -149,7 +149,7 @@ public class ItemCreator{
 	
 	public static String formatItemName(ItemStack item)
 	{
-		return (item.getItemMeta().hasDisplayName()?item.getItemMeta().getDisplayName():StringUtils.capitaliseAllWords(item.getType().toString().replaceAll("_", " ").toLowerCase()));
+		return (item.getItemMeta().hasDisplayName()?item.getItemMeta().getDisplayName():Chat.formatName(item.getType().toString()));
 	}
 	
 	public static ItemStack getKitSelector()
