@@ -111,26 +111,29 @@ public class EndTimer {
 						}
 						else if(!(loc.getX() < a.getXMin() || loc.getX() > a.getXMax() || loc.getY() > a.getYMax() || loc.getZ() < a.getZMin() || loc.getZ() > a.getZMax()))
 							oobs.remove(player);
-						if(oobs.containsKey(player))
+						if(oobs.containsKey(player) && !player.isDead())
 						{
 							switch(oobs.get(player).getSecondsPassedSince())
 							{
-							case 2:
-								player.sendMessage(Chat.translate(Lang.Tag + "&cYou are out of bounds. Return to the map or you will be killed in 5..."));
+							case 1:
+								player.sendMessage(Chat.translate(Lang.Tag + "&cYou are out of bounds. Return to the map or you will be killed in 10 seconds."));
 								break;
-							case 3:
-								player.sendMessage(Chat.translate("&c4..."));
+							case 11:
+								player.sendMessage(Chat.translate("&cOut of bounds: Death in 5..."));
 								break;
-							case 4:
-								player.sendMessage(Chat.translate("&c3..."));
+							case 12:
+								player.sendMessage(Chat.translate("&cOut of bounds: Death in 4..."));
 								break;
-							case 5:
-								player.sendMessage(Chat.translate("&c2..."));
+							case 13:
+								player.sendMessage(Chat.translate("&cOut of bounds: Death in 3..."));
 								break;
-							case 6:
-								player.sendMessage(Chat.translate("&c1..."));
+							case 14:
+								player.sendMessage(Chat.translate("&cOut of bounds: Death in 2..."));
 								break;
-							case 7:
+							case 15:
+								player.sendMessage(Chat.translate("&cOut of bounds: Death in 1..."));
+								break;
+							case 16:
 								player.damage(player.getHealth());
 								oobs.remove(player);
 								break;
