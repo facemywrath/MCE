@@ -133,6 +133,29 @@ public class CommandArena implements CommandExecutor{
 			arenaAdd.put(player, ArenaName);
 			adding.put(player, AddType.SIGN);
 		}
+		if(args[0].equalsIgnoreCase("setcreator"))
+		{
+			if(args.length == 1)
+			{
+				sender.sendMessage(Lang.InvalidSyn);
+				return true;
+			}
+			String ArenaName = args[1];
+			if(am.getArenaSection(args[1]) == null)
+			{
+				sender.sendMessage(Lang.Tag + Chat.translate("&cAn arena by the name of &6" + ArenaName + " &cdoes not exist!"));
+				return true;
+			}
+			if(args.length == 2)
+			{
+				sender.sendMessage(Lang.InvalidSyn);
+				return true;
+			}
+			ConfigurationSection section = am.getArenaSection(ArenaName);
+			section.set("Creator", args[2]);
+			am.getFileControl().save();
+			sender.sendMessage(Lang.Tag + Chat.translate("You set the creator of &b" + ArenaName + " &ato be &b" + args[2]));
+		}
 		if (args[0].equalsIgnoreCase("spawn")) 
 		{
 			if (args.length == 1) 

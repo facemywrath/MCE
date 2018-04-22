@@ -16,6 +16,7 @@ public class ArenaSign {
 	private Location loc;
 	private String name;
 	private ArenaManager am;
+	private String creator;
 
 	public ArenaSign(ArenaManager am, ConfigurationSection section)
 	{
@@ -25,6 +26,10 @@ public class ArenaSign {
 			loc = null;
 		loc = new Location(Bukkit.getWorld(section.getString("World")), section.getDouble("x"), section.getDouble("y"), section.getDouble("z"));
 		name = section.getString("Name");
+		if(am.getFileControl().getConfig().contains(section.getCurrentPath().substring(0, section.getCurrentPath().lastIndexOf('.')) + ".Creator"))
+		{
+			creator = am.getFileControl().getConfig().getString(section.getCurrentPath().substring(0, section.getCurrentPath().lastIndexOf('.')) + ".Creator");
+		}
 	}
 
 	public void updateSign()
@@ -36,6 +41,8 @@ public class ArenaSign {
 			sign.setLine(1, "Size: " + getSize());
 			if(am.getMatchManager().votesReceived.containsKey(this))
 				sign.setLine(2, "Votes: " + am.getMatchManager().votesReceived.get(this));
+			if(creator != null)
+				sign.setLine(3, Chat.translate("&9Cred: &2" + creator));
 			sign.update();
 		}
 	}
