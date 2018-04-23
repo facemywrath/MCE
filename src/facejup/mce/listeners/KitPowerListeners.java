@@ -15,6 +15,7 @@ import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -281,7 +282,7 @@ public class KitPowerListeners implements Listener {
 			return;
 		if(main.getMatchManager().getPlayerKit(player) != Kit.GRAVITON)
 			return;
-		Material toggleOn = Material.SNOW_BALL;
+		Material toggleOn = Material.SLIME_BALL;
 		Material toggleOff = Material.MAGMA_CREAM;
 		if(player.getInventory().getItemInMainHand().getType() == toggleOn && player.getLevel() > 0)
 		{
@@ -383,7 +384,7 @@ public class KitPowerListeners implements Listener {
 	}
 
 	@EventHandler
-	public void removeFire(EntityChangeBlockEvent event)
+	public void removeFireAndIce(EntityChangeBlockEvent event)
 	{
 		if(event.getTo() == Material.FIRE)
 		{
@@ -592,7 +593,7 @@ public class KitPowerListeners implements Listener {
 	}
 
 	@EventHandler
-	public void wightSlowListener(EntityDamageByEntityEvent event)
+	public void yetiSlowListener(EntityDamageByEntityEvent event)
 	{
 		if(!(event.getDamager() instanceof Player && event.getEntity() instanceof Player))
 			return;
@@ -604,17 +605,7 @@ public class KitPowerListeners implements Listener {
 			return;
 		if(main.getMatchManager().getPlayerKit(killer) != Kit.YETI)
 			return;
-		if(target.hasPotionEffect(PotionEffectType.SLOW))
-		{
-			int level = target.getPotionEffect(PotionEffectType.SLOW).getAmplifier();
-			target.removePotionEffect(PotionEffectType.SLOW);
-			if(level+1 < 4)
-				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, level+1));
-			else
-				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, level));
-		}
-		else
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0));
+		addStack(target, PotionEffectType.SLOW, 60, 2);
 	}
 
 	@EventHandler
@@ -648,7 +639,7 @@ public class KitPowerListeners implements Listener {
 				return;
 			damager.getInventory().addItem(new ItemCreator(item).setAmount(1).getItem());
 			damager.sendMessage(Chat.translate("&8You stole 1 &7" + ItemCreator.formatItemName(item)));
-			target.sendMessage(Chat.translate("&8You lost 1 &7" + ItemCreator.formatItemName(item) + " &8to a Goblin."));
+			target.sendMessage(Chat.translate("&dYou lost 1 &b" + ItemCreator.formatItemName(item) + " &dto a Goblin. Kill it quickly to get its loot!"));
 			if(item.getAmount() > 1)
 			{
 				target.getInventory().setItem(slot, new ItemCreator(item).setAmount(item.getAmount()-1).getItem());
@@ -657,14 +648,14 @@ public class KitPowerListeners implements Listener {
 			{
 				target.getInventory().setItem(slot, new ItemStack(Material.AIR));
 			}
-			if(stolenItems.containsKey(target))
+			if(stolenItems.containsKey(damager))
 			{
-				stolenItems.get(target).addItem(new ItemCreator(item).setAmount(1).getItem());
+				stolenItems.get(damager).addItem(new ItemCreator(item).setAmount(1).getItem());
 			}
 			else
 			{
-				stolenItems.put(target, Bukkit.createInventory(target, 27));
-				stolenItems.get(target).addItem(new ItemCreator(item).setAmount(1).getItem());
+				stolenItems.put(damager, Bukkit.createInventory(damager, 27));
+				stolenItems.get(damager).addItem(new ItemCreator(item).setAmount(1).getItem());
 			}
 		}
 	}
@@ -699,7 +690,7 @@ public class KitPowerListeners implements Listener {
 	public int getRandomItemSlot(Player target)
 	{
 		Inventory inv = target.getInventory();
-		List<Material> blacklist = Arrays.asList(Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
+		List<Material> blacklist = Arrays.asList(Material.SLIME_BALL, Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
 		List<Integer> slots = new ArrayList<>();
 		for(int i = 0; i < 8; i++)
 		{
@@ -729,6 +720,35 @@ public class KitPowerListeners implements Listener {
 		if(main.getMatchManager().getPlayerKit(player) != Kit.GOBLIN)
 			return;
 		event.setCancelled(true);
+	}
+
+	public void addStack(Player player, PotionEffectType type, int time, int max)
+	{
+		if(!player.hasPotionEffect(type) && max != 0)
+		{
+			player.addPotionEffect(new PotionEffect(type, time, 0));
+		}
+		else if(player.hasPotionEffect(type))
+		{
+			int level = player.getPotionEffect(type).getAmplifier();
+			if(player.getPotionEffect(type).getAmplifier() < max)
+				level+=1;
+			player.removePotionEffect(type);
+			player.addPotionEffect(new PotionEffect(type, time, level));
+		}
+	}
+
+	@EventHandler
+	public void snowBallSlow(ProjectileHitEvent event)
+	{
+		if(event.getHitEntity() == null)
+			return;
+		if(!(event.getHitEntity() instanceof Player))
+			return;
+		if(event.getEntity() instanceof Snowball)
+		{
+			addStack(((Player) event.getHitEntity()), PotionEffectType.SLOW, 60, 1);
+		}
 	}
 
 }

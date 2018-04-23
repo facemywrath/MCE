@@ -3,6 +3,8 @@ package facejup.mce.timers;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -14,6 +16,7 @@ import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Marker;
 import net.minecraft.server.v1_12_R1.MinecraftServer;
 
 public class StartTimer {
@@ -44,11 +47,19 @@ public class StartTimer {
 		{
 			main.getMatchManager().spawnPlayer(player);
 			main.getMatchManager().setPlayerKit(player, Kit.NONE);
-				main.getUserManager().getUser(player).updateScoreboard();
+			main.getUserManager().getUser(player).updateScoreboard();
 		}
 		if(mm.getArenaManager() != null)
 		{
 			mm.getArenaManager().loadVoteSigns();
+		}
+		if(!main.getEventManager().getKitPowerListeners().ignitedBlocks.isEmpty())
+		{
+			for(Marker<Location> marker : main.getEventManager().getKitPowerListeners().ignitedBlocks)
+			{
+				if(marker.getItem().getBlock().getType() == Material.FIRE)
+					marker.getItem().getBlock().setType(Material.AIR);
+			}
 		}
 		countdown();
 	}

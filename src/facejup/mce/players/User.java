@@ -21,6 +21,7 @@ import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Numbers;
 
 public class User {
 	
@@ -432,6 +433,24 @@ public class User {
 			section.set("Kits", Arrays.asList("NONE", "RANDOM", "ARCHER", "WARRIOR", "GUARD"));
 		}
 		return Arrays.asList(Kit.NONE, Kit.RANDOM, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
+	}
+	
+	public Kit getRandomKit()
+	{
+		if(section.contains("Kits"))
+		{
+			List<Kit> kits = new ArrayList<>();
+			for(String str : section.getStringList("Kits"))
+			{
+				if(str.equals("RANDOM") || str.equals("NONE"))
+					continue;
+				kits.add(Kit.valueOf(str));
+			}
+			if(kits.isEmpty())
+				return Arrays.asList(Kit.ARCHER, Kit.WARRIOR, Kit.GUARD).get(Numbers.getRandom(0, 2));
+			return kits.get(Numbers.getRandom(0, kits.size()-1));
+		}
+		return Arrays.asList(Kit.ARCHER, Kit.WARRIOR, Kit.GUARD).get(Numbers.getRandom(0, 2));
 	}
 
 	public void updateScoreboard() {

@@ -1,5 +1,6 @@
 package facejup.mce.timers;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -7,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -24,6 +26,7 @@ import facejup.mce.util.Marker;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
+import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
 import net.minecraft.server.v1_12_R1.MinecraftServer;
 
 public class EndTimer {
@@ -151,6 +154,22 @@ public class EndTimer {
 						if(mm.getPlayerKit(player) != Kit.NONE && mm.getLives(player) > 0)
 						{
 							Kit kit = mm.getPlayerKit(player);
+							if(kit.disguiseName != null)
+							{
+								if(!DisguiseAPI.isDisguised(player))
+								{
+									PlayerDisguise disguise = new PlayerDisguise(player.getName(), kit.disguiseName);
+									disguise.setEntity(player);
+									disguise.setViewSelfDisguise(false);
+									disguise.setVelocitySent(true);
+									disguise.startDisguise();
+								}
+							}
+							ItemStack  slowball = new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Slowball").setLore(Arrays.asList("&7Adds a stack of slow", "&7to the target.")).getItem();
+							if(player.getInventory().contains(Material.SNOW_BALL) && player.getInventory().getItem(player.getInventory().first(Material.SNOW_BALL)).getAmount() < 8 && kit == Kit.YETI && time%4 == 0 && player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE)
+							{
+								player.getInventory().addItem();
+							}
 							if(kit == Kit.GOBLIN)
 							{
 								if(!DisguiseAPI.isDisguised(player))
@@ -181,6 +200,18 @@ public class EndTimer {
 								else
 									player.setLevel(100);
 								player.setExp((float) (player.getLevel()/100.0));
+							}
+							if(kit == Kit.GUARD)
+							{
+								if(!DisguiseAPI.isDisguised(player))
+								{
+									PlayerDisguise disguise = new PlayerDisguise(player.getName(), "YamaGaming");
+									disguise.setEntity(player);
+
+									disguise.setViewSelfDisguise(false);
+									disguise.setVelocitySent(true);
+									disguise.startDisguise();
+								}
 							}
 							if(kit == Kit.HARPY && player.isOnGround() && player.getLevel() < 100)
 							{

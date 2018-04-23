@@ -370,7 +370,7 @@ public class MatchManager {
 		}
 		else if(desiredKits.get(player) == Kit.RANDOM)
 		{
-			Kit kit = main.getUserManager().getUser(player).getKits().get(Numbers.getRandom(2, main.getUserManager().getUser(player).getKits().size()-1));
+			Kit kit = main.getUserManager().getUser(player).getRandomKit();
 			kits.put(player, kit);
 			player.sendMessage(Lang.Tag + Chat.translate("Your random kit was &b" + StringUtils.capitalize(kit.name().toLowerCase())));
 		} else if (!(kits.containsKey(player)) || kits.get(player) == Kit.NONE)
