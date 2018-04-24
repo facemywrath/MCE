@@ -43,6 +43,7 @@ public class StartTimer {
 			main.getMatchManager().getEndTimer().stopTimer();
 		time = WAIT_TIME;
 		running = true;
+		main.getMatchManager().randomKits = false;
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
 			main.getMatchManager().spawnPlayer(player);

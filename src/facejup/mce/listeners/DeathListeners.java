@@ -3,6 +3,7 @@ package facejup.mce.listeners;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -103,14 +104,15 @@ public class DeathListeners implements Listener {
 		if(!em.getMain().getMatchManager().isMatchRunning())
 			return;
 		lastDamagedBy.put(player, marker);
-		em.getMain().getServer().getScheduler().scheduleSyncDelayedTask(em.getMain(), new Runnable()
-		{
-			public void run()
+		if(em.getMain() != null)
+			em.getMain().getServer().getScheduler().scheduleSyncDelayedTask(em.getMain(), new Runnable()
 			{
-				if(lastDamagedBy.containsKey(player) && lastDamagedBy.get(player).equals(marker))
-					lastDamagedBy.remove(player);
-			}
-		}, 160L);
+				public void run()
+				{
+					if(lastDamagedBy.containsKey(player) && lastDamagedBy.get(player).equals(marker))
+						lastDamagedBy.remove(player);
+				}
+			}, 160L);
 	}
 
 	@EventHandler
@@ -137,16 +139,18 @@ public class DeathListeners implements Listener {
 			{ // If there's only one player left
 
 				main.getMatchManager().checkMatchEnd(player);
-			
+
 			}
 			return;
 		}
 		Player killer = lastDamagedBy.get(event.getEntity()).getItem();	
+		if(killer.getInventory().getItemInMainHand().getType() == Material.RAW_FISH)
+			main.getUserManager().getUser(killer).incScore(Achievement.FISHSLAP);
 		if(main.getMatchManager().getLives(player) > 0)
-		event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
+			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
 		else
 			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.GOLD + player.getName() + " &d&ohas been eliminated from the game."));
-		if(Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0))
+		if(!killer.equals(player) && Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0))
 			main.getMatchManager().incLives(killer);
 		for(Player player2 : Bukkit.getOnlinePlayers())
 		{

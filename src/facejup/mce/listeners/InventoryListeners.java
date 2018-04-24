@@ -241,8 +241,6 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 						Player player = event.getPlayer();
 						if(main.getMatchManager().voted.containsKey(player))
 						{
-							if(main.getMatchManager().voted.get(player).equals(sign))
-								return;
 							main.getMatchManager().votesReceived.put(main.getMatchManager().voted.get(player), main.getMatchManager().votesReceived.get(main.getMatchManager().voted.get(player))-1);
 							main.getMatchManager().voted.get(player).updateSign();
 						}

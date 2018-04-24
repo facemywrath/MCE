@@ -1,7 +1,9 @@
 package facejup.mce.timers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -10,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -94,11 +97,16 @@ public class EndTimer {
 					main.getMatchManager().getArenaManager().getArena().getWorld().setTime(600);
 				if(!main.getEventManager().getKitPowerListeners().ignitedBlocks.isEmpty())
 				{
+					List<Marker<Location>> removeQueue = new ArrayList<>();
 					for(Marker<Location> marker : main.getEventManager().getKitPowerListeners().ignitedBlocks)
 					{
 						if(marker.getMillisPassedSince() > 1250)
+						{
 							marker.getItem().getBlock().setType(Material.AIR);
+							removeQueue.add(marker);
+						}
 					}
+					removeQueue.stream().forEach(item -> main.getEventManager().getKitPowerListeners().ignitedBlocks.remove(item));
 				}
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
@@ -166,7 +174,7 @@ public class EndTimer {
 								}
 							}
 							ItemStack  slowball = new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Slowball").setLore(Arrays.asList("&7Adds a stack of slow", "&7to the target.")).getItem();
-							if(player.getInventory().contains(Material.SNOW_BALL) && player.getInventory().getItem(player.getInventory().first(Material.SNOW_BALL)).getAmount() < 8 && kit == Kit.YETI && time%4 == 0 && player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE)
+							if((!player.getInventory().contains(Material.SNOW_BALL) || (player.getInventory().contains(Material.SNOW_BALL) && player.getInventory().getItem(player.getInventory().first(Material.SNOW_BALL)).getAmount() < 8)) && kit == Kit.YETI && time%4 == 0 && player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE)
 							{
 								player.getInventory().addItem();
 							}

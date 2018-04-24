@@ -9,7 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.google.common.util.concurrent.Service.State;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
@@ -120,6 +123,16 @@ public class AchievementListeners implements Listener{
 		if(event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.HOT_FLOOR)
 		{
 			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.HELLFIRE);
+		}
+	}
+	
+	@EventHandler
+	public void fishermanModifier(PlayerFishEvent event)
+	{
+		if(event.getState() == PlayerFishEvent.State.CAUGHT_FISH)
+		{
+			if(em.getMain().getMatchManager().isMatchRunning())
+				em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.FISHERMAN);
 		}
 	}
 }

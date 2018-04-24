@@ -265,6 +265,7 @@ public class User {
 			section.set("Gamesplayed", section.getInt("Gamesplayed") + i);
 		else
 			section.set("Gamesplayed", i);
+		incScore(Achievement.PLAYER);
 		this.um.getFileControl().save();
 		updateScoreboard();
 	}
@@ -281,7 +282,7 @@ public class User {
 				else
 					unlockKit(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight());
 				if (this.player.isOnline()) {
-					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + Achievement.getAchievementLevelName(getAchievementLevel(ach)) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
+					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + Achievement.getAchievementLevelName(getAchievementLevelIndex(ach)) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				}
 				if (ach != Achievement.MASTER) {
 					incScore(Achievement.MASTER);
