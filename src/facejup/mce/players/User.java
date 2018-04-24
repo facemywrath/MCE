@@ -61,7 +61,7 @@ public class User {
 				config.set("Users." + player.getUniqueId() + ".Wins", 0);
 				config.set("Users." + player.getUniqueId() + ".Runnerup", 0);
 				config.set("Users." + player.getUniqueId() + ".Gamesplayed", 0);
-				config.set("Users." + player.getUniqueId() + ".Kits", Arrays.asList("NONE", "ARCHER", "WARRIOR", "GUARD"));
+				config.set("Users." + player.getUniqueId() + ".Kits", Arrays.asList("NONE", "RANDOM", "ARCHER", "WARRIOR", "GUARD"));
 				for (Achievement ach : Achievement.values()) {
 					config.set("Users." + player.getUniqueId() + ".Achievements." + ach.toString() + ".Score", 0);
 				}
@@ -116,6 +116,8 @@ public class User {
 		{
 			if(score >= lower && score < higher)
 			{
+				if(i == -1)
+					return 0;
 				return i;
 			}
 			lower = higher;
@@ -193,21 +195,7 @@ public class User {
 	{
 		String level = "";
 		if(ach.scores.size() > 1)
-			switch(getAchievementLevel(ach))
-			{
-			case 0:
-				level = "Iron ";
-				break;
-			case 1:
-				level = "Iron ";
-				break;
-			case 2:
-				level = "Gold ";
-				break;
-			case 3:
-				level = "Diamond ";
-				break;
-			}
+			level = Achievement.getAchievementLevelName(getAchievementLevel(ach));
 		return level;
 	}
 
@@ -293,7 +281,7 @@ public class User {
 				else
 					unlockKit(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight());
 				if (this.player.isOnline()) {
-					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + getAchievementTypeByScore(ach) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
+					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + Achievement.getAchievementLevelName(getAchievementLevel(ach)) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				}
 				if (ach != Achievement.MASTER) {
 					incScore(Achievement.MASTER);
@@ -484,16 +472,12 @@ public class User {
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 			objective.getScore("           ").setScore(14);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Server ").setScore(20);
-			objective.getScore(ChatColor.GREEN + "  IP: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getIp()).setScore(19);
-			objective.getScore(ChatColor.GREEN + "  Online: " + ChatColor.LIGHT_PURPLE + Bukkit.getServer().getOnlinePlayers().size()).setScore(17);
 			objective.getScore(ChatColor.GREEN + "  Queued: " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getPlayersQueued() + "/" + Bukkit.getServer().getOnlinePlayers().size()).setScore(16);
-			objective.getScore(ChatColor.GREEN + "             ").setScore(15);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(14);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Player ").setScore(13);
 			objective.getScore(ChatColor.GREEN + "  Name: " + ChatColor.LIGHT_PURPLE + player.getName()).setScore(12);
 			objective.getScore(ChatColor.GREEN + "  Coins: " + ChatColor.LIGHT_PURPLE + getCoins()).setScore(11);
 			objective.getScore(ChatColor.GREEN + "  Achievements: " + ChatColor.LIGHT_PURPLE + getAchievementCount() + "/" + Achievement.getMaxAchievementCount()).setScore(10);
-			objective.getScore(ChatColor.GREEN + "             ").setScore(9);
 			objective.getScore(ChatColor.GREEN + "             ").setScore(8);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Stats ").setScore(7);
 			objective.getScore(ChatColor.GREEN + "  KDR: " + ChatColor.LIGHT_PURPLE + getKDR()).setScore(6);

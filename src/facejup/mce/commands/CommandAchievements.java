@@ -2,6 +2,7 @@ package facejup.mce.commands;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -45,6 +46,7 @@ public class CommandAchievements implements CommandExecutor{
 				User user = main.getUserManager().getUser(Bukkit.getOfflinePlayer(args[0]));
 				user.setScore(ach, ach.scores.get(ach.scores.size()-1));
 			}
+			return true;
 		}
 		else if(((Player) sender).isOp())
 		{
@@ -67,6 +69,7 @@ public class CommandAchievements implements CommandExecutor{
 				user.setScore(ach, ach.scores.get(ach.scores.size()-1));
 				return true;
 			}
+			return true;
 		}
 
 		Player player = (Player) sender;

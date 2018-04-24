@@ -25,7 +25,7 @@ import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
 
 public class UserManager implements Listener {
-	
+
 	private final boolean BETA = true;
 
 	private Main main; // Dependency Injection Variable.
@@ -193,7 +193,7 @@ public class UserManager implements Listener {
 		if(main.getMatchManager().voted.containsKey(player))
 		{
 			ArenaSign sign = main.getMatchManager().voted.get(player);
-			main.getMatchManager().votesReceived.put(sign, main.getMatchManager().votesReceived.get(sign)+1);
+			main.getMatchManager().votesReceived.put(sign, main.getMatchManager().votesReceived.get(sign)-1);
 			main.getMatchManager().voted.remove(player);
 		}
 		if(main.getMatchManager().getPlayersAlive().contains(player))
@@ -261,8 +261,16 @@ public class UserManager implements Listener {
 		if(!users.containsKey(player))
 		{
 			users.put(player, new User(this, player));
-			getUser(player).updateScoreboard();
+			if(player.isOnline())
+				getUser(player).updateScoreboard();
 		}
+	}
+
+	public void reloadUser(OfflinePlayer player)
+	{
+		users.put(player,  new User(this, player));
+		if(player.isOnline())
+			getUser(player).updateScoreboard();
 	}
 
 }

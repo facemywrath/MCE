@@ -13,6 +13,7 @@ import facejup.mce.enums.Achievement;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
 import facejup.mce.players.UserManager;
+import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
 import net.md_5.bungee.api.ChatColor;
 
@@ -39,6 +40,20 @@ public class CommandStats implements CommandExecutor {
 		}
 		Player player = (Player) sender;
 		FileConfiguration config = cm.getMain().getUserManager().getFileControl().getConfig();
+		if(player.isOp())
+		{
+			if(args.length > 1 && args[0].equalsIgnoreCase("reset") && Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore())
+			{
+				OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+				if(main.getUserManager().getFileControl().getConfig().isConfigurationSection("Users." + target.getUniqueId().toString()))
+				{
+					main.getUserManager().getFileControl().getConfig().set("Users." + target.getUniqueId().toString(),null);
+					main.getUserManager().getFileControl().save();
+					main.getUserManager().reloadUser(target);
+					sender.sendMessage(Chat.translate(Lang.Tag + "Player &b" + target.getName() + "&a's file reset."));
+				}
+			}
+		}
 		if (args.length == 0) {
 			User p = main.getUserManager().getUser(player);
 			int Coins = p.getCoins();

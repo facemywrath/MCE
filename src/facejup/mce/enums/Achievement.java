@@ -13,15 +13,16 @@ import facejup.mce.util.ItemCreator;
 public enum Achievement {
 	
 	MASTER(false, new ItemCreator(Material.BOOK).setDisplayname("Master").setLore(Arrays.asList("&7&oGet every other achievement")).getItem(), Arrays.asList(1), new ArrayList<>()),
-	HITTER(false, new ItemCreator(Material.WOOD_SWORD).setDisplayname("Hitter").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(250,500,1000), Arrays.asList(new Reward(50),new Reward(150),new Reward(300))),
-	ARCHERY(false, new ItemCreator(Material.BOW).setDisplayname("Archery").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(125,250,500), Arrays.asList(new Reward(50),new Reward(150),new Reward(Kit.GUNNER))),
-	SPREE(false, new ItemCreator(Material.POTION).setDisplayname("Spree").setLore(Arrays.asList("&7&oGet a &r%SCORE% &7&oplayer killing spree")).getItem(), Arrays.asList(5,10,15), Arrays.asList(new Reward(100),new Reward(200),new Reward(300))),
-	VICTOR(false, new ItemCreator(Material.GOLDEN_APPLE).setDisplayname("Victor").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&owins")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(100),new Reward(300),new Reward(700))),
-	FAILURE(false, new ItemCreator(Material.GOLDEN_APPLE).setAmount(2).setDisplayname("Failure").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&orunnerups")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(75),new Reward(250),new Reward(500))),
-	THISISSPARTA(false, new ItemCreator(Material.STONE_SWORD).setDisplayname("THIS IS SPARTA!!!").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fall damage.")).getItem(), Arrays.asList(20,50,100), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.GRAVITON))),
-	ASSASSINATE(false, new ItemCreator(Material.TOTEM).setDisplayname("Assassinate").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills without being hit within the last 8 seconds.")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.SHADE))),
-	HELLFIRE(false, new ItemCreator(Material.FIREBALL).setDisplayname("Hellfire").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fire damage.")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.DEMON))),
-	SKYLORD(false, new ItemCreator(Material.FEATHER).setDisplayname("Skylord").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills while falling")).getItem(), Arrays.asList(20,50,75), Arrays.asList(new Reward(75),new Reward(250),new Reward(Kit.HARPY))),
+	HITTER(false, new ItemCreator(Material.WOOD_SWORD).setDisplayname("Hitter").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(100,250,500,1000,5000), Arrays.asList(new Reward(25), new Reward(50),new Reward(150),new Reward(300), new Reward(750))),
+	ARCHERY(false, new ItemCreator(Material.BOW).setDisplayname("Archery").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits with arrows")).getItem(), Arrays.asList(60,125,250,500, 2500), Arrays.asList(new Reward(25),new Reward(50),new Reward(150), new Reward(500), new Reward(Kit.GUNNER))),
+	SPREE(false, new ItemCreator(Material.POTION).setDisplayname("Spree").setLore(Arrays.asList("&7&oGet a &r%SCORE% &7&oplayer killing spree")).getItem(), Arrays.asList(3,5,10,15,20), Arrays.asList(new Reward(50),new Reward(100),new Reward(200),new Reward(300), new Reward(1000))),
+	VICTOR(false, new ItemCreator(Material.GOLDEN_APPLE).setDisplayname("Victor").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&owins")).getItem(), Arrays.asList(10,20,50,100,500), Arrays.asList(new Reward(50),new Reward(100),new Reward(300),new Reward(700), new Reward(2500))),
+	FAILURE(false, new ItemCreator(Material.GOLDEN_APPLE).setAmount(2).setDisplayname("Failure").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&orunnerups")).getItem(), Arrays.asList(10,20,50,100,500), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(500), new Reward(1500))),
+	THISISSPARTA(false, new ItemCreator(Material.STONE_SWORD).setDisplayname("THIS IS SPARTA!!!").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fall damage.")).getItem(), Arrays.asList(10,20,50,100,200), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(750), new Reward(Kit.GRAVITON))),
+	ASSASSINATE(false, new ItemCreator(Material.TOTEM).setDisplayname("Assassinate").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills without being hit","&7&owithin the last 8 seconds.")).getItem(), Arrays.asList(10,20,50,75,175), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(750), new Reward(Kit.SHADE))),
+	HELLFIRE(false, new ItemCreator(Material.FIREBALL).setDisplayname("Hellfire").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills using fire damage.")).getItem(), Arrays.asList(10,20,50,75,150), Arrays.asList(new Reward(50),new Reward(75),new Reward(250), new Reward(1000), new Reward(Kit.DEMON))),
+	SKYLORD(false, new ItemCreator(Material.FEATHER).setDisplayname("Skylord").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills while falling")).getItem(), Arrays.asList(10,20,50,75,200), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(750),new Reward(Kit.HARPY))),
+	DESTROYER(false, new ItemCreator(Material.DIAMOND_SWORD).setDisplayname("Destroyer").setLore(Arrays.asList("&7&oEliminate &r%SCORE% &7&oplayers from the game")).getItem(), Arrays.asList(10,20,50,75,200), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(750),new Reward(1500))),
 	PUBLICITY(true, new ItemCreator(Material.SKULL).setData(3).setDisplayname("Publicity").setLore(Arrays.asList("&d&lGet us members by streaming.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),
 	BETA(true, new ItemCreator(Material.EYE_OF_ENDER).setDisplayname("Beta").setLore(Arrays.asList("&d&lBe a beta tester.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(2000))),
 	SPENDER(true, new ItemCreator(Material.GOLD_INGOT).setDisplayname("Spender").setLore(Arrays.asList("&d&lPurchase a kit.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),
@@ -69,15 +70,18 @@ public enum Achievement {
 		switch(i)
 		{
 		case 0:
-			level = "Iron ";
+			level = "Stone ";
 			break;
 		case 1:
-			level = "Gold ";
+			level = "Iron ";
 			break;
 		case 2:
-			level = "Diamond ";
+			level = "Gold ";
 			break;
 		case 3:
+			level = "Diamond ";
+			break;
+		case 4:
 			level = "Ender ";
 			break;
 		}

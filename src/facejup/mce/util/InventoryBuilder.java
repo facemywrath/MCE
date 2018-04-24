@@ -122,18 +122,7 @@ public class InventoryBuilder {
 		String newName = (flag ? "&aUnlocked: " : "&cLocked: ");
 		String level = "";
 		if(ach.scores.size() > 1)
-			switch(user.getAchievementLevel(ach))
-			{
-			case 0:
-				level = "Iron ";
-				break;
-			case 1:
-				level = "Gold ";
-				break;
-			case 2:
-				level = "Diamond ";
-				break;
-			}
+			level = Achievement.getAchievementLevelName(user.getAchievementLevel(ach));
 		newName += level + name;
 		for(int i = 0; i < lore.size(); i++)
 		{

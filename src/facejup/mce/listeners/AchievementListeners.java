@@ -90,7 +90,7 @@ public class AchievementListeners implements Listener{
 	@EventHandler
 	public void SkylordAchievementModifier(PlayerKillEvent event)
 	{
-		if(event.getPlayer().getVelocity().getY() < 0)
+		if(event.getPlayer().getVelocity().getY() < -0.8)
 		{
 			em.getMain().getUserManager().getUser(event.getPlayer()).incScore(Achievement.SKYLORD);
 		}

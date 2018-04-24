@@ -12,6 +12,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import facejup.mce.enums.Achievement;
+import facejup.mce.events.PlayerEliminatedEvent;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.events.PlayerKillThroughEnvironmentEvent;
 import facejup.mce.main.Main;
@@ -140,7 +142,10 @@ public class DeathListeners implements Listener {
 			return;
 		}
 		Player killer = lastDamagedBy.get(event.getEntity()).getItem();	
+		if(main.getMatchManager().getLives(player) > 0)
 		event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
+		else
+			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.GOLD + player.getName() + " &d&ohas been eliminated from the game."));
 		if(Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0))
 			main.getMatchManager().incLives(killer);
 		for(Player player2 : Bukkit.getOnlinePlayers())
@@ -152,6 +157,8 @@ public class DeathListeners implements Listener {
 		main.getServer().getPluginManager().callEvent(new PlayerKillEvent(killer, player));
 		if(main.getMatchManager().getLives(player) == 0)
 		{
+			main.getUserManager().getUser(killer).incScore(Achievement.DESTROYER);
+			main.getServer().getPluginManager().callEvent(new PlayerEliminatedEvent(killer, player));
 			main.getMatchManager().checkMatchEnd(player);
 		}
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
