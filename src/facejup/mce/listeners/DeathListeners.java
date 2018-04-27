@@ -133,6 +133,10 @@ public class DeathListeners implements Listener {
 		{ // Update every players scoreboard
 			main.getUserManager().getUser(player2).updateScoreboard();
 		}
+		if(main.getMatchManager().teamtype != TeamType.FFA && main.getMatchManager().team.containsKey(player) && main.getMatchManager().teamlives.containsKey(main.getMatchManager().team.get(player)) && main.getMatchManager().teamlives.get(main.getMatchManager().team.get(player)) == 0 && main.getMatchManager().getLives(player) > 0)
+		{
+			Chat.bc(Chat.translate(Lang.Tag + "" + main.getMatchManager().team.get(player) + Chat.formatName(main.getMatchManager().team.get(player).name()) + " &aTeam has no more lives. They no longer respawn. Eliminate them!"));
+		}
 		if(!lastDamagedBy.containsKey(event.getEntity()))
 		{ // If they weren't killed by a player:
 			// Broadcast msg
@@ -146,6 +150,13 @@ public class DeathListeners implements Listener {
 			return;
 		}
 		Player killer = lastDamagedBy.get(event.getEntity()).getItem();	
+		if(main.getMatchManager().matchtype == MatchType.BOSS)
+		{
+			if(main.getMatchManager().team.containsKey(player) && main.getMatchManager().team.get(player) == org.bukkit.ChatColor.RED)
+			{
+				main.getUserManager().getUser(killer).incScore(Achievement.OVERLORD);
+			}
+		}
 		if(killer.getInventory().getItemInMainHand().getType() == Material.RAW_FISH)
 			main.getUserManager().getUser(killer).incScore(Achievement.FISHSLAP);
 		if(main.getMatchManager().getLives(player) > 0)

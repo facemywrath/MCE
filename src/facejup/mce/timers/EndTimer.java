@@ -173,6 +173,8 @@ public class EndTimer {
 									disguise.startDisguise();
 								}
 							}
+							if(DisguiseAPI.isDisguised(player) && DisguiseAPI.getDisguise(player).isSelfDisguiseVisible())
+								DisguiseAPI.getDisguise(player).setViewSelfDisguise(false);
 							ItemStack  slowball = new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Slowball").setLore(Arrays.asList("&7Adds a stack of slow", "&7to the target.")).getItem();
 							if((!player.getInventory().contains(Material.SNOW_BALL) || (player.getInventory().contains(Material.SNOW_BALL) && player.getInventory().getItem(player.getInventory().first(Material.SNOW_BALL)).getAmount() < 8)) && kit == Kit.YETI && time%4 == 0 && player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE)
 							{
@@ -261,12 +263,20 @@ public class EndTimer {
 								}
 								player.setExp((float) (player.getLevel()/100.0));
 							}
-							if(kit == Kit.MAGE && time%15 == 0)
+							if(kit == Kit.MAGE)
 							{
+								if(player.getLevel() <= 87)
+									player.setLevel(player.getLevel()+13);
+								else
+									player.setLevel(100);
+								player.setExp((float) (player.getLevel()/100.0));
+								if(time%15 == 0)
+								{
 								if(!player.getInventory().contains(Material.POTION))
 									player.getInventory().addItem(new ItemCreator(Material.POTION).setPotionType(new PotionEffect(PotionEffectType.HEAL, 0, 1)).getItem());
 								if(!player.getInventory().contains(Material.SPLASH_POTION) && !player.getInventory().contains(Material.LINGERING_POTION))
 									player.getInventory().addItem(getRandomPotion());
+								}
 							}
 							if(kit.pot != null)
 							{

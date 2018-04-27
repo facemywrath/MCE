@@ -847,7 +847,7 @@ public class MatchManager {
 					}
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
-					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON)
+					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON || kit == Kit.MAGE)
 						player.setLevel(100);
 					else
 						player.setLevel(0);
@@ -1190,6 +1190,18 @@ public class MatchManager {
 	public void kill(Player player) {
 		this.lives.remove(player);
 
+	}
+
+	public void kickPlayer(Player player) {
+		if(getPlayersAlive().contains(player))
+		{
+			setPlayerKit(player, Kit.NONE);
+			lives.put(player, 0);
+			if(team.containsKey(player))
+				team.remove(player);
+			spawnPlayer(player);
+			player.sendMessage(Lang.Tag + Chat.translate("&cYou have been kicked from the match."));
+		}
 	}
 
 }

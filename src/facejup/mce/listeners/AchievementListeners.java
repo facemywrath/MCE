@@ -3,6 +3,7 @@ package facejup.mce.listeners;
 import java.util.HashMap;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -55,7 +56,7 @@ public class AchievementListeners implements Listener{
 			return;
 		if(event.getFinalDamage() == 0)
 			return;
-		if(!(event.getDamager() instanceof Projectile) || !(((Projectile) event.getDamager()).getShooter() instanceof Player))
+		if(!(event.getDamager() instanceof Arrow) || !(((Projectile) event.getDamager()).getShooter() instanceof Player))
 			return;
 		Player damager = null;
 		damager = (Player) ((Projectile) event.getDamager()).getShooter();

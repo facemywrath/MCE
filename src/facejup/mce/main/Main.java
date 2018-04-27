@@ -1,5 +1,10 @@
 package facejup.mce.main;
 
+import java.util.Set;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import facejup.mce.commands.CommandManager;
@@ -7,6 +12,7 @@ import facejup.mce.listeners.EventManager;
 import facejup.mce.players.UserManager;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
+import facejup.mce.util.Marker;
 
 public class Main extends JavaPlugin {
 
@@ -22,6 +28,19 @@ public class Main extends JavaPlugin {
 		em = new EventManager(this);
 		cm = new CommandManager(this);
 		restartTimer();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void onDisable()
+	{
+		for(Marker<Location> marker : em.getKitPowerListeners().ignitedBlocks)
+		{
+			marker.getItem().getBlock().setType(Material.AIR);
+		}
+		for(Player player : ((Set<Player>)em.getInventoryListeners().specialBlocks.keySet()))
+		{
+			em.getInventoryListeners().clearSpecialBlocks(player);
+		}
 	}
 
 	public void restartTimer()

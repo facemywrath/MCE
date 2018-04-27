@@ -13,8 +13,10 @@ import org.bukkit.Statistic;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SmallFireball;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.TNTPrimed;
@@ -44,6 +46,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.main.Main;
@@ -68,6 +71,43 @@ public class KitPowerListeners implements Listener {
 		this.em = em;
 		this.main = em.getMain();
 		main.getServer().getPluginManager().registerEvents(this, main);
+	}
+
+	@EventHandler
+	public void headshotListener(EntityDamageByEntityEvent event)
+	{
+		if(!(event.getDamager() instanceof Arrow))
+			return;
+		if(!(((Projectile)event.getDamager()).getShooter() instanceof Player))
+			return;
+		Location loc = event.getDamager().getLocation().clone();
+		event.getDamager().remove();
+		Player shooter = (Player) ((Projectile)event.getDamager()).getShooter();
+		if(loc.getY() > event.getEntity().getLocation().getY()+1.5)
+		{
+			int rand = Numbers.getRandom(2, 4);
+			event.setDamage(event.getDamage()+rand);
+			shooter.sendMessage(Chat.translate("&2&lHeadshot! &b+" + rand + " Damage!"));
+			main.getUserManager().getUser(shooter).incScore(Achievement.MARKSMAN);
+		}
+	}
+
+	@EventHandler
+	public void mageWand(PlayerInteractEvent event)
+	{
+		if(!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
+			return;
+		Player player = event.getPlayer();
+		if(ItemManager.toRPGItem(player.getInventory().getItemInMainHand()) != null && ItemManager.toRPGItem(player.getInventory().getItemInMainHand()).getName().equalsIgnoreCase("mage_wand"))
+		{
+			if(player.getLevel() >= 14)
+			{
+				player.setLevel(player.getLevel()-14);
+				player.setExp((float) (player.getLevel()/100.0));
+				SmallFireball ball = player.launchProjectile(SmallFireball.class);
+				ball.setVelocity(player.getLocation().getDirection().multiply(0.25));
+			}
+		}
 	}
 
 	@EventHandler
@@ -200,21 +240,6 @@ public class KitPowerListeners implements Listener {
 			if(main.getMatchManager().getPlayerKit((Player) event.getEntity()) == Kit.HARPY)
 			{
 				event.setDamage(event.getDamage()/4);
-			}
-		}
-	}
-
-	@EventHandler
-	public void sniperHeadshot(ProjectileHitEvent event)
-	{
-		if(!(event.getEntity().getShooter() instanceof Player))
-			return;
-		if(event.getEntity() instanceof Arrow)
-		{
-			if(event.getHitEntity() == null)
-				return;
-			if(event.getEntity().getLocation().getY() > event.getHitEntity().getLocation().getY()+1.5)
-			{
 			}
 		}
 	}

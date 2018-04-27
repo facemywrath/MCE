@@ -39,6 +39,29 @@ public class CommandArena implements CommandExecutor{
 
 		if (!(sender instanceof Player)) 
 		{
+			if(args.length == 0)
+			{
+				sender.sendMessage(Lang.ConsoleUse);
+				return true;
+			}
+			if(args[0].equalsIgnoreCase("kick"))
+			{
+				if(args.length == 1)
+				{
+					sender.sendMessage(Lang.InvalidSyn);
+					return true;
+				}
+				if(!Bukkit.getOfflinePlayer(args[1]).isOnline())
+				{
+					sender.sendMessage(Lang.NullPlayer);
+					return true;
+				}
+				if(cm.getMain().getMatchManager().getPlayersAlive().contains(sender))
+				{
+					cm.getMain().getMatchManager().kickPlayer(Bukkit.getPlayer(args[1]));
+				}
+			}
+			else
 			sender.sendMessage(Lang.ConsoleUse);
 			return true;
 		}
@@ -299,6 +322,23 @@ public class CommandArena implements CommandExecutor{
 					cm.getMain().getMatchManager().spawnPlayer(p);
 			cm.getMain().getMatchManager().startTimer.startTimer();
 			return true;
+		}
+		if(args[0].equalsIgnoreCase("kick"))
+		{
+			if(args.length == 1)
+			{
+				sender.sendMessage(Lang.InvalidSyn);
+				return true;
+			}
+			if(!Bukkit.getOfflinePlayer(args[1]).isOnline())
+			{
+				sender.sendMessage(Lang.NullPlayer);
+				return true;
+			}
+			if(cm.getMain().getMatchManager().getPlayersAlive().contains(sender))
+			{
+				cm.getMain().getMatchManager().kickPlayer(Bukkit.getPlayer(args[1]));
+			}
 		}
 		return true;
 	}

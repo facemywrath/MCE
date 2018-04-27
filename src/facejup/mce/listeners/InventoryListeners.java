@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -29,7 +30,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
-import facejup.mce.enums.MatchType;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
@@ -44,7 +44,7 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 	private Main main; // Dependency Injection Variable
 	private EventManager em; // Other Dependency Injection Variable
 
-	public HashMap<Player, List<Marker<Location>>> specialBlocks = new HashMap<>();
+	public HashMap<Player, List<Marker<Pair<Location, Material>>>> specialBlocks = new HashMap<Player, List<Marker<Pair<Location, Material>>>>();
 
 	public void updateSpecialBlocks(Player player)
 	{
@@ -57,11 +57,11 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		ItemStack specialBlock = new ItemCreator(Material.OBSIDIAN).setDisplayname("&aSpecial Stone").setLore(Arrays.asList("&5&lA reward for your architecture.", "&7&oThese blocks automatically", "&7&odespawn after 10 seconds.")).getItem();
 
 		List<Marker<Location>> removeQueue = new ArrayList<>();
-		for(Marker<Location> loc : specialBlocks.get(player))
+		for(Marker<Pair<Location, Material>> loc : specialBlocks.get(player))
 		{
 			if(loc.getSecondsPassedSince() == 10 || loc.getSecondsPassedSince() == 11)
 			{
-				loc.getItem().getBlock().setType(Material.AIR);
+				loc.getItem().getLeft().getBlock().setType(loc.getItem().getRight());
 			}
 			if(loc.getSecondsPassedSince() == 12)
 			{
@@ -82,9 +82,9 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 			return;
 		if(specialBlocks.get(player).isEmpty())
 			return;
-		for(Marker<Location> loc : specialBlocks.get(player))
+		for(Marker<Pair<Location, Material>> loc : specialBlocks.get(player))
 		{
-			loc.getItem().getBlock().setType(Material.AIR);
+			loc.getItem().getLeft().getBlock().setType(loc.getItem().getRight());
 		}
 		specialBlocks.remove(player);
 	}
@@ -185,13 +185,13 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		}
 		if(specialBlocks.containsKey(player))
 		{
-			List<Marker<Location>> blocks = new ArrayList<>();
+			List<Marker<Pair<Location, Material>>> blocks = new ArrayList<>();
 			blocks.addAll(specialBlocks.get(player));
-			blocks.add(new Marker<Location>(event.getBlock().getLocation()));
+			blocks.add(new Marker<Pair<Location, Material>>(Pair.of(event.getBlock().getLocation(), event.getBlock().getType())));
 			specialBlocks.put(player, blocks);
 		}
 		else
-			specialBlocks.put(player, Arrays.asList(new Marker<Location>(event.getBlock().getLocation())));
+			specialBlocks.put(player, Arrays.asList(new Marker<Pair<Location, Material>>(Pair.of(event.getBlock().getLocation(), event.getBlock().getType()))));
 	}
 	@EventHandler
 	public void playerDropItem(PlayerDropItemEvent event)
