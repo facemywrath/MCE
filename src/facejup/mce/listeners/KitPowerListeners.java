@@ -132,7 +132,7 @@ public class KitPowerListeners implements Listener {
 				main.getEventManager().getDeathListeners().setLastDamagedBy(target, marker);
 				target.damage(1);
 				event.getHitEntity().teleport(player);
-				player.setCooldown(Material.FISHING_ROD, 40);
+				player.setCooldown(Material.FISHING_ROD, 80);
 			}
 			event.getEntity().remove();
 		}
@@ -690,7 +690,7 @@ public class KitPowerListeners implements Listener {
 	public int getRandomItemSlot(Player target)
 	{
 		Inventory inv = target.getInventory();
-		List<Material> blacklist = Arrays.asList(Material.SLIME_BALL, Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
+		List<Material> blacklist = Arrays.asList(Material.GOLD_PICKAXE, Material.SLIME_BALL, Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
 		List<Integer> slots = new ArrayList<>();
 		for(int i = 0; i < 8; i++)
 		{

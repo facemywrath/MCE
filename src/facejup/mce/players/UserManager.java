@@ -198,6 +198,8 @@ public class UserManager implements Listener {
 		}
 		if(main.getMatchManager().getPlayersAlive().contains(player))
 		{
+			if(main.getMatchManager().team.containsKey(player))
+				main.getMatchManager().team.remove(player);
 			this.main.getMatchManager().setLives(player, 0);
 			this.main.getMatchManager().setPlayerDesiredKit(player, Kit.NONE);
 			this.main.getMatchManager().setPlayerKit(player, Kit.NONE);

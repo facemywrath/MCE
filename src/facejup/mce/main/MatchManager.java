@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +23,8 @@ import facejup.mce.arenas.ArenaManager;
 import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
+import facejup.mce.enums.TeamType;
 import facejup.mce.players.User;
 import facejup.mce.timers.EndTimer;
 import facejup.mce.timers.StartTimer;
@@ -31,7 +34,6 @@ import facejup.mce.util.Lang;
 import facejup.mce.util.Marker;
 import facejup.mce.util.Numbers;
 import me.libraryaddict.disguise.DisguiseAPI;
-import net.md_5.bungee.api.ChatColor;
 
 public class MatchManager {
 
@@ -44,11 +46,15 @@ public class MatchManager {
 	public EndTimer endTimer; // The timer variable which decides when a round begins.
 	public String Tag = Lang.Tag;
 
-	public boolean randomKits = false;
+	public MatchType matchtype = MatchType.NORMAL;
+	public TeamType teamtype = TeamType.FFA;
+	public Kit OFAKit = null;
 	public HashMap<ArenaSign, Integer> votesReceived = new HashMap<>();
 	public HashMap<Player, ArenaSign> voted = new HashMap<>();
 	private HashMap<Player, Marker<Location>> lastMovement = new HashMap<>();
 	private HashMap<Player, Integer> lives = new HashMap<>();
+	public HashMap<ChatColor, Integer> teamlives = new HashMap<>();
+	public HashMap<Player, ChatColor> team = new HashMap<>();
 	private HashMap<Player, Kit> kits = new HashMap<>();
 	private HashMap<Player, Kit> desiredKits = new HashMap<>();
 
@@ -241,20 +247,99 @@ public class MatchManager {
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
 			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
+			this.teamtype = getRandomTeamType();
+			this.matchtype = getRandomMatchType();
+			if(matchtype == MatchType.BOSS)
+				teamtype = TeamType.TWOTEAMS;
+			if(teamtype != teamtype.FFA)
+			{
+				teamlives.put(ChatColor.RED, 0);
+				teamlives.put(ChatColor.BLUE, 0);
+				if(teamtype == TeamType.FOURTEAMS)
+				{
+					teamlives.put(ChatColor.YELLOW, 0);
+					teamlives.put(ChatColor.GREEN, 0);
+				}
+			}
+			if(matchtype == MatchType.ONEFORALL)
+				OFAKit = Kit.values()[Numbers.getRandom(2, Kit.values().length-1)];
+			Player boss = null;
+			if(matchtype != MatchType.NORMAL)
+			{
+				if(matchtype == MatchType.BOSS)
+					boss = desiredKits.keySet().stream().collect(Collectors.toList()).get(Numbers.getRandom(0, desiredKits.keySet().size()-1));
+				Chat.bc(matchtype.broadcast.replaceAll("%PLAYER%", (boss != null?boss.getName():"")).replaceAll("%KIT%", (OFAKit != null?Chat.formatName(OFAKit.name()):"")));
+			}
+			if(matchtype != MatchType.BOSS)
+				Chat.bc(Chat.translate(Lang.Tag + "&6Team Type: " + teamtype.broadcast));
+			List<Player> queued = desiredKits.keySet().stream().collect(Collectors.toList());
 			endTimer.startTimer();
-			randomKits = false;
-			if(Numbers.getRandom(0, 10) == 10)
-				randomKits = true;
-			if(randomKits)
-				Chat.bc(Lang.Tag + "&5Random Heroes Mode");
+			for(int i = 0; i < desiredKits.keySet().size(); i++)
+			{
+				Player player = queued.get(i);
+				main.getUserManager().getUser(player).incGamesplayed(1);
+				if(matchtype == MatchType.SUDDENDEATH)
+					lives.put(player, 1);
+				else
+				{
+					if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
+						lives.put(player, 5);
+					else
+						lives.put(player, 6);
+				}
+				if(teamtype != TeamType.FFA)
+				{
+					lives.put(player, 1);
+					if(matchtype == MatchType.BOSS && player.equals(boss))
+					{
+						setPlayerKit(player, Kit.BOSS);
+						setPlayerDesiredKit(player, Kit.BOSS);
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+(desiredKits.size()/5));
+
+					}
+					else if(matchtype == MatchType.BOSS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS && i%2==0)
+					{
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.FOURTEAMS)
+					{
+						switch(i%4)
+						{
+						case 0:
+							team.put(player, ChatColor.YELLOW);
+							teamlives.put(ChatColor.YELLOW,teamlives.get(ChatColor.YELLOW)+4);
+							break;
+						case 1:
+							team.put(player, ChatColor.GREEN);
+							teamlives.put(ChatColor.GREEN,teamlives.get(ChatColor.GREEN)+4);
+							break;
+						case 2:
+							team.put(player, ChatColor.RED);
+							teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+							break;
+						case 3:
+							team.put(player, ChatColor.BLUE);
+							teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+							break;
+						}
+					}
+				}
+				spawnPlayer(player);
+			}
 			for(Player player : desiredKits.keySet())
 			{
-				main.getUserManager().getUser(player).incGamesplayed(1);
-				if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
-					lives.put(player, 5);
-				else
-					lives.put(player, 6);
-				spawnPlayer(player);
 				main.getUserManager().getUser(player).updateScoreboard();
 			}
 		}
@@ -264,6 +349,32 @@ public class MatchManager {
 			Chat.bc(Tag + "&cError: No Arena Found.");
 			return;
 		}
+	}
+
+
+
+	public MatchType getRandomMatchType()
+	{
+		int rand = Numbers.getRandom(0, 100);
+			if(rand < 60)
+			return MatchType.NORMAL;
+		if(rand < 70)
+			return MatchType.SUDDENDEATH;
+		if(rand < 80)
+			return MatchType.RANDOM;
+		if(rand < 95)
+			return MatchType.ONEFORALL;
+		return MatchType.BOSS;
+	}
+
+	public TeamType getRandomTeamType()
+	{
+		int rand = Numbers.getRandom(0, 100);
+		if(rand < 70 && desiredKits.keySet().size()%2 == 0)
+			return TeamType.TWOTEAMS;
+		if(rand < 100 && desiredKits.keySet().size() > 4 && desiredKits.keySet().size()%4 == 0)
+			return TeamType.FOURTEAMS;
+		return TeamType.FFA;
 	}
 
 	public void startMatch(String arenaname)
@@ -278,20 +389,360 @@ public class MatchManager {
 		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
 		{
 			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
+			this.teamtype = getRandomTeamType();
+			this.matchtype = getRandomMatchType();
+			if(matchtype == MatchType.BOSS)
+				teamtype = TeamType.TWOTEAMS;
+			if(teamtype != teamtype.FFA)
+			{
+				teamlives.put(ChatColor.RED, 0);
+				teamlives.put(ChatColor.BLUE, 0);
+				if(teamtype == TeamType.FOURTEAMS)
+				{
+					teamlives.put(ChatColor.YELLOW, 0);
+					teamlives.put(ChatColor.GREEN, 0);
+				}
+			}
+			if(matchtype == MatchType.ONEFORALL)
+				OFAKit = Kit.values()[Numbers.getRandom(2, Kit.values().length-1)];
+			Player boss = null;
+			if(matchtype != MatchType.NORMAL)
+			{
+				if(matchtype == MatchType.BOSS)
+					boss = desiredKits.keySet().stream().collect(Collectors.toList()).get(Numbers.getRandom(0, desiredKits.keySet().size()-1));
+				Chat.bc(matchtype.broadcast.replaceAll("%PLAYER%", (boss != null?boss.getName():"")).replaceAll("%KIT%", (OFAKit != null?Chat.formatName(OFAKit.name()):"")));
+			}
+			if(matchtype != MatchType.BOSS)
+				Chat.bc(Chat.translate(Lang.Tag + "&6Team Type: " + teamtype.broadcast));
+			List<Player> queued = desiredKits.keySet().stream().collect(Collectors.toList());
 			endTimer.startTimer();
-			randomKits = false;
-			if(Numbers.getRandom(0, 1) == 1)
-				randomKits = true;
-			if(randomKits)
-				Chat.bc(Lang.Tag + "&5Random Heroes Mode");
+			for(int i = 0; i < desiredKits.keySet().size(); i++)
+			{
+				Player player = queued.get(i);
+				main.getUserManager().getUser(player).incGamesplayed(1);
+				if(matchtype == MatchType.SUDDENDEATH)
+					lives.put(player, 1);
+				else
+				{
+					if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
+						lives.put(player, 5);
+					else
+						lives.put(player, 6);
+				}
+				if(teamtype != TeamType.FFA)
+				{
+					lives.put(player, 1);
+					if(matchtype == MatchType.BOSS && player.equals(boss))
+					{
+						setPlayerKit(player, Kit.BOSS);
+						setPlayerDesiredKit(player, Kit.BOSS);
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+(desiredKits.size()/5));
+
+					}
+					else if(matchtype == MatchType.BOSS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS && i%2==0)
+					{
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.FOURTEAMS)
+					{
+						switch(i%4)
+						{
+						case 0:
+							team.put(player, ChatColor.YELLOW);
+							teamlives.put(ChatColor.YELLOW,teamlives.get(ChatColor.YELLOW)+4);
+							break;
+						case 1:
+							team.put(player, ChatColor.GREEN);
+							teamlives.put(ChatColor.GREEN,teamlives.get(ChatColor.GREEN)+4);
+							break;
+						case 2:
+							team.put(player, ChatColor.RED);
+							teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+							break;
+						case 3:
+							team.put(player, ChatColor.BLUE);
+							teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+							break;
+						}
+					}
+				}
+				spawnPlayer(player);
+			}
 			for(Player player : desiredKits.keySet())
 			{
+				main.getUserManager().getUser(player).updateScoreboard();
+			}
+		}
+		else
+		{
+			startTimer.linger();
+			Chat.bc(Tag + "&cError: No Arena found within parameters.");
+			return;
+		}
+	}
+	public void startMatch(MatchType mtype)
+	{
+		Optional<Integer> votes = votesReceived.values().stream().max((int1, int2) -> Integer.compare(int1, int2));
+		Arena arena = am.getRandomArena(desiredKits.keySet().size());
+		if(votes.isPresent() && votes.get() > 0)
+		{
+			int count = (int) votesReceived.values().stream().filter(i -> i==votes.get()).count();
+			if(count > 1)
+			{
+				List<ArenaSign> signs = votesReceived.keySet().stream().filter(sign -> votesReceived.get(sign) == votes.get()).collect(Collectors.toList());
+				arena = am.setArena(new Arena(am, am.getArenaSection(signs.get(Numbers.getRandom(0, signs.size()-1)).getArenaName())));
+			}
+			else
+			{
+				ArenaSign sign2 = votesReceived.keySet().stream().filter(sign -> votesReceived.get(sign) == votes.get()).collect(Collectors.toList()).get(0);
+				arena = am.setArena(new Arena(am, am.getArenaSection(sign2.getArenaName())));
+			}
+		}
+		if(arena == null)
+		{
+			startTimer.linger();
+			Chat.bc(Tag + "&cError: The chosen arena doesn't exist.");
+			return;
+		}
+		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
+		{
+			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
+			this.teamtype = getRandomTeamType();
+			this.matchtype = mtype;
+			if(matchtype == MatchType.BOSS)
+				teamtype = TeamType.TWOTEAMS;
+			if(teamtype != teamtype.FFA)
+			{
+				teamlives.put(ChatColor.RED, 0);
+				teamlives.put(ChatColor.BLUE, 0);
+				if(teamtype == TeamType.FOURTEAMS)
+				{
+					teamlives.put(ChatColor.YELLOW, 0);
+					teamlives.put(ChatColor.GREEN, 0);
+				}
+			}
+			if(matchtype == MatchType.ONEFORALL)
+				OFAKit = Kit.values()[Numbers.getRandom(2, Kit.values().length-1)];
+			Player boss = null;
+			if(matchtype != MatchType.NORMAL)
+			{
+				if(matchtype == MatchType.BOSS)
+					boss = desiredKits.keySet().stream().collect(Collectors.toList()).get(Numbers.getRandom(0, desiredKits.keySet().size()-1));
+				Chat.bc(matchtype.broadcast.replaceAll("%PLAYER%", (boss != null?boss.getName():"")).replaceAll("%KIT%", (OFAKit != null?Chat.formatName(OFAKit.name()):"")));
+			}
+			if(matchtype != MatchType.BOSS)
+				Chat.bc(Chat.translate(Lang.Tag + "&6Team Type: " + teamtype.broadcast));
+			List<Player> queued = desiredKits.keySet().stream().collect(Collectors.toList());
+			endTimer.startTimer();
+			for(int i = 0; i < desiredKits.keySet().size(); i++)
+			{
+				Player player = queued.get(i);
 				main.getUserManager().getUser(player).incGamesplayed(1);
-				if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
-					lives.put(player, 5);
+				if(matchtype == MatchType.SUDDENDEATH)
+					lives.put(player, 1);
 				else
-					lives.put(player, 6);
+				{
+					if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
+						lives.put(player, 5);
+					else
+						lives.put(player, 6);
+				}
+				if(teamtype != TeamType.FFA)
+				{
+					lives.put(player, 1);
+					if(matchtype == MatchType.BOSS && player.equals(boss))
+					{
+						setPlayerKit(player, Kit.BOSS);
+						setPlayerDesiredKit(player, Kit.BOSS);
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+(desiredKits.size()/5));
+
+					}
+					else if(matchtype == MatchType.BOSS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS && i%2==0)
+					{
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.FOURTEAMS)
+					{
+						switch(i%4)
+						{
+						case 0:
+							team.put(player, ChatColor.YELLOW);
+							teamlives.put(ChatColor.YELLOW,teamlives.get(ChatColor.YELLOW)+4);
+							break;
+						case 1:
+							team.put(player, ChatColor.GREEN);
+							teamlives.put(ChatColor.GREEN,teamlives.get(ChatColor.GREEN)+4);
+							break;
+						case 2:
+							team.put(player, ChatColor.RED);
+							teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+							break;
+						case 3:
+							team.put(player, ChatColor.BLUE);
+							teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+							break;
+						}
+					}
+				}
 				spawnPlayer(player);
+			}
+			for(Player player : desiredKits.keySet())
+			{
+				main.getUserManager().getUser(player).updateScoreboard();
+			}
+		}
+		else
+		{
+			startTimer.linger();
+			Chat.bc(Tag + "&cError: No Arena found within parameters.");
+			return;
+		}
+	}
+
+	public void startMatch(MatchType mtype, Kit kit)
+	{
+		Optional<Integer> votes = votesReceived.values().stream().max((int1, int2) -> Integer.compare(int1, int2));
+		Arena arena = am.getRandomArena(desiredKits.keySet().size());
+		if(votes.isPresent() && votes.get() > 0)
+		{
+			int count = (int) votesReceived.values().stream().filter(i -> i==votes.get()).count();
+			if(count > 1)
+			{
+				List<ArenaSign> signs = votesReceived.keySet().stream().filter(sign -> votesReceived.get(sign) == votes.get()).collect(Collectors.toList());
+				arena = am.setArena(new Arena(am, am.getArenaSection(signs.get(Numbers.getRandom(0, signs.size()-1)).getArenaName())));
+			}
+			else
+			{
+				ArenaSign sign2 = votesReceived.keySet().stream().filter(sign -> votesReceived.get(sign) == votes.get()).collect(Collectors.toList()).get(0);
+				arena = am.setArena(new Arena(am, am.getArenaSection(sign2.getArenaName())));
+			}
+		}
+		if(arena == null)
+		{
+			startTimer.linger();
+			Chat.bc(Tag + "&cError: The chosen arena doesn't exist.");
+			return;
+		}
+		if(arena.getSpawnPoints().size() >= desiredKits.keySet().size())
+		{
+			Chat.bc(Tag + "&b&l Arena selected: " + arena.getName().replaceAll("_"," "));
+			this.teamtype = getRandomTeamType();
+			this.matchtype = mtype;
+			if(matchtype == MatchType.BOSS)
+				teamtype = TeamType.TWOTEAMS;
+			if(teamtype != teamtype.FFA)
+			{
+				teamlives.put(ChatColor.RED, 0);
+				teamlives.put(ChatColor.BLUE, 0);
+				if(teamtype == TeamType.FOURTEAMS)
+				{
+					teamlives.put(ChatColor.YELLOW, 0);
+					teamlives.put(ChatColor.GREEN, 0);
+				}
+			}
+			if(matchtype == MatchType.ONEFORALL)
+				OFAKit = kit;
+			Player boss = null;
+			if(matchtype != MatchType.NORMAL)
+			{
+				if(matchtype == MatchType.BOSS)
+					boss = desiredKits.keySet().stream().collect(Collectors.toList()).get(Numbers.getRandom(0, desiredKits.keySet().size()-1));
+				Chat.bc(matchtype.broadcast.replaceAll("%PLAYER%", (boss != null?boss.getName():"")).replaceAll("%KIT%", (OFAKit != null?Chat.formatName(OFAKit.name()):"")));
+			}
+			if(matchtype != MatchType.BOSS)
+				Chat.bc(Chat.translate(Lang.Tag + "&6Team Type: " + teamtype.broadcast));
+			List<Player> queued = desiredKits.keySet().stream().collect(Collectors.toList());
+			endTimer.startTimer();
+			for(int i = 0; i < desiredKits.keySet().size(); i++)
+			{
+				Player player = queued.get(i);
+				main.getUserManager().getUser(player).incGamesplayed(1);
+				if(matchtype == MatchType.SUDDENDEATH)
+					lives.put(player, 1);
+				else
+				{
+					if(!main.getUserManager().getUser(player).hasAchievement(Achievement.SPENDER))
+						lives.put(player, 5);
+					else
+						lives.put(player, 6);
+				}
+				if(teamtype != TeamType.FFA)
+				{
+					lives.put(player, 1);
+					if(matchtype == MatchType.BOSS && player.equals(boss))
+					{
+						setPlayerKit(player, Kit.BOSS);
+						setPlayerDesiredKit(player, Kit.BOSS);
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+(desiredKits.size()/5));
+
+					}
+					else if(matchtype == MatchType.BOSS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS && i%2==0)
+					{
+						team.put(player, ChatColor.RED);
+						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+					}
+					else if(teamtype == TeamType.TWOTEAMS)
+					{
+						team.put(player, ChatColor.BLUE);
+						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+					}
+					else if(teamtype == TeamType.FOURTEAMS)
+					{
+						switch(i%4)
+						{
+						case 0:
+							team.put(player, ChatColor.YELLOW);
+							teamlives.put(ChatColor.YELLOW,teamlives.get(ChatColor.YELLOW)+4);
+							break;
+						case 1:
+							team.put(player, ChatColor.GREEN);
+							teamlives.put(ChatColor.GREEN,teamlives.get(ChatColor.GREEN)+4);
+							break;
+						case 2:
+							team.put(player, ChatColor.RED);
+							teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+							break;
+						case 3:
+							team.put(player, ChatColor.BLUE);
+							teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+							break;
+						}
+					}
+				}
+				spawnPlayer(player);
+			}
+			for(Player player : desiredKits.keySet())
+			{
 				main.getUserManager().getUser(player).updateScoreboard();
 			}
 		}
@@ -345,10 +796,15 @@ public class MatchManager {
 			}
 			return;
 		}
-		if(randomKits)
-			setPlayerDesiredKit(player, Kit.values()[Numbers.getRandom(2, Kit.values().length-1)]);
-		if(randomKits)
+		if(matchtype == MatchType.RANDOM)
+		{
+			setPlayerDesiredKit(player, Kit.getUsableKits().get(Numbers.getRandom(2, Kit.getUsableKits().size()-1)));
 			player.sendMessage(Chat.translate(Lang.Tag + "You spawned with &bKit " + StringUtils.capitalize(getPlayerDesiredKit(player).toString().toLowerCase())));
+		} 
+		else if(matchtype == MatchType.ONEFORALL)
+		{
+			setPlayerDesiredKit(player, (OFAKit != null?OFAKit:Kit.NONE));
+		}
 		if (lives.get(player) == 0) {
 			lives.remove(player);
 			kits.put(player, Kit.NONE);
@@ -395,6 +851,10 @@ public class MatchManager {
 						player.setLevel(100);
 					else
 						player.setLevel(0);
+					if(kit == Kit.BOSS)
+					{
+						player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, endTimer.getTime(), (kits.size() < 4?kits.size()-1:5)));
+					}
 					player.setExp((float) (player.getLevel()/100.0));
 					main.getEventManager().getAchievementListeners().killsPerLife.put(player, 0);
 					kit.storage.stream().filter(item -> item != null).forEach(item -> player.getInventory().addItem(item));
@@ -431,11 +891,37 @@ public class MatchManager {
 
 	public void checkMatchEnd(Player check)
 	{
+		if(teamtype != TeamType.FFA)
+		{
+			List<ChatColor> livingteams = new ArrayList<>();
+			for(ChatColor color : teamlives.keySet())
+			{
+				if(teamlives.get(color) > 0 || getPlayersAlive(color).size() > 0)
+				{
+					livingteams.add(color);
+				}
+			}
+			if(livingteams.size() > 1)
+				return;
+			for(Player player : team.keySet())
+			{
+				if(team.get(player) != livingteams.get(0))
+					continue;
+				main.getUserManager().getUser(player).incWin(1);
+				if(getLives(player) >= 5)
+					main.getUserManager().getUser(player).incScore(Achievement.FLAWLESS);
+			}
+			String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + Chat.formatName(livingteams.get(0).name()) + " team winning!";
+			Chat.bc(msg);
+			startTimer.startTimer();
+		}
 		if(getPlayersAlive().size() == 1)
 		{
 			Player winner = main.getMatchManager().getPlayersAlive().get(0);
 			main.getUserManager().getUser(check).incRunnerup(1);
 			main.getUserManager().getUser(winner).incWin(1);
+			if(getLives(winner) <= 5)
+				main.getUserManager().getUser(winner).incScore(Achievement.FLAWLESS);
 			String msg = "&9&l(&r&bMCE&9&l) &6The match has ended with " + winner.getName() + " winning, and a runnerup of " + check.getName();
 			Chat.bc(msg);
 			startTimer.startTimer();
@@ -570,8 +1056,24 @@ public class MatchManager {
 		return 0;
 	}
 
+	public int getLives(ChatColor color)
+	{
+		if(teamlives.containsKey(color))
+			return teamlives.get(color);
+		return 0;
+	}
+
 	public void incLives(Player player)
 	{
+		if(team.containsKey(player))
+		{
+			if(teamlives.containsKey(team.get(player)) && teamlives.get(team.get(player)) > 0)
+			{
+				teamlives.put(team.get(player), teamlives.get(team.get(player))+1);
+				player.sendMessage(Lang.Tag + ChatColor.GOLD + " You gained an extra life!");
+				return;
+			}
+		}
 		if(lives.containsKey(player))
 			if(lives.get(player) > 0)
 			{
@@ -581,9 +1083,21 @@ public class MatchManager {
 	}
 
 	public void decLives(Player player) {
-		if(lives.containsKey(player))
-			if((lives.get(player) - 1) >= 0)
-				lives.put(player, (lives.get(player) - 1));
+		if(team.containsKey(player) && teamlives.get(team.get(player)) > 0)
+			decTeamLives(team.get(player));
+		else
+		{
+			if(lives.containsKey(player))
+				if((lives.get(player) - 1) >= 0)
+					lives.put(player, (lives.get(player) - 1));
+		}
+	}
+
+	public void decTeamLives(ChatColor color)
+	{
+		if(teamlives.containsKey(color))
+			if((teamlives.get(color) - 1) >= 0)
+				teamlives.put(color, (teamlives.get(color) - 1));
 	}
 
 	public Kit getPlayerKit(Player player)
@@ -620,7 +1134,18 @@ public class MatchManager {
 		List<Player> players = new ArrayList<>();
 		for(Player player : lives.keySet())
 		{
-			if(lives.get(player) > 0 && kits.get(player) != Kit.NONE)
+			if(!players.contains(player) && player.isOnline() && lives.get(player) > 0 && kits.get(player) != Kit.NONE)
+				players.add(player);
+		}
+		return players;
+	}
+
+	public List<Player> getPlayersAlive(ChatColor color)
+	{
+		List<Player> players = new ArrayList<>();
+		for(Player player : lives.keySet())
+		{
+			if(team.containsKey(player) && team.get(player) == color && !players.contains(player) && player.isOnline() && lives.get(player) > 0 && kits.get(player) != Kit.NONE)
 				players.add(player);
 		}
 		return players;
@@ -646,6 +1171,8 @@ public class MatchManager {
 		for(Player player : getPlayersAlive())
 		{
 			if(player.equals(target))
+				continue;
+			if(teamtype != TeamType.FFA && team.containsKey(player) && team.containsKey(target) && team.get(target).equals(team.get(player)))
 				continue;
 			if(player.getWorld().equals(target.getWorld()))
 			{

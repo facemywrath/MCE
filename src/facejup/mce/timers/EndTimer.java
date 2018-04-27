@@ -237,12 +237,12 @@ public class EndTimer {
 							}
 							if(kit == Kit.GRAVITON)
 							{
-								if(player.getInventory().first(Material.SNOW_BALL) == -1 && player.getInventory().first(Material.MAGMA_CREAM) == -1)
+								if(player.getInventory().first(Material.SLIME_BALL) == -1 && player.getInventory().first(Material.MAGMA_CREAM) == -1)
 									player.getInventory().addItem(new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Toggle Levitation On").getItem());
 								if(player.hasPotionEffect(PotionEffectType.LEVITATION) && player.getLevel() == 0)
 								{
 									player.removePotionEffect(PotionEffectType.LEVITATION);
-									player.getInventory().setItem(player.getInventory().first(Material.MAGMA_CREAM), new ItemCreator(Material.SNOW_BALL).setDisplayname("&9Toggle Levitation On").getItem());
+									player.getInventory().setItem(player.getInventory().first(Material.MAGMA_CREAM), new ItemCreator(Material.SLIME_BALL).setDisplayname("&9Toggle Levitation On").getItem());
 								}
 								else if(!player.hasPotionEffect(PotionEffectType.LEVITATION))
 								{
@@ -265,7 +265,7 @@ public class EndTimer {
 							{
 								if(!player.getInventory().contains(Material.POTION))
 									player.getInventory().addItem(new ItemCreator(Material.POTION).setPotionType(new PotionEffect(PotionEffectType.HEAL, 0, 1)).getItem());
-								if(!player.getInventory().contains(Material.SPLASH_POTION))
+								if(!player.getInventory().contains(Material.SPLASH_POTION) && !player.getInventory().contains(Material.LINGERING_POTION))
 									player.getInventory().addItem(getRandomPotion());
 							}
 							if(kit.pot != null)
@@ -380,11 +380,11 @@ public class EndTimer {
 		case 0:
 			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.GLOWING, 200, 1)).setDisplayname("&9Potion Of Glowing").getItem();
 		case 1:
-			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.POISON, 200, 0)).setDisplayname("&9Potion Of Poison").getItem();
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.POISON, 200, 1)).setDisplayname("&9Potion Of Poison").getItem();
 		case 2:
-			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.WEAKNESS, 200, 2)).setDisplayname("&9Potion Of Weakness").getItem();
+			return new ItemCreator(Material.LINGERING_POTION).setPotionType(new PotionEffect(PotionEffectType.WEAKNESS, 200, 2)).setDisplayname("&9Potion Of Weakness").getItem();
 		case 3:
-			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.CONFUSION, 200, 2)).setDisplayname("&9Potion Of Confusion").getItem();
+			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.CONFUSION, 300, 4)).setDisplayname("&9Potion Of Confusion").getItem();
 		case 4:
 			return new ItemCreator(Material.SPLASH_POTION).setPotionType(new PotionEffect(PotionEffectType.BLINDNESS, 200, 2)).setDisplayname("&9Potion Of Blindness").getItem();
 		case 5:

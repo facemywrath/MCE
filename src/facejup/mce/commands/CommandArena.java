@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 
 import facejup.mce.arenas.ArenaManager;
 import facejup.mce.enums.AddType;
+import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
@@ -257,6 +259,22 @@ public class CommandArena implements CommandExecutor{
 			{
 				if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
 					cm.getMain().getMatchManager().startMatch(args[1]);
+				else
+					sender.sendMessage(Chat.translate(Lang.Tag + "&cNot enough players queued up."));
+				return true;
+			}
+			else if(args.length == 2 && MatchType.getTypeByName(args[1]) != null)
+			{
+				if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
+					cm.getMain().getMatchManager().startMatch(MatchType.getTypeByName(args[1]));
+				else
+					sender.sendMessage(Chat.translate(Lang.Tag + "&cNot enough players queued up."));
+				return true;
+			}
+			else if(args.length == 3 && MatchType.getTypeByName(args[1]) != null && Kit.getKitByName(args[2]) != null)
+			{
+				if(cm.getMain().getMatchManager().getPlayersQueued() >= cm.getMain().getMatchManager().MIN_PLAYERS)
+					cm.getMain().getMatchManager().startMatch(MatchType.getTypeByName(args[1]), Kit.getKitByName(args[2]));
 				else
 					sender.sendMessage(Chat.translate(Lang.Tag + "&cNot enough players queued up."));
 				return true;

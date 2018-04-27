@@ -10,6 +10,8 @@ import org.bukkit.potion.PotionEffect;
 
 import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
+import facejup.mce.enums.TeamType;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.players.User;
@@ -43,11 +45,14 @@ public class StartTimer {
 			main.getMatchManager().getEndTimer().stopTimer();
 		time = WAIT_TIME;
 		running = true;
-		main.getMatchManager().randomKits = false;
+		main.getMatchManager().matchtype = MatchType.NORMAL;
+		main.getMatchManager().teamtype = TeamType.FFA;
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
 			main.getMatchManager().spawnPlayer(player);
 			main.getMatchManager().setPlayerKit(player, Kit.NONE);
+			if(!main.getUserManager().getUser(player).hasKit(main.getMatchManager().getPlayerDesiredKit(player)))
+				main.getMatchManager().setPlayerDesiredKit(player, Kit.NONE);
 			main.getUserManager().getUser(player).updateScoreboard();
 		}
 		if(mm.getArenaManager() != null)

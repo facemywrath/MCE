@@ -16,15 +16,20 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.Team.Option;
+import org.bukkit.scoreboard.Team.OptionStatus;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
+import facejup.mce.enums.TeamType;
 import facejup.mce.util.Chat;
 import facejup.mce.util.Lang;
 import facejup.mce.util.Numbers;
 
 public class User {
-	
+
 	private UserManager um; // Dependency Injection Variable.
 
 	private ConfigurationSection section; // Section storing the players information.
@@ -190,14 +195,6 @@ public class User {
 		um.getFileControl().save();
 		updateScoreboard();
 	}
-	
-	public String getAchievementTypeByScore(Achievement ach)
-	{
-		String level = "";
-		if(ach.scores.size() > 1)
-			level = Achievement.getAchievementLevelName(getAchievementLevel(ach));
-		return level;
-	}
 
 	public void setScore(Achievement ach, int score)
 	{
@@ -210,7 +207,10 @@ public class User {
 			else
 				unlockKit(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight());
 			if (this.player.isOnline()) {
-				((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + getAchievementTypeByScore(ach) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
+				String prefix = Achievement.getAchievementLevelName(getAchievementLevelIndex(ach));
+				if(ach.scores.size() == 1)
+					prefix = "";
+				((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + prefix + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 			}
 			if (ach != Achievement.MASTER) {
 				incScore(Achievement.MASTER);
@@ -219,7 +219,7 @@ public class User {
 		um.getFileControl().save();
 		updateScoreboard();
 	}
-	
+
 	public void useFreeKit(Kit kit)
 	{
 		if(section.contains("FreeKit") && section.getBoolean("FreeKit"))
@@ -282,7 +282,10 @@ public class User {
 				else
 					unlockKit(ach.rewards.get(getAchievementLevelIndex(ach)).getReward().getRight());
 				if (this.player.isOnline()) {
-					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + Achievement.getAchievementLevelName(getAchievementLevelIndex(ach)) + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
+					String prefix = Achievement.getAchievementLevelName(getAchievementLevelIndex(ach));
+					if(ach.scores.size() == 1)
+						prefix = "";
+					((Player) player).sendMessage(Lang.Tag + Chat.translate("&aYou have unlocked the achievement: &b" + prefix + StringUtils.capitaliseAllWords(ach.name().toLowerCase().replaceAll("_", " "))));
 				}
 				if (ach != Achievement.MASTER) {
 					incScore(Achievement.MASTER);
@@ -423,7 +426,7 @@ public class User {
 		}
 		return Arrays.asList(Kit.NONE, Kit.RANDOM, Kit.ARCHER, Kit.WARRIOR, Kit.GUARD);
 	}
-	
+
 	public Kit getRandomKit()
 	{
 		if(section.contains("Kits"))
@@ -451,7 +454,7 @@ public class User {
 		int lives = this.um.getMain().getMatchManager().getLives(player);
 		Scoreboard board = manager.getNewScoreboard();
 		if(running)
-		{
+		{				
 			Objective objective = board.getObjective("lives") != null?board.getObjective("lives"):board.registerNewObjective("lives", "dummy");
 			objective.setDisplayName(ChatColor.GREEN + "   " + ChatColor.BOLD + "Current Game");
 			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -460,6 +463,42 @@ public class User {
 			objective.getScore(ChatColor.GREEN + "" + ChatColor.BOLD + "  Players Alive: " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getPlayersAlive().size()).setScore(19);
 			objective.getScore("           ").setScore(18);
 			objective.getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "Lives ").setScore(17);
+			if(um.getMain().getMatchManager().teamtype != TeamType.FFA)
+			{
+				TeamType type = um.getMain().getMatchManager().teamtype;
+				for(ChatColor color : um.getMain().getMatchManager().teamlives.keySet())
+				{
+					Team team = board.registerNewTeam(Chat.formatName(color.name()));
+				}
+				for(Player p : um.getMain().getMatchManager().team.keySet())
+				{
+					Team team = board.getTeam(Chat.formatName(um.getMain().getMatchManager().team.get(p).name()));
+					team.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.ALWAYS);
+					team.setDisplayName(Chat.formatName(um.getMain().getMatchManager().team.get(p).name()));
+					team.setPrefix(um.getMain().getMatchManager().team.get(p) + "");
+					team.addPlayer(p);
+					team.setAllowFriendlyFire(false);
+				}
+				if(type == TeamType.TWOTEAMS)
+				{
+					if(um.getMain().getMatchManager().matchtype == MatchType.BOSS)
+					{
+						for(ChatColor color : um.getMain().getMatchManager().teamlives.keySet())
+						{
+							objective.getScore(color + "" +  ChatColor.BOLD + "  " + (color==ChatColor.RED?"Boss":"Minions") + ": " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getLives(color)).setScore(um.getMain().getMatchManager().getLives(color));
+						}
+					}
+					else
+					{
+						for(ChatColor color : um.getMain().getMatchManager().teamlives.keySet())
+						{
+							objective.getScore(ChatColor.GREEN + "  " + Chat.formatName(color.name()) + ": " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getLives(color)).setScore(um.getMain().getMatchManager().getLives(color));
+						}
+					}
+				}
+				player.setScoreboard(board);
+				return;
+			}
 			for(Player tempPlayer : um.getMain().getMatchManager().getPlayersAlive())
 			{
 				objective.getScore(ChatColor.GREEN + "  " + tempPlayer.getName() + ": " + ChatColor.LIGHT_PURPLE + um.getMain().getMatchManager().getLives(tempPlayer)).setScore(um.getMain().getMatchManager().getLives(tempPlayer));;

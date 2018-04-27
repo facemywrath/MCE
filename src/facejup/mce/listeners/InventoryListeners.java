@@ -29,6 +29,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
@@ -208,8 +209,8 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		//Open the custom inventory for kit selection.
 		if(event.getAction().toString().contains("RIGHT_CLICK") && event.getPlayer().getInventory().getItemInMainHand().equals(ItemCreator.getKitSelector()))
 		{
-			if(main.getMatchManager().randomKits)
-				event.getPlayer().sendMessage(Lang.Tag + Chat.translate("&cYou can't select a kit in Random Mode"));
+			if(!main.getMatchManager().matchtype.selectkits || main.getMatchManager().getPlayerKit(event.getPlayer()) == Kit.BOSS)
+				event.getPlayer().sendMessage(Lang.Tag + Chat.translate("&cYou can't select a kit in this mode"));
 			else
 				event.getPlayer().openInventory(InventoryBuilder.createKitInventory(event.getPlayer()));
 		}

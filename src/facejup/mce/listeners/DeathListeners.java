@@ -14,6 +14,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import facejup.mce.enums.Achievement;
+import facejup.mce.enums.MatchType;
+import facejup.mce.enums.TeamType;
 import facejup.mce.events.PlayerEliminatedEvent;
 import facejup.mce.events.PlayerKillEvent;
 import facejup.mce.events.PlayerKillThroughEnvironmentEvent;
@@ -150,7 +152,7 @@ public class DeathListeners implements Listener {
 			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.AQUA + killer.getName() + " &ahas killed &b" + player.getName()));
 		else
 			event.setDeathMessage(Lang.Tag + Chat.translate(ChatColor.GOLD + player.getName() + " &d&ohas been eliminated from the game."));
-		if(!killer.equals(player) && Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0))
+		if(main.getMatchManager().matchtype == MatchType.SUDDENDEATH || (main.getMatchManager().matchtype != MatchType.BOSS && !killer.equals(player) && Numbers.getRandom(0, 4) == 4 && (!em.getAchievementListeners().killsPerLife.containsKey(killer) || em.getAchievementListeners().killsPerLife.get(killer)%2==0)))
 			main.getMatchManager().incLives(killer);
 		for(Player player2 : Bukkit.getOnlinePlayers())
 		{
@@ -159,6 +161,16 @@ public class DeathListeners implements Listener {
 		main.getUserManager().getUser(killer).incCoins();
 		main.getUserManager().getUser(killer).incKills();
 		main.getServer().getPluginManager().callEvent(new PlayerKillEvent(killer, player));
+		if(main.getMatchManager().teamtype != TeamType.FFA)
+		{
+			if(main.getMatchManager().team.containsKey(player))
+			{
+				if(main.getMatchManager().getLives(main.getMatchManager().team.get(player)) == 0 && main.getMatchManager().getLives(player) > 0)
+				{
+				//	Chat.translate(Chat.translate(Lang.Tag + ChatColor.valueOf(main.getMatchManager().team.get(player))))
+				}
+			}
+		}
 		if(main.getMatchManager().getLives(player) == 0)
 		{
 			main.getUserManager().getUser(killer).incScore(Achievement.DESTROYER);

@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
 import facejup.mce.main.Main;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
@@ -71,8 +72,12 @@ public class CommandKits implements CommandExecutor{
 				return true;
 			}
 		}
-
 		Player player = (Player) sender;
+		if(!main.getMatchManager().matchtype.selectkits || main.getMatchManager().getPlayerKit(player) == Kit.BOSS)
+		{
+			sender.sendMessage(Lang.Tag + Chat.translate("&cYou can't select a kit in this mode"));
+			return true;
+		}
 		player.openInventory(InventoryBuilder.createKitInventory(player));
 
 		return true;
