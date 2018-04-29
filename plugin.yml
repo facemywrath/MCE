@@ -10,6 +10,7 @@ commands:
     description: Stats command for MCE
   achievements:
     description: Achievements command for MCE
+    aliases: [ ach ]
   kits:
     description: Kits command for MCE
   spectate:

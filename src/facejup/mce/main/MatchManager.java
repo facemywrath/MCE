@@ -14,7 +14,9 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -277,6 +279,8 @@ public class MatchManager {
 			for(int i = 0; i < desiredKits.keySet().size(); i++)
 			{
 				Player player = queued.get(i);
+				if(!player.isOnline() || desiredKits.get(player) == Kit.NONE)
+					continue;
 				main.getUserManager().getUser(player).incGamesplayed(1);
 				if(matchtype == MatchType.SUDDENDEATH)
 					lives.put(player, 1);
@@ -356,23 +360,25 @@ public class MatchManager {
 	public MatchType getRandomMatchType()
 	{
 		int rand = Numbers.getRandom(0, 100);
-			if(rand < 60)
+		if(rand < 60)
 			return MatchType.NORMAL;
-		if(rand < 70)
+		if(rand < 65)
 			return MatchType.SUDDENDEATH;
 		if(rand < 80)
 			return MatchType.RANDOM;
 		if(rand < 95)
 			return MatchType.ONEFORALL;
+		if(rand == 100)
+			return MatchType.SURVIVAL;
 		return MatchType.BOSS;
 	}
 
 	public TeamType getRandomTeamType()
 	{
 		int rand = Numbers.getRandom(0, 100);
-		if(rand < 70 && desiredKits.keySet().size()%2 == 0)
+		if(rand < 70 && getPlayersQueued()%2 == 0)
 			return TeamType.TWOTEAMS;
-		if(rand < 100 && desiredKits.keySet().size() > 4 && desiredKits.keySet().size()%4 == 0)
+		if(rand < 100 && getPlayersQueued() > 4 && desiredKits.keySet().size()%4 == 0)
 			return TeamType.FOURTEAMS;
 		return TeamType.FFA;
 	}
@@ -419,6 +425,8 @@ public class MatchManager {
 			for(int i = 0; i < desiredKits.keySet().size(); i++)
 			{
 				Player player = queued.get(i);
+				if(!player.isOnline() || desiredKits.get(player) == Kit.NONE)
+					continue;
 				main.getUserManager().getUser(player).incGamesplayed(1);
 				if(matchtype == MatchType.SUDDENDEATH)
 					lives.put(player, 1);
@@ -549,6 +557,8 @@ public class MatchManager {
 			for(int i = 0; i < desiredKits.keySet().size(); i++)
 			{
 				Player player = queued.get(i);
+				if(!player.isOnline() || desiredKits.get(player) == Kit.NONE)
+					continue;
 				main.getUserManager().getUser(player).incGamesplayed(1);
 				if(matchtype == MatchType.SUDDENDEATH)
 					lives.put(player, 1);
@@ -654,7 +664,7 @@ public class MatchManager {
 			this.matchtype = mtype;
 			if(matchtype == MatchType.BOSS)
 				teamtype = TeamType.TWOTEAMS;
-			if(teamtype != teamtype.FFA)
+			if(teamtype != TeamType.FFA)
 			{
 				teamlives.put(ChatColor.RED, 0);
 				teamlives.put(ChatColor.BLUE, 0);
@@ -680,6 +690,8 @@ public class MatchManager {
 			for(int i = 0; i < desiredKits.keySet().size(); i++)
 			{
 				Player player = queued.get(i);
+				if(!player.isOnline() || desiredKits.get(player) == Kit.NONE)
+					continue;
 				main.getUserManager().getUser(player).incGamesplayed(1);
 				if(matchtype == MatchType.SUDDENDEATH)
 					lives.put(player, 1);
@@ -709,12 +721,14 @@ public class MatchManager {
 					else if(teamtype == TeamType.TWOTEAMS && i%2==0)
 					{
 						team.put(player, ChatColor.RED);
-						teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+						if(matchtype != MatchType.SUDDENDEATH)
+							teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
 					}
 					else if(teamtype == TeamType.TWOTEAMS)
 					{
 						team.put(player, ChatColor.BLUE);
-						teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+						if(matchtype != MatchType.SUDDENDEATH)
+							teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
 					}
 					else if(teamtype == TeamType.FOURTEAMS)
 					{
@@ -722,19 +736,23 @@ public class MatchManager {
 						{
 						case 0:
 							team.put(player, ChatColor.YELLOW);
-							teamlives.put(ChatColor.YELLOW,teamlives.get(ChatColor.YELLOW)+4);
+							if(matchtype != MatchType.SUDDENDEATH)
+								teamlives.put(ChatColor.YELLOW,teamlives.get(ChatColor.YELLOW)+4);
 							break;
 						case 1:
 							team.put(player, ChatColor.GREEN);
-							teamlives.put(ChatColor.GREEN,teamlives.get(ChatColor.GREEN)+4);
+							if(matchtype != MatchType.SUDDENDEATH)
+								teamlives.put(ChatColor.GREEN,teamlives.get(ChatColor.GREEN)+4);
 							break;
 						case 2:
 							team.put(player, ChatColor.RED);
-							teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
+							if(matchtype != MatchType.SUDDENDEATH)
+								teamlives.put(ChatColor.RED,teamlives.get(ChatColor.RED)+4);
 							break;
 						case 3:
 							team.put(player, ChatColor.BLUE);
-							teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
+							if(matchtype != MatchType.SUDDENDEATH)
+								teamlives.put(ChatColor.BLUE,teamlives.get(ChatColor.BLUE)+4);
 							break;
 						}
 					}
@@ -847,7 +865,7 @@ public class MatchManager {
 					}
 					player.getInventory().setItem(8, ItemCreator.getKitSelector());
 					Kit kit = kits.get(player);
-					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON || kit == Kit.MAGE)
+					if(kit == Kit.HARPY || kit == Kit.SHADE || kit == Kit.DEMON || kit == Kit.GRAVITON || kit == Kit.MAGE || kit == Kit.GUNNER)
 						player.setLevel(100);
 					else
 						player.setLevel(0);
@@ -868,6 +886,11 @@ public class MatchManager {
 					if(kit == Kit.MAGE)
 						player.getInventory().addItem(endTimer.getRandomPotion());
 					Location loc = am.getArena().getRandomSpawn();
+					for(Entity ent : loc.getWorld().getNearbyEntities(loc, 8, 8, 8))
+					{
+						if(ent instanceof Zombie)
+							ent.remove();
+					}
 					player.teleport(loc);
 				}
 				else
@@ -1026,6 +1049,8 @@ public class MatchManager {
 			{
 				main.getUserManager().getUser(player).updateScoreboard();
 			}
+			if(getPlayersQueued() == Bukkit.getOnlinePlayers().size())
+				startTimer.setTime(15);
 			Chat.bc(Lang.Tag + ChatColor.LIGHT_PURPLE + player.getName() + " has chosen a kit. &6(" + (main.getMatchManager().getPlayersQueued()) + "/" + main.getMatchManager().MIN_PLAYERS + ")");
 		}
 		else if(!isMatchRunning() && main.getMatchManager().getPlayerDesiredKit(player) != Kit.NONE && kit == Kit.NONE)

@@ -5,10 +5,13 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 import facejup.mce.arenas.ArenaSign;
+import facejup.mce.enums.Achievement;
 import facejup.mce.enums.Kit;
 import facejup.mce.enums.MatchType;
 import facejup.mce.enums.TeamType;
@@ -58,6 +61,14 @@ public class StartTimer {
 		if(mm.getArenaManager() != null)
 		{
 			mm.getArenaManager().loadVoteSigns();
+			if(mm.getArenaManager().getArena() != null)
+			{
+				for(LivingEntity ent : mm.getArenaManager().getArena().getWorld().getLivingEntities())
+				{
+					if(ent.getType() != EntityType.PLAYER)
+					ent.remove();
+				}
+			}
 		}
 		if(!main.getEventManager().getKitPowerListeners().ignitedBlocks.isEmpty())
 		{
@@ -73,6 +84,11 @@ public class StartTimer {
 	public void resumeTimer() {
 		this.running = true;
 		countdown();
+	}
+	
+	public void setTime(int i)
+	{
+		this.time = i;
 	}
 
 	public void stopTimer()
@@ -93,12 +109,18 @@ public class StartTimer {
 		{
 			if(time > 0)
 			{
+				if(time%45 == 0)
+					Lang.autoBroadcast();
 				for(ArenaSign sign : ((Set<ArenaSign>) mm.votesReceived.keySet()))
 				{
 					sign.updateSign();
 				}
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
+					Location parkour = new Location(Bukkit.getWorld("Lobby"), -723, 132, -372);
+					if(player.getWorld().getName().equalsIgnoreCase("Lobby") && player.getLocation().distance(parkour) < 4)
+						if(!main.getUserManager().getUser(player).hasAchievement(Achievement.HARDCORE))
+							main.getUserManager().getUser(player).incScore(Achievement.HARDCORE);
 					mm.afkCheck(player);
 					for(PotionEffect pot : player.getActivePotionEffects())
 					{

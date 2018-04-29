@@ -10,7 +10,9 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -28,7 +30,7 @@ public class ItemCreator{
 	{
 		this.item = new ItemStack(mat, 1);
 	}
-	
+
 	public ItemCreator(ItemStack item)
 	{
 		this.item = item.clone();
@@ -47,7 +49,7 @@ public class ItemCreator{
 		item.setItemMeta(meta);
 		return this;
 	}
-	
+
 	public ItemCreator setDyeColor(DyeColor color)
 	{
 		LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
@@ -100,7 +102,7 @@ public class ItemCreator{
 		item = setTag(item, "HideFlags", i);
 		return this;
 	}
-	
+
 	public ItemCreator setPotionType(PotionEffect effect)
 	{
 		if(item.getItemMeta() instanceof PotionMeta)
@@ -117,7 +119,7 @@ public class ItemCreator{
 	{
 		return this.item;
 	}	
-	
+
 	private ItemStack setTag(ItemStack item, String tagname, int amt)
 	{
 		net.minecraft.server.v1_12_R1.ItemStack itemnms = CraftItemStack.asNMSCopy(item);
@@ -133,7 +135,7 @@ public class ItemCreator{
 		NBTTagCompound tag = (itemnms.hasTag() ? itemnms.getTag() : new NBTTagCompound());
 		return tag.getByte(tagname);
 	}
-	
+
 	public static ItemStack getChameleonArmor(String str)
 	{
 		if(str.equalsIgnoreCase("helmet"))
@@ -146,14 +148,51 @@ public class ItemCreator{
 			return (new ItemCreator(Material.LEATHER_BOOTS).setDisplayname("Chameleon Helmet").getItem());
 		return null;
 	}
-	
+
 	public static String formatItemName(ItemStack item)
 	{
 		return (item.getItemMeta().hasDisplayName()?item.getItemMeta().getDisplayName():Chat.formatName(item.getType().toString()));
 	}
-	
+
 	public static ItemStack getKitSelector()
 	{
 		return new ItemCreator(Material.COMPASS).setDisplayname("&5&lKit Selector").setLore(Arrays.asList("&7&oRightclick with this to", "&7&oopen the kit menu.")).getItem();
+	}
+	public static double getArmorPoints(ItemStack item) {
+		double red = 0.0;
+		//
+		if(item.getType().toString().contains("HELMET")) {
+			if (item.getType() == Material.LEATHER_HELMET) red = red + 0.04;
+			else if (item.getType() == Material.GOLD_HELMET) red = red + 0.08;
+			else if (item.getType() == Material.CHAINMAIL_HELMET) red = red + 0.08;
+			else if (item.getType() == Material.IRON_HELMET) red = red + 0.08;
+			else if (item.getType() == Material.DIAMOND_HELMET) red = red + 0.12;
+		}
+		//
+		if(item.getType().toString().contains("CHESTPLATE")) {
+			if (item.getType() == Material.LEATHER_CHESTPLATE)    red = red + 0.12;
+			else if (item.getType() == Material.GOLD_CHESTPLATE)red = red + 0.20;
+			else if (item.getType() == Material.CHAINMAIL_CHESTPLATE) red = red + 0.20;
+			else if (item.getType() == Material.IRON_CHESTPLATE) red = red + 0.24;
+			else if (item.getType() == Material.DIAMOND_CHESTPLATE) red = red + 0.32;
+		}
+		//
+		if(item.getType().toString().contains("LEGGINGS")) {
+			if (item.getType() == Material.LEATHER_LEGGINGS) red = red + 0.08;
+			else if (item.getType() == Material.GOLD_LEGGINGS)    red = red + 0.12;
+			else if (item.getType() == Material.CHAINMAIL_LEGGINGS) red = red + 0.16;
+			else if (item.getType() == Material.IRON_LEGGINGS)    red = red + 0.20;
+			else if (item.getType() == Material.DIAMOND_LEGGINGS) red = red + 0.24;
+		}
+		//
+		if(item.getType().toString().contains("BOOTS")) {
+			if (item.getType() == Material.LEATHER_BOOTS) red = red + 0.04;
+			else if (item.getType() == Material.GOLD_BOOTS) red = red + 0.04;
+			else if (item.getType() == Material.CHAINMAIL_BOOTS) red = red + 0.04;
+			else if (item.getType() == Material.IRON_BOOTS) red = red + 0.08;
+			else if (item.getType() == Material.DIAMOND_BOOTS)    red = red + 0.12;
+		}
+		//
+		return red * (1/0.04);
 	}
 }

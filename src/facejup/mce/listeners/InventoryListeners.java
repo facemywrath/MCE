@@ -187,7 +187,8 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 		{
 			List<Marker<Pair<Location, Material>>> blocks = new ArrayList<>();
 			blocks.addAll(specialBlocks.get(player));
-			blocks.add(new Marker<Pair<Location, Material>>(Pair.of(event.getBlock().getLocation(), event.getBlock().getType())));
+			player.sendMessage(event.getBlockReplacedState().getType().toString());
+			blocks.add(new Marker<Pair<Location, Material>>(Pair.of(event.getBlock().getLocation(), event.getBlockReplacedState().getType())));
 			specialBlocks.put(player, blocks);
 		}
 		else
@@ -254,11 +255,11 @@ public class InventoryListeners<PlayerItemSwapHandEvent> implements Listener {
 				}
 			}
 		}
-		if((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && event.getItem() != null && (event.getItem().getType() == Material.POTION || event.getItem().getType() == Material.COOKED_BEEF))
+		if((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && event.getItem() != null && (event.getItem().getType() == Material.ROTTEN_FLESH || event.getItem().getType() == Material.POTION || event.getItem().getType() == Material.COOKED_BEEF))
 		{
 			if(event.getPlayer().getHealth() < event.getPlayer().getMaxHealth())
 			{
-				for(int i = 0; i < 8; i++)
+				for(int i = 0; i < (event.getItem().getType() == Material.ROTTEN_FLESH?4:8); i++)
 				{
 					if(event.getPlayer().getHealth() > 0 && event.getPlayer().getHealth()+1 < event.getPlayer().getMaxHealth())
 					{

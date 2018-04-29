@@ -1,15 +1,24 @@
 package facejup.mce.listeners;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -25,12 +34,17 @@ import facejup.mce.util.Lang;
 import facejup.mce.util.Marker;
 import facejup.mce.util.Numbers;
 import net.md_5.bungee.api.ChatColor;
+import net.minecraft.server.v1_12_R1.AttributeInstance;
+import net.minecraft.server.v1_12_R1.AttributeModifier;
+import net.minecraft.server.v1_12_R1.EntityInsentient;
+import net.minecraft.server.v1_12_R1.GenericAttributes;
 
 public class DeathListeners implements Listener {
 
 	private EventManager em;
 	private Main main;
 
+	public List<Marker<Location>> zombieSpawns = new ArrayList<>();
 	public HashMap<Player, Marker<Player>> lastDamagedBy = new HashMap<>();
 
 	public DeathListeners(EventManager em)
@@ -178,13 +192,15 @@ public class DeathListeners implements Listener {
 			{
 				if(main.getMatchManager().getLives(main.getMatchManager().team.get(player)) == 0 && main.getMatchManager().getLives(player) > 0)
 				{
-				//	Chat.translate(Chat.translate(Lang.Tag + ChatColor.valueOf(main.getMatchManager().team.get(player))))
+					//	Chat.translate(Chat.translate(Lang.Tag + ChatColor.valueOf(main.getMatchManager().team.get(player))))
 				}
 			}
 		}
 		if(main.getMatchManager().getLives(player) == 0)
 		{
 			main.getUserManager().getUser(killer).incScore(Achievement.DESTROYER);
+			//player.spigot().respawn();
+			//player.performCommand("spectate");
 			main.getServer().getPluginManager().callEvent(new PlayerEliminatedEvent(killer, player));
 			main.getMatchManager().checkMatchEnd(player);
 		}
@@ -198,5 +214,34 @@ public class DeathListeners implements Listener {
 		}, 100L);
 	}
 
+	@EventHandler
+	public void zombieRespawn(EntityDeathEvent event)
+	{
+		if(event.getEntity() instanceof Zombie && event.getEntity().getFireTicks() < 0 && event.getEntity().getLocation().getY() > 0)
+		{
+			if(event.getEntity().getKiller() != null)
+			{
+				main.getUserManager().getUser(event.getEntity().getKiller()).incScore(Achievement.ZOMBIELAND);
+			}
+			for(int i = 0; i < Numbers.getRandom(1, 3); i++)
+			{
+				zombieSpawns.add(new Marker<Location>(event.getEntity().getLocation()));
+			}
+		}
+	}
+
+	public void spawnZombies()
+	{
+		List<Marker<Location>> removeQueue = new ArrayList<>();
+		for(Marker<Location> loc : zombieSpawns)
+		{
+			if(loc.getSecondsPassedSince() > 5)
+			{
+				removeQueue.add(loc);
+				Main.spawnZombie(loc.getItem());
+			}
+		}
+		removeQueue.stream().forEach(item -> zombieSpawns.remove(item));
+	}
 
 }

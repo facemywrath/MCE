@@ -23,6 +23,7 @@ import facejup.mce.main.Main;
 import facejup.mce.util.BlockColor;
 import facejup.mce.util.Chat;
 import facejup.mce.util.FileControl;
+import facejup.mce.util.Lang;
 
 public class UserManager implements Listener {
 
@@ -169,6 +170,16 @@ public class UserManager implements Listener {
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent event)
 	{
+		Player player = event.getPlayer();
+		if(!event.getPlayer().hasPlayedBefore())
+		{
+			player.sendMessage(Chat.translate("&5&oWelcome to " + Lang.Tag + "&5&o!"));
+			player.sendMessage(Chat.translate("&7Before you get started, feel free to use &8/help &7to view our commands! Then select a kit with the compass in your hotbar when you are ready to begin."));
+		}
+		if(main.getMatchManager().isMatchRunning())
+		{
+			player.sendMessage(Lang.Tag + Chat.translate("&7A match is currently running! Type &8/spectate &7to spectate!"));
+		}
 		addUser(event.getPlayer());
 		if(!users.get(event.getPlayer()).hasAchievement(Achievement.BETA) && BETA)
 			users.get(event.getPlayer()).setScore(Achievement.BETA, 1);

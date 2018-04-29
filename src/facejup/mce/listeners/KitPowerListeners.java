@@ -12,8 +12,8 @@ import org.bukkit.Particle;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EnderPearl;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SmallFireball;
@@ -53,6 +53,7 @@ import facejup.mce.main.Main;
 import facejup.mce.players.User;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
+import facejup.mce.util.Lang;
 import facejup.mce.util.Marker;
 import facejup.mce.util.Numbers;
 import think.rpgitems.item.ItemManager;
@@ -241,6 +242,41 @@ public class KitPowerListeners implements Listener {
 			{
 				event.setDamage(event.getDamage()/4);
 			}
+		}
+	}
+
+	@EventHandler
+	public void shadeBlind(PlayerInteractEvent event)
+	{
+		if(!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
+			return;
+		if(event.getItem().getType() != Material.EYE_OF_ENDER)
+			return;
+		event.setCancelled(true);
+		if(event.getPlayer().getCooldown(Material.EYE_OF_ENDER) <= 0 && ItemManager.toRPGItem(event.getItem()) != null && ItemManager.toRPGItem(event.getItem()).getName().equalsIgnoreCase("shade_blind"))
+		{
+			if(event.getPlayer().getNearbyEntities(5, 5, 5).size() > 0)
+			{
+				event.getPlayer().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, event.getPlayer().getLocation(), 1);
+				for(Entity ent : event.getPlayer().getNearbyEntities(5, 5, 5))
+				{
+					if(ent instanceof Player && !ent.equals(event.getPlayer()))
+					{
+						Player target = (Player) ent;
+						Location loc = target.getLocation();
+						loc.setDirection(target.getLocation().toVector().subtract(event.getPlayer().getLocation().toVector()));
+						target.teleport(loc);
+						if(!target.hasPotionEffect(PotionEffectType.BLINDNESS))
+						{
+							target.sendMessage(Chat.translate("&7A ninja used a flashbang, you look away to protect your eyes!"));
+							target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+						}
+					}
+				}
+				event.getPlayer().setCooldown(Material.EYE_OF_ENDER, 300);
+			}
+			else
+				event.getPlayer().sendMessage(Chat.translate(Lang.Tag + "&cNo players close enough."));
 		}
 	}
 
@@ -695,9 +731,13 @@ public class KitPowerListeners implements Listener {
 			return;
 		if(main.getMatchManager().getPlayerKit(target) == Kit.GOBLIN)
 		{
-			if(stolenItems.containsKey(target) && stolenItems.get(target).firstEmpty() > -1)
+			if(stolenItems.containsKey(target) && stolenItems.get(target).getContents().length > 0)
 			{
-				Arrays.asList(stolenItems.get(target).getContents()).stream().filter(item -> target.getInventory().contains(item.getType())).forEach(item -> target.getWorld().dropItemNaturally(target.getLocation(), item));
+				for(ItemStack item : stolenItems.get(target).getContents())
+				{
+					if(target.getInventory().contains(item))
+						target.getWorld().dropItemNaturally(target.getLocation(), item);
+				}
 				stolenItems.remove(target);
 			}
 		}
@@ -715,7 +755,7 @@ public class KitPowerListeners implements Listener {
 	public int getRandomItemSlot(Player target)
 	{
 		Inventory inv = target.getInventory();
-		List<Material> blacklist = Arrays.asList(Material.GOLD_PICKAXE, Material.SLIME_BALL, Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
+		List<Material> blacklist = Arrays.asList(Material.GOLD_AXE, Material.GOLD_PICKAXE, Material.SLIME_BALL, Material.MAGMA_CREAM, Material.FISHING_ROD, Material.ARROW, Material.SHIELD, Material.GOLD_HOE, Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLD_SWORD, Material.DIAMOND_SWORD, Material.BLAZE_ROD, Material.BOW, Material.HOPPER);
 		List<Integer> slots = new ArrayList<>();
 		for(int i = 0; i < 8; i++)
 		{

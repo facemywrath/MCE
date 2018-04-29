@@ -5,14 +5,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -20,16 +24,24 @@ import org.bukkit.potion.PotionEffectType;
 import facejup.mce.arenas.Arena;
 import facejup.mce.arenas.ArenaSign;
 import facejup.mce.enums.Kit;
+import facejup.mce.enums.MatchType;
+import facejup.mce.enums.TeamType;
 import facejup.mce.main.Main;
 import facejup.mce.main.MatchManager;
 import facejup.mce.util.Chat;
 import facejup.mce.util.ItemCreator;
 import facejup.mce.util.Lang;
 import facejup.mce.util.Marker;
+import facejup.mce.util.Numbers;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
+import org.bukkit.entity.Zombie;
+import net.minecraft.server.v1_12_R1.AttributeInstance;
+import net.minecraft.server.v1_12_R1.AttributeModifier;
+import net.minecraft.server.v1_12_R1.EntityInsentient;
+import net.minecraft.server.v1_12_R1.GenericAttributes;
 import net.minecraft.server.v1_12_R1.MinecraftServer;
 
 public class EndTimer {
@@ -62,6 +74,14 @@ public class EndTimer {
 			mm.votesReceived.put(sign, 0);
 			sign.updateSign();
 		}
+		if(mm.getArenaManager() != null && mm.getArenaManager().getArena() != null)
+		{
+			for(LivingEntity ent : mm.getArenaManager().getArena().getWorld().getLivingEntities())
+			{
+				if(ent.getType() != EntityType.PLAYER)
+					ent.remove();
+			}
+		}
 		main.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable()
 		{
 			public void run()
@@ -93,8 +113,21 @@ public class EndTimer {
 		{
 			if(time > 0)
 			{
-				if(main.getMatchManager().getArenaManager().getArena().getWorld().getTime() > 1700)
-					main.getMatchManager().getArenaManager().getArena().getWorld().setTime(600);
+				if(time%225 == 0)
+					Lang.autoBroadcast();
+				if(getTime() < MATCH_TIME-5 && time%5 == 0 && main.getMatchManager().matchtype == MatchType.SURVIVAL)
+				{
+					World w = main.getMatchManager().getArenaManager().getArena().getWorld();
+					for(int i = 0; i < (MATCH_TIME - time)/50.0+1; i++)
+					{
+						Main.spawnZombie(main.getMatchManager().getArenaManager().getArena().getRandomSpawn());
+					}
+				}
+				mm.getMain().getEventManager().getDeathListeners().spawnZombies();
+				if(main.getMatchManager().matchtype != MatchType.SURVIVAL && main.getMatchManager().getArenaManager().getArena().getWorld().getTime() > 6000)
+					main.getMatchManager().getArenaManager().getArena().getWorld().setTime(0);
+				else if(main.getMatchManager().matchtype == MatchType.SURVIVAL && (main.getMatchManager().getArenaManager().getArena().getWorld().getTime() > 22500 || main.getMatchManager().getArenaManager().getArena().getWorld().getTime() < 13800))
+					main.getMatchManager().getArenaManager().getArena().getWorld().setTime(13800);
 				if(!main.getEventManager().getKitPowerListeners().ignitedBlocks.isEmpty())
 				{
 					List<Marker<Location>> removeQueue = new ArrayList<>();
@@ -180,6 +213,36 @@ public class EndTimer {
 							{
 								player.getInventory().addItem();
 							}
+							if(kit == Kit.GUNNER)
+							{
+								if(player.isSprinting())
+								{
+									if(player.getLevel() >= 9)
+									{
+										player.setLevel(player.getLevel()-9);
+										if(player.hasPotionEffect(PotionEffectType.SLOW))
+											player.removePotionEffect(PotionEffectType.SLOW);
+										if(!player.hasPotionEffect(PotionEffectType.SPEED))
+											player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, time, 1));
+									}
+									else if(player.hasPotionEffect(PotionEffectType.SPEED))
+									{
+										if(!player.hasPotionEffect(PotionEffectType.SLOW))
+											player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time, 0));
+										player.removePotionEffect(PotionEffectType.SPEED);
+									}
+								}
+								else if(!player.isSprinting())
+								{
+									if(player.hasPotionEffect(PotionEffectType.SPEED))
+										player.removePotionEffect(PotionEffectType.SPEED);
+									if(!player.hasPotionEffect(PotionEffectType.SLOW))
+										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, time, 0));
+									if(player.getLevel() < 90)
+										player.setLevel(player.getLevel()+10);
+								}
+								player.setExp((float) ((float) player.getLevel()/100.0));
+							}
 							if(kit == Kit.GOBLIN)
 							{
 								if(!DisguiseAPI.isDisguised(player))
@@ -190,7 +253,10 @@ public class EndTimer {
 									disguise.setVelocitySent(true);
 									disguise.setModifyBoundingBox(true);
 									disguise.setShowName(true);
-									disguise.getWatcher().setCustomName(player.getName());
+									if(mm.teamtype != TeamType.FFA && mm.team.containsKey(player))
+										disguise.getWatcher().setCustomName(mm.team.get(player) + player.getName());
+									else
+										disguise.getWatcher().setCustomName(player.getName());
 									disguise.getWatcher().setCustomNameVisible(true);
 									disguise.startDisguise();
 								}
@@ -272,10 +338,10 @@ public class EndTimer {
 								player.setExp((float) (player.getLevel()/100.0));
 								if(time%15 == 0)
 								{
-								if(!player.getInventory().contains(Material.POTION))
-									player.getInventory().addItem(new ItemCreator(Material.POTION).setPotionType(new PotionEffect(PotionEffectType.HEAL, 0, 1)).getItem());
-								if(!player.getInventory().contains(Material.SPLASH_POTION) && !player.getInventory().contains(Material.LINGERING_POTION))
-									player.getInventory().addItem(getRandomPotion());
+									if(!player.getInventory().contains(Material.POTION))
+										player.getInventory().addItem(new ItemCreator(Material.POTION).setPotionType(new PotionEffect(PotionEffectType.HEAL, 0, 1)).getItem());
+									if(!player.getInventory().contains(Material.SPLASH_POTION) && !player.getInventory().contains(Material.LINGERING_POTION))
+										player.getInventory().addItem(getRandomPotion());
 								}
 							}
 							if(kit.pot != null)

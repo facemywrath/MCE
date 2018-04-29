@@ -13,6 +13,7 @@ import facejup.mce.util.ItemCreator;
 public enum Achievement {
 	
 	MASTER(false, new ItemCreator(Material.BOOK).setDisplayname("Master").setLore(Arrays.asList("&7&oGet every other achievement")).getItem(), Arrays.asList(1), new ArrayList<>()),
+	HARDCORE(false, new ItemCreator(Material.DIAMOND_BOOTS).setDisplayname("Hardcore").setLore(Arrays.asList("&7&oFinish the parkour at spawn!")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(200))),
 	PLAYER(false, new ItemCreator(Material.EXP_BOTTLE).setDisplayname("Player").setLore(Arrays.asList("&7&oPlay &r%SCORE% &7&omatches")).getItem(), Arrays.asList(20,50,150,250,500), Arrays.asList(new Reward(25), new Reward(50),new Reward(150),new Reward(300), new Reward(750))),
 	HITTER(false, new ItemCreator(Material.WOOD_SWORD).setDisplayname("Hitter").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits")).getItem(), Arrays.asList(100,250,500,1000,5000), Arrays.asList(new Reward(25), new Reward(50),new Reward(150),new Reward(300), new Reward(750))),
 	ARCHERY(false, new ItemCreator(Material.BOW).setDisplayname("Archery").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&ohits with arrows")).getItem(), Arrays.asList(60,125,250,500, 2500), Arrays.asList(new Reward(25),new Reward(50),new Reward(150), new Reward(500), new Reward(Kit.GUNNER))),
@@ -27,6 +28,7 @@ public enum Achievement {
 	SKYLORD(false, new ItemCreator(Material.FEATHER).setDisplayname("Skylord").setLore(Arrays.asList("&7&oGet &r%SCORE% &7&okills while falling")).getItem(), Arrays.asList(10,20,50,75,200), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(750),new Reward(Kit.HARPY))),
 	DESTROYER(false, new ItemCreator(Material.DIAMOND_SWORD).setDisplayname("Destroyer").setLore(Arrays.asList("&7&oEliminate &r%SCORE% &7&oplayers from the game")).getItem(), Arrays.asList(10,20,50,75,200), Arrays.asList(new Reward(50),new Reward(75),new Reward(250),new Reward(750),new Reward(1500))),
 	OVERLORD(false, new ItemCreator(Material.GOLD_AXE).setDisplayname("Overlord").setLore(Arrays.asList("&7&oKill &r%SCORE% &7&obosses")).getItem(), Arrays.asList(1,2,4,8,16), Arrays.asList(new Reward(100),new Reward(200),new Reward(400),new Reward(800),new Reward(1600))),
+	ZOMBIELAND(false, new ItemCreator(Material.ROTTEN_FLESH).setDisplayname("Zombieland").setLore(Arrays.asList("&7&oKill &r%SCORE% &7&ozombies")).getItem(), Arrays.asList(100,250,500,1000,5000), Arrays.asList(new Reward(50),new Reward(100),new Reward(225),new Reward(500), new Reward(1250))),
 	FISHERMAN(true, new ItemCreator(Material.FISHING_ROD).setData(3).setDisplayname("Fisherman").setLore(Arrays.asList("&d&lFish out an actual fish", "&d&las fisherman.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),
 	FISHSLAP(true, new ItemCreator(Material.RAW_FISH).setData(3).setDisplayname("Fishslap").setLore(Arrays.asList("&d&lGet a kill using a fish.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),
 	PUBLICITY(true, new ItemCreator(Material.SKULL).setData(3).setDisplayname("Publicity").setLore(Arrays.asList("&d&lGet us members by streaming.")).getItem(), Arrays.asList(1), Arrays.asList(new Reward(100))),

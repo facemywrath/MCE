@@ -52,9 +52,14 @@ public class CommandSpectate implements CommandExecutor{
 			{
 				public void run()
 				{
-					player.setGameMode(GameMode.SPECTATOR);
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', Lang.Tag + "&aYou are now spectating. Re-type this command to return to lobby."));
-					player.getInventory().clear();
+					if(main.getMatchManager().isMatchRunning())
+					{
+						player.setGameMode(GameMode.SPECTATOR);
+						player.sendMessage(ChatColor.translateAlternateColorCodes('&', Lang.Tag + "&aYou are now spectating. Re-type this command to return to lobby."));
+						player.getInventory().clear();
+					}
+					else
+						main.getMatchManager().spawnPlayer(player);
 				}
 			}, 5L);
 		}
