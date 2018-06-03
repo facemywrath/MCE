@@ -99,7 +99,10 @@ public class ItemCreator{
 
 	public ItemCreator hideFlags(int i)
 	{
-		item = setTag(item, "HideFlags", i);
+		ItemMeta meta = item.getItemMeta():
+		meta.addItemFlags(ItemFlag.values());
+		item.setItemMeta(meta);
+		
 		return this;
 	}
 
